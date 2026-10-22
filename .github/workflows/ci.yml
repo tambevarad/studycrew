@@ -1,0 +1,106 @@
+# CI — required to pass before merge (Definition of Done, NFR-06).
+# quality: lint + typecheck + unit · integration: services/routes on real Postgres + coverage gate
+# e2e: production build + seeded DB + Cypress (with axe accessibility checks)
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DATABASE_URL: postgresql://studycrew:studycrew@localhost:5432/studycrew
+  TEST_DATABASE_URL: postgresql://studycrew:studycrew@localhost:5432/studycrew_test
+  BETTER_AUTH_SECRET: ci-secret-ci-secret-ci-secret-ci-secret-00
+  BETTER_AUTH_URL: http://localhost:3000
+  AI_PROVIDER: mock
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    env:
+      CYPRESS_INSTALL_BINARY: 0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit
+
+  integration:
+    runs-on: ubuntu-latest
+    env:
+      CYPRESS_INSTALL_BINARY: 0
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: studycrew
+          POSTGRES_PASSWORD: studycrew
+          POSTGRES_DB: studycrew_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U studycrew" --health-interval 2s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+      - name: Unit + integration tests with coverage gate (≥ 70% lines)
+        run: npm run test:coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: studycrew
+          POSTGRES_PASSWORD: studycrew
+          POSTGRES_DB: studycrew
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U studycrew" --health-interval 2s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+      - run: npm run db:seed
+      - run: npm run build
+      - uses: cypress-io/github-action@v6
+        with:
+          install: false
+          start: npm run start
+          wait-on: http://localhost:3000/api/health
+          wait-on-timeout: 120
+          browser: chrome
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          retention-days: 7
