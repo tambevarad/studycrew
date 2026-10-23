@@ -91,13 +91,21 @@ jobs:
       - run: npx prisma migrate deploy
       - run: npm run db:seed
       - run: npm run build
+      - name: Start app and wait for /api/health
+        run: |
+          nohup npm run start > next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:3000/api/health; then echo; echo "app is up"; exit 0; fi
+            sleep 2
+          done
+          echo "app did not start"; cat next.log; exit 1
       - uses: cypress-io/github-action@v6
         with:
           install: false
-          start: npm run start
-          wait-on: http://localhost:3000/api/health
-          wait-on-timeout: 120
           browser: chrome
+      - name: Server log
+        if: failure()
+        run: cat next.log || true
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
