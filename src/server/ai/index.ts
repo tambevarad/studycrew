@@ -1,4 +1,7 @@
 import { MockCoverageModel } from "./mock-model";
+import { createClaudeCoverageModel } from "./providers/claude";
+import { createGeminiCoverageModel } from "./providers/gemini";
+import { createOpenAICoverageModel } from "./providers/openai";
 import type { CoverageModel, ProviderName } from "./types";
 
 export type { CoverageModel, CoverageModelInput, CoverageModelItem, ProviderName } from "./types";
@@ -13,6 +16,9 @@ export type { CoverageModel, CoverageModelInput, CoverageModelItem, ProviderName
  */
 const factories: Partial<Record<ProviderName, () => CoverageModel>> = {
   mock: () => new MockCoverageModel(),
+  openai: createOpenAICoverageModel,
+  gemini: createGeminiCoverageModel,
+  claude: createClaudeCoverageModel,
 };
 
 export function getCoverageModel(): CoverageModel {
