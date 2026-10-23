@@ -69,8 +69,8 @@ everyone out.
 | Secret | Where Dev finds it |
 |---|---|
 | `VERCEL_TOKEN` | https://vercel.com/account/settings/tokens → Create (scope: Dev's Hobby team; give it an expiry) |
-| `VERCEL_ORG_ID` | https://vercel.com/account/settings → General → **Vercel ID** |
-| `VERCEL_PROJECT_ID` | Vercel project → Settings → General → **Project ID** |
+| `VERCEL_ORG_ID` | `orgId` in `.vercel/project.json` of a linked checkout (the **team** ID of "devjpatell's projects", starts with `team_`) |
+| `VERCEL_PROJECT_ID` | `projectId` in the same file (= Vercel project → Settings → General → **Project ID**, starts with `prj_`) |
 
 Dev sends these to Varad **privately** (not team chat, not an AI tool), and Varad pastes them into GitHub.
 
