@@ -1,5 +1,6 @@
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
+import { inviteExpiryLabels, joinRequestLabels } from "@/components/features/teams/labels";
 import { InvitationsList, MyRequestsList } from "@/components/features/teams/my-invites-and-requests";
 import { TeamCard } from "@/components/features/teams/team-card";
 import { Alert } from "@/components/ui/alert";
@@ -45,8 +46,8 @@ export default async function FindTeamsPage({ searchParams }: PageProps<"/teams"
       />
 
       <div className="flex flex-col gap-6">
-        <InvitationsList invites={invites} timeZone={user.timezone} />
-        <MyRequestsList requests={requests} timeZone={user.timezone} nowIso={new Date().toISOString()} />
+        <InvitationsList invites={invites} expiryLabels={inviteExpiryLabels(invites, user.timezone)} />
+        <MyRequestsList requests={requests} timeLabels={joinRequestLabels(requests, new Date(), user.timezone)} />
 
         {/* A plain GET form: works without JavaScript, and the URL (?course=&q=) is shareable. */}
         <form role="search" aria-label="Search teams" action="/teams" method="get" className="flex flex-wrap items-end gap-3">

@@ -15,7 +15,6 @@ import { Input, Textarea } from "@/components/ui/input";
 import { SectionHeader } from "@/components/ui/page-header";
 import type { JoinRequestDTO, TeamDetailDTO, TeamInviteDTO, TeamMemberDTO } from "@/contracts/teams";
 import { apiFetch } from "@/lib/api-client";
-import { relativeTime } from "@/lib/dates";
 import { useApiAction } from "@/lib/use-api-action";
 import { inviteLink, parseEmailList, seatsLabel } from "./team-utils";
 
@@ -33,16 +32,15 @@ export function MembersView({
   joinRequests,
   meId,
   justCreated,
-  timeZone,
-  nowIso,
+  requestTimeLabels,
 }: {
   team: TeamDetailDTO;
   /** Pending requests; empty for non-leaders (they can't see them). */
   joinRequests: JoinRequestDTO[];
   meId: string;
   justCreated: boolean;
-  timeZone: string;
-  nowIso: string;
+  /** request id → "Sent 3 h ago", built on the server (labels.ts) so nothing is Intl-formatted during hydration. */
+  requestTimeLabels: Record<string, string>;
 }) {
   const router = useRouter();
   const { run, pending } = useApiAction();
@@ -50,7 +48,6 @@ export function MembersView({
   const isLeader = team.myRole === "LEADER";
   const leaderCount = team.members.filter((m) => m.role === "LEADER").length;
   const imOnlyLeader = isLeader && leaderCount === 1;
-  const now = new Date(nowIso);
 
   async function setRole(member: TeamMemberDTO, role: "LEADER" | "MEMBER") {
     await run(
@@ -98,7 +95,7 @@ export function MembersView({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="flex flex-col gap-6">
           {isLeader ? (
-            <JoinRequestsCard requests={joinRequests} timeZone={timeZone} now={now} />
+            <JoinRequestsCard requests={joinRequests} timeLabels={requestTimeLabels} />
           ) : null}
 
           <Card>
@@ -222,15 +219,7 @@ export function MembersView({
   );
 }
 
-function JoinRequestsCard({
-  requests,
-  timeZone,
-  now,
-}: {
-  requests: JoinRequestDTO[];
-  timeZone: string;
-  now: Date;
-}) {
+function JoinRequestsCard({ requests, timeLabels }: { requests: JoinRequestDTO[]; timeLabels: Record<string, string> }) {
   const { run, pending } = useApiAction();
 
   function decide(r: JoinRequestDTO, decision: "APPROVE" | "DECLINE") {
@@ -257,7 +246,7 @@ function JoinRequestsCard({
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-slate-900">{r.user.name}</p>
                     <p className="truncate text-sm text-slate-600">
-                      {r.user.email} · {relativeTime(r.createdAt, now, timeZone)}
+                      {r.user.email} · {timeLabels[r.id]}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -357,7 +346,7 @@ function InviteByEmailCard({ teamId }: { teamId: string }) {
         <CardTitle>Invite by email</CardTitle>
       </CardHeader>
       <CardBody>
-        <form onSubmit={onSubmit} className="flex flex-col gap-3">
+        <form onSubmit={onSubmit} className="flex flex-col gap-3" noValidate>
           <FormField
             label="Email addresses"
             hint="Up to 10, separated by commas or new lines. People with a StudyCrew account see it on their Find teams page."

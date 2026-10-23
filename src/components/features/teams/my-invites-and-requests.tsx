@@ -6,11 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import type { JoinRequestDTO, TeamDetailDTO, TeamInviteDTO } from "@/contracts/teams";
 import { apiFetch } from "@/lib/api-client";
-import { formatDate, relativeTime } from "@/lib/dates";
 import { useApiAction } from "@/lib/use-api-action";
 
-/** "Invitations" on /teams: accept (→ open the team) or decline. Hidden when there are none. */
-export function InvitationsList({ invites, timeZone }: { invites: TeamInviteDTO[]; timeZone: string }) {
+/**
+ * "Invitations" on /teams: accept (→ open the team) or decline. Hidden when there are none.
+ * `expiryLabels` comes from the server (labels.ts) so no Intl formatting happens during hydration.
+ */
+export function InvitationsList({
+  invites,
+  expiryLabels,
+}: {
+  invites: TeamInviteDTO[];
+  expiryLabels: Record<string, string>;
+}) {
   const router = useRouter();
   const { run, pending } = useApiAction();
   if (invites.length === 0) return null;
@@ -46,7 +54,7 @@ export function InvitationsList({ invites, timeZone }: { invites: TeamInviteDTO[
                   {invite.team.name} <span className="text-brand-700 text-sm">· {invite.team.courseCode}</span>
                 </p>
                 <p className="text-sm text-slate-600">
-                  {invite.invitedBy.name} invited you · expires {formatDate(invite.expiresAt, timeZone)}
+                  {invite.invitedBy.name} invited you · {expiryLabels[invite.id]}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -83,20 +91,20 @@ const STATUS: Record<JoinRequestDTO["status"], { label: string; tone: "neutral" 
   CANCELLED: { label: "Cancelled", tone: "neutral" },
 };
 
-/** "My requests" on /teams: pending ones can be cancelled; recent decisions show their outcome. */
+/**
+ * "My requests" on /teams: pending ones can be cancelled; recent decisions show their outcome.
+ * `timeLabels` ("Sent 2 d ago · answered 3 h ago") is built on the server (labels.ts).
+ */
 export function MyRequestsList({
   requests,
-  timeZone,
-  nowIso,
+  timeLabels,
 }: {
   requests: JoinRequestDTO[];
-  timeZone: string;
-  nowIso: string;
+  timeLabels: Record<string, string>;
 }) {
   const { run, pending } = useApiAction();
   const shown = requests.filter((r) => r.status !== "CANCELLED").slice(0, 8);
   if (shown.length === 0) return null;
-  const now = new Date(nowIso);
 
   return (
     <Card>
@@ -112,8 +120,7 @@ export function MyRequestsList({
                   {r.team.name} <span className="text-brand-700 text-sm">· {r.team.courseCode}</span>
                 </p>
                 <p className="text-sm text-slate-600">
-                  Sent {relativeTime(r.createdAt, now, timeZone)}
-                  {r.decidedAt ? ` · answered ${relativeTime(r.decidedAt, now, timeZone)}` : ""}
+                  {timeLabels[r.id]}
                 </p>
               </div>
               <div className="flex items-center gap-2">

@@ -85,7 +85,7 @@ function AskToJoinButton({ team }: { team: TeamSummaryDTO }) {
           title={`Ask to join ${team.name}`}
           description="The team's leaders get a notification and can approve or decline."
         >
-          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
             <FormField
               label="Message (optional)"
               hint={`${message.length} / ${MESSAGE_MAX}. Say what you can help with.`}

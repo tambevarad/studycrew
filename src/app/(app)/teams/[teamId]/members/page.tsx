@@ -1,3 +1,4 @@
+import { joinRequestLabels } from "@/components/features/teams/labels";
 import { MembersView } from "@/components/features/teams/members-view";
 import { getTeam, listJoinRequests } from "@/server/services/teams/service";
 import { requirePageUser } from "@/server/session";
@@ -16,8 +17,7 @@ export default async function MembersPage({ params, searchParams }: PageProps<"/
       joinRequests={joinRequests}
       meId={user.id}
       justCreated={created === "1"}
-      timeZone={user.timezone}
-      nowIso={new Date().toISOString()}
+      requestTimeLabels={joinRequestLabels(joinRequests, new Date(), user.timezone)}
     />
   );
 }
