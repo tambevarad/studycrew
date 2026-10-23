@@ -112,6 +112,42 @@ describe("PB-06 meetings", () => {
     expect(await db.notification.count({ where: { type: "MEETING_UPDATED" } })).toBe(0); // no time/place change → no ping
   });
 
+  it("AC7: each member's notification shows the time in their own zone", async () => {
+    const { team, leader } = await makeTeam();
+    const ny = await makeUser({ timezone: "America/New_York" });
+    const la = await makeUser({ timezone: "America/Los_Angeles" });
+    await db.teamMember.createMany({
+      data: [
+        { teamId: team.id, userId: ny.id },
+        { teamId: team.id, userId: la.id },
+      ],
+    });
+    await createMeeting(team.id, leader.id, { title: "Standup", startsAt: THU_7PM, endsAt: THU_8PM });
+    const body = async (userId: string) =>
+      (await db.notification.findFirstOrThrow({ where: { userId, type: "MEETING_SCHEDULED" } })).body;
+    expect(await body(ny.id)).toContain("Thu, Oct 29, 8:00 PM EDT");
+    expect(await body(la.id)).toContain("Thu, Oct 29, 5:00 PM PDT");
+    expect(await db.notification.count({ where: { userId: leader.id } })).toBe(0);
+  });
+
+  it("a save that changes nothing logs nothing and notifies no one", async () => {
+    const { team, leader, members } = await makeTeam({ members: 1 });
+    const m = await createMeeting(team.id, leader.id, {
+      title: "Same",
+      startsAt: THU_7PM,
+      endsAt: THU_8PM,
+      location: "Lab",
+    });
+    await updateMeeting(team.id, leader.id, m.id, {
+      title: "Same",
+      startsAt: THU_7PM,
+      endsAt: THU_8PM,
+      location: "Lab",
+    });
+    expect(await db.activityEvent.count({ where: { type: "MEETING_UPDATED" } })).toBe(0);
+    expect(await db.notification.count({ where: { userId: members[0].id, type: "MEETING_UPDATED" } })).toBe(0);
+  });
+
   it("notifies on a time or place change and on cancellation", async () => {
     const { team, leader, members } = await makeTeam({ members: 1 });
     const m = await createMeeting(team.id, leader.id, { title: "Demo prep", startsAt: THU_7PM, endsAt: THU_8PM });

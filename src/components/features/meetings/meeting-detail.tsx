@@ -13,6 +13,7 @@ import type { MeetingDTO, RsvpValue } from "@/contracts/meetings";
 import { apiFetch } from "@/lib/api-client";
 import { useApiAction } from "@/lib/use-api-action";
 import { cn } from "@/lib/utils";
+import { formatDayLong, formatTimeRange, zoneAbbreviation } from "./format";
 import { draftFromMeeting, MeetingFormDialog } from "./meeting-form-dialog";
 
 const OPTIONS: Array<{ value: RsvpValue; label: string; active: string }> = [
@@ -42,19 +43,9 @@ export function MeetingDetail({
   const [confirming, setConfirming] = useState(false);
   const base = `/api/v1/teams/${meeting.teamId}/meetings/${meeting.id}`;
 
-  const day = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(meeting.startsAt));
-  const range = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    hour: "numeric",
-    minute: "2-digit",
-    timeZoneName: "short",
-  }).formatRange(new Date(meeting.startsAt), new Date(meeting.endsAt));
+  const start = new Date(meeting.startsAt);
+  const day = formatDayLong(start, timeZone, true);
+  const range = `${formatTimeRange(start, new Date(meeting.endsAt), timeZone)} ${zoneAbbreviation(start, timeZone)}`;
   const byResponse = (r: RsvpValue) => meeting.rsvps.filter((x) => x.response === r).map((x) => x.user);
   const answered = new Set(meeting.rsvps.map((r) => r.user.id));
   const noAnswer = members.filter((m) => !answered.has(m.id));
@@ -94,7 +85,7 @@ export function MeetingDetail({
             <Button variant="outline" onClick={() => setEditing(true)}>
               <Pencil aria-hidden /> Edit
             </Button>
-            <Button variant="outline" className="text-danger-700" onClick={() => setConfirming(true)}>
+            <Button variant="danger" onClick={() => setConfirming(true)}>
               <Trash2 aria-hidden /> Cancel meeting
             </Button>
           </div>
@@ -168,9 +159,9 @@ export function MeetingDetail({
           editingId={meeting.id}
         />
       ) : null}
-      {canManage ? (
+      {canManage && confirming ? (
         <ConfirmDialog
-          open={confirming}
+          open
           onCancel={() => setConfirming(false)}
           pending={del.pending}
           confirmLabel="Cancel meeting"

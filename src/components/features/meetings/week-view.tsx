@@ -6,6 +6,7 @@ import type { UserSummaryDTO } from "@/contracts/common";
 import type { MeetingDTO } from "@/contracts/meetings";
 import { cn } from "@/lib/utils";
 import { addDays, parseDate, zonedParts } from "./calendar-dates";
+import { formatDayLong, formatTimeRange } from "./format";
 
 const ROW_PX = 22; // one half-hour row
 
@@ -88,8 +89,6 @@ export function WeekView({
   const total = Math.max(members.length, 1);
   const nameOf = (id: string) => members.find((m) => m.id === id)?.name ?? "Someone";
   const placed = place(meetings, weekStart, timeZone);
-  const timeFmt = new Intl.DateTimeFormat("en-US", { timeZone, hour: "numeric", minute: "2-digit" });
-  const dayFmt = new Intl.DateTimeFormat("en-US", { timeZone, weekday: "long", month: "long", day: "numeric" });
 
   return (
     <div className="bg-surface overflow-x-auto rounded-lg border border-slate-200">
@@ -170,7 +169,7 @@ export function WeekView({
                   const top = ((Math.max(p.startMin, firstHalf * 30) - firstHalf * 30) / 30) * ROW_PX;
                   const height = Math.max(((p.endMin - Math.max(p.startMin, firstHalf * 30)) / 30) * ROW_PX - 2, 18);
                   const style = RSVP_STYLE[p.meeting.myRsvp ?? "NONE"];
-                  const when = timeFmt.formatRange(new Date(p.meeting.startsAt), new Date(p.meeting.endsAt));
+                  const when = formatTimeRange(new Date(p.meeting.startsAt), new Date(p.meeting.endsAt), timeZone);
                   return (
                     <Link
                       key={`${p.meeting.id}-${day}`}
@@ -189,7 +188,7 @@ export function WeekView({
                       <span className="block truncate font-semibold">{p.meeting.title}</span>
                       <span className="block truncate">{when}</span>
                       <span className="sr-only">
-                        {`, ${dayFmt.format(new Date(p.meeting.startsAt))}, ${p.meeting.myRsvp ? `you answered ${RSVP_WORD[p.meeting.myRsvp]}` : "you haven't answered"}`}
+                        {`, ${formatDayLong(new Date(p.meeting.startsAt), timeZone)}, ${p.meeting.myRsvp ? `you answered ${RSVP_WORD[p.meeting.myRsvp]}` : "you haven't answered"}`}
                       </span>
                     </Link>
                   );

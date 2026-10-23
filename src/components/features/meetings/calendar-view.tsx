@@ -11,6 +11,7 @@ import type { UserSummaryDTO } from "@/contracts/common";
 import type { MeetingDTO, MeetingSuggestionDTO } from "@/contracts/meetings";
 import { addDays, parseDate, zonedParts } from "./calendar-dates";
 import { FindTimeDialog } from "./find-time-dialog";
+import { monthShort } from "./format";
 import { MeetingFormDialog, type MeetingDraft } from "./meeting-form-dialog";
 import { SuggestionText } from "./suggestion-text";
 import { WeekView } from "./week-view";
@@ -28,8 +29,7 @@ function draftFromSuggestion(s: MeetingSuggestionDTO, timeZone: string): Meeting
 function weekLabel(weekStart: string): string {
   const a = parseDate(weekStart);
   const b = parseDate(addDays(weekStart, 6));
-  const month = (m: number) =>
-    new Date(Date.UTC(2026, m - 1, 1)).toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+  const month = monthShort;
   return a.m === b.m ? `${month(a.m)} ${a.d} – ${b.d}, ${b.y}` : `${month(a.m)} ${a.d} – ${month(b.m)} ${b.d}, ${b.y}`;
 }
 
@@ -225,18 +225,20 @@ export function CalendarView({
         </p>
       ) : null}
 
-      <FindTimeDialog
-        teamId={teamId}
-        timeZone={timeZone}
-        today={today}
-        members={members}
-        open={findOpen}
-        onClose={() => setFindOpen(false)}
-        onPick={(s) => {
-          setFindOpen(false);
-          setDraft(draftFromSuggestion(s, timeZone));
-        }}
-      />
+      {findOpen ? (
+        <FindTimeDialog
+          teamId={teamId}
+          timeZone={timeZone}
+          today={today}
+          members={members}
+          open
+          onClose={() => setFindOpen(false)}
+          onPick={(s) => {
+            setFindOpen(false);
+            setDraft(draftFromSuggestion(s, timeZone));
+          }}
+        />
+      ) : null}
       {draft ? (
         <MeetingFormDialog
           key={`${draft.date}-${draft.startMinute}`}

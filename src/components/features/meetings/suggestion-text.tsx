@@ -1,5 +1,6 @@
 import type { UserSummaryDTO } from "@/contracts/common";
 import type { MeetingSuggestionDTO } from "@/contracts/meetings";
+import { formatDayShort, formatTimeRange } from "./format";
 
 /** "Thu, Oct 29 · 7:00 – 8:00 PM" + who can't make it. */
 export function SuggestionText({
@@ -11,13 +12,8 @@ export function SuggestionText({
   timeZone: string;
   members: UserSummaryDTO[];
 }) {
-  const day = new Intl.DateTimeFormat("en-US", { timeZone, weekday: "short", month: "short", day: "numeric" }).format(
-    new Date(suggestion.startsAt),
-  );
-  const range = new Intl.DateTimeFormat("en-US", { timeZone, hour: "numeric", minute: "2-digit" }).formatRange(
-    new Date(suggestion.startsAt),
-    new Date(suggestion.endsAt),
-  );
+  const day = formatDayShort(new Date(suggestion.startsAt), timeZone);
+  const range = formatTimeRange(new Date(suggestion.startsAt), new Date(suggestion.endsAt), timeZone);
   const missing = suggestion.unavailableUserIds.map(
     (id) => members.find((m) => m.id === id)?.name.split(" ")[0] ?? "someone",
   );

@@ -11,14 +11,15 @@ import {
   type UpdateMeetingInput,
 } from "@/contracts/meetings";
 import { addDays, daysBetween, isValidDateKey, zonedInstant } from "@/components/features/meetings/calendar-dates";
+import { formatWhen } from "@/components/features/meetings/format";
 import type { Prisma } from "@/generated/prisma/client";
-import { logActivity } from "../../activity";
-import { db, type Tx } from "../../db";
-import { errors } from "../../errors";
-import { toUserSummary, userSummarySelect } from "../../mappers";
-import { notify } from "../../notifications";
-import { getTeamMemberIds, requireMembership, type Membership } from "../../permissions";
-import { getTeamAvailability } from "../../shared/team-availability";
+import { logActivity } from "@/server/activity";
+import { db, type Tx } from "@/server/db";
+import { errors } from "@/server/errors";
+import { toUserSummary, userSummarySelect } from "@/server/mappers";
+import { notify } from "@/server/notifications";
+import { requireMembership, type Membership } from "@/server/permissions";
+import { getTeamAvailability } from "@/server/shared/team-availability";
 import { suggestMeetingTimes, weekAvailability } from "./meeting-finder";
 
 /** PB-06 · FR-03 — team meetings, RSVPs, and suggested times. */
@@ -68,22 +69,24 @@ export async function getMeeting(teamId: string, actorId: string, meetingId: str
   return toMeetingDTO(await loadInTeam(teamId, meetingId), actorId);
 }
 
-/** "Thu, Oct 29, 7:00 PM CDT" — notifications go to everyone, so the zone name is included. */
-function whenText(startsAt: Date, timeZone: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZoneName: "short",
-  }).format(startsAt);
-}
-
-async function actorTimeZone(actorId: string): Promise<string> {
-  const u = await db.user.findUnique({ where: { id: actorId }, select: { timezone: true } });
-  return u?.timezone ?? "America/Chicago";
+/**
+ * Notify every other member, each in THEIR OWN time zone (AC7): recipients are grouped by zone
+ * and `build(zone)` writes the text for that group, e.g. "Thu, Oct 29, 8:00 PM EDT" for New York.
+ */
+async function notifyMembersInTheirZones(
+  tx: Tx,
+  args: { teamId: string; actorId: string; type: "MEETING_SCHEDULED" | "MEETING_UPDATED"; link: string },
+  build: (timeZone: string) => { title: string; body: string },
+) {
+  const rows = await tx.teamMember.findMany({
+    where: { teamId: args.teamId, userId: { not: args.actorId } },
+    select: { user: { select: { id: true, timezone: true } } },
+  });
+  const byZone = new Map<string, string[]>();
+  for (const { user } of rows) byZone.set(user.timezone, [...(byZone.get(user.timezone) ?? []), user.id]);
+  for (const [timeZone, userIds] of byZone) {
+    await notify({ userIds, type: args.type, teamId: args.teamId, link: args.link, ...build(timeZone) }, tx);
+  }
 }
 
 function assertRange(startsAt: Date, endsAt: Date) {
@@ -100,7 +103,6 @@ export async function createMeeting(teamId: string, actorId: string, input: Crea
   const startsAt = new Date(input.startsAt);
   const endsAt = new Date(input.endsAt);
   assertRange(startsAt, endsAt);
-  const tz = await actorTimeZone(actorId);
 
   const row = await db.$transaction(async (tx) => {
     const created = await tx.meeting.create({
@@ -129,17 +131,13 @@ export async function createMeeting(teamId: string, actorId: string, input: Crea
       },
       tx,
     );
-    await notify(
-      {
-        userIds: await getTeamMemberIds(teamId, tx),
-        exceptUserId: actorId,
-        type: "MEETING_SCHEDULED",
-        teamId,
-        title: `New meeting: “${created.title}”`,
-        body: `${whenText(startsAt, tz)}${created.location ? ` · ${created.location}` : ""}. Let the team know if you can come.`,
-        link: `/teams/${teamId}/calendar/${created.id}`,
-      },
+    await notifyMembersInTheirZones(
       tx,
+      { teamId, actorId, type: "MEETING_SCHEDULED", link: `/teams/${teamId}/calendar/${created.id}` },
+      (zone) => ({
+        title: `New meeting: “${created.title}”`,
+        body: `${formatWhen(startsAt, zone)}${created.location ? ` · ${created.location}` : ""}. Let the team know if you can come.`,
+      }),
     );
     return created;
   });
@@ -165,22 +163,21 @@ export async function updateMeeting(
   const startsAt = input.startsAt ? new Date(input.startsAt) : existing.startsAt;
   const endsAt = input.endsAt ? new Date(input.endsAt) : existing.endsAt;
   assertRange(startsAt, endsAt);
+  const title = input.title ?? existing.title;
+  const description = input.description === undefined ? existing.description : input.description || null;
+  const location = input.location === undefined ? existing.location : input.location || null;
+
   const timeChanged =
     startsAt.getTime() !== existing.startsAt.getTime() || endsAt.getTime() !== existing.endsAt.getTime();
-  const location = input.location === undefined ? existing.location : input.location || null;
   const placeChanged = location !== existing.location;
-  const tz = await actorTimeZone(actorId);
+  const anythingChanged =
+    timeChanged || placeChanged || title !== existing.title || description !== existing.description;
+  if (!anythingChanged) return toMeetingDTO(existing, actorId); // no-op save: no history, no pings
 
   const row = await db.$transaction(async (tx) => {
     const updated = await tx.meeting.update({
       where: { id: meetingId },
-      data: {
-        title: input.title,
-        description: input.description === undefined ? undefined : input.description || null,
-        location,
-        startsAt,
-        endsAt,
-      },
+      data: { title, description, location, startsAt, endsAt },
       include: meetingInclude,
     });
     await logActivity(
@@ -196,17 +193,13 @@ export async function updateMeeting(
       tx,
     );
     if (timeChanged || placeChanged) {
-      await notify(
-        {
-          userIds: await getTeamMemberIds(teamId, tx),
-          exceptUserId: actorId,
-          type: "MEETING_UPDATED",
-          teamId,
-          title: timeChanged ? `“${updated.title}” was moved` : `“${updated.title}” has a new location`,
-          body: `Now ${whenText(startsAt, tz)}${location ? ` · ${location}` : ""}.`,
-          link: `/teams/${teamId}/calendar/${meetingId}`,
-        },
+      await notifyMembersInTheirZones(
         tx,
+        { teamId, actorId, type: "MEETING_UPDATED", link: `/teams/${teamId}/calendar/${meetingId}` },
+        (zone) => ({
+          title: timeChanged ? `“${updated.title}” was moved` : `“${updated.title}” has a new location`,
+          body: `Now ${formatWhen(startsAt, zone)}${location ? ` · ${location}` : ""}.`,
+        }),
       );
     }
     return updated;
@@ -218,7 +211,6 @@ export async function deleteMeeting(teamId: string, actorId: string, meetingId: 
   const membership = await requireMembership(teamId, actorId);
   const existing = await loadInTeam(teamId, meetingId);
   requireOrganizerOrLeader(existing, actorId, membership, "cancel");
-  const tz = await actorTimeZone(actorId);
 
   await db.$transaction(async (tx) => {
     await tx.meeting.delete({ where: { id: meetingId } });
@@ -233,17 +225,13 @@ export async function deleteMeeting(teamId: string, actorId: string, meetingId: 
       },
       tx,
     );
-    await notify(
-      {
-        userIds: await getTeamMemberIds(teamId, tx),
-        exceptUserId: actorId,
-        type: "MEETING_UPDATED",
-        teamId,
-        title: `“${existing.title}” was cancelled`,
-        body: `It was planned for ${whenText(existing.startsAt, tz)}.`,
-        link: `/teams/${teamId}/calendar`,
-      },
+    await notifyMembersInTheirZones(
       tx,
+      { teamId, actorId, type: "MEETING_UPDATED", link: `/teams/${teamId}/calendar` },
+      (zone) => ({
+        title: `“${existing.title}” was cancelled`,
+        body: `It was planned for ${formatWhen(existing.startsAt, zone)}.`,
+      }),
     );
   });
   return { deleted: true };
