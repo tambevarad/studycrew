@@ -1,25 +1,13 @@
 /** PB-05 task board: create via dialog, move via “Move to…” → Done, persists after reload; keyboard; a11y (AC1, AC2, AC7, AC8, AC10). */
 
-/**
- * Same as cy.checkPageA11y() but without the shared sidebar, whose active team link fails contrast on every team page
- * (docs/contract-requests/PB-05-sidebar-team-contrast.md). Switch back to cy.checkPageA11y() once that lands.
- */
-const checkBoardA11y = () => {
-  cy.injectAxe();
-  cy.checkA11y({ exclude: [["aside"]] }, { includedImpacts: ["serious", "critical"] });
-};
-
 describe("PB-05 task board", () => {
   beforeEach(() => cy.login("krish"));
-  // Let Better Auth's sign-in rate limit (3 per 10 s) reset before the next spec
-  // (docs/contract-requests/PB-05-e2e-sign-in-rate-limit.md).
-  after(() => cy.wait(10_000));
 
   it("AC1/AC2/AC10: creates a task, moves it to Done with the menu, and it stays there after reload", () => {
     const title = `E2E task ${Date.now()}`;
     cy.visitTeam("board");
     cy.contains("h2", "Task board");
-    checkBoardA11y();
+    cy.checkPageA11y();
 
     cy.contains("button", "New task").click();
     cy.get("dialog[open]").within(() => {
@@ -30,14 +18,16 @@ describe("PB-05 task board", () => {
       cy.get("select[name=priority]").select("High");
       cy.contains("label", "Dev Patel").find("input[type=checkbox]").check();
     });
-    checkBoardA11y();
+    cy.checkPageA11y();
     cy.get("dialog[open]").contains("button", "Add task").click();
     cy.get("dialog[open]").should("not.exist");
 
     cy.get("section[aria-labelledby=column-TODO]").contains("li", title).as("card");
     cy.get("@card").should("contain", "High").find("[aria-label='Dev Patel']").should("exist");
     cy.get(`button[aria-label='Move to… “${title}”']`).click();
+    cy.intercept("POST", "**/tasks/*/move").as("move");
     cy.get("[role=menu]").contains("[role=menuitem]", "Done").click();
+    cy.wait("@move").its("response.statusCode").should("eq", 200);
     cy.get("section[aria-labelledby=column-DONE]").should("contain", title);
 
     cy.reload();
@@ -45,7 +35,7 @@ describe("PB-05 task board", () => {
     cy.get("section[aria-labelledby=column-TODO]").should("not.contain", title);
     // sonner's success toast is below 4.5:1 (docs/contract-requests/PB-02-toast-contrast.md); check without it.
     cy.get("[data-sonner-toast]", { timeout: 10000 }).should("not.exist");
-    checkBoardA11y();
+    cy.checkPageA11y();
   });
 
   it("AC8: the “Move to…” menu works from the keyboard", () => {

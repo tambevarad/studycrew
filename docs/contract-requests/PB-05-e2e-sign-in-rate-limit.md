@@ -1,5 +1,7 @@
 # Contract request: E2E specs hit Better Auth's sign-in rate limit (429) — `smoke.cy.ts` fails after other specs
 
+> **Status: resolved by #20** (`cy.login()` retries on 429; sidebar contrast fixed). `board.cy.ts` dropped its workaround in the PB-05 move-race follow-up.
+
 Requested by: Krish Ruparel for PB-05 (also seen in PB-02) · Date: 2026-10-22
 
 ## What I need

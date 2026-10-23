@@ -129,14 +129,17 @@ export function TaskBoard({
     onDragCancel: ({ active }) => `Stopped dragging “${titleOf(active.id)}”. It did not move.`,
   };
 
-  /** Optimistic move, then persist; on failure restore the previous board (the hook shows the error toast). */
+  /**
+   * Optimistic move, then persist; on failure restore the previous board (the hook shows the error toast).
+   * After a successful save we also refresh from the server: the local copy is reset whenever new server props
+   * arrive, so a props update that was rendered before this move (e.g. the create dialog's refresh landing late)
+   * could otherwise undo it with nothing left to correct it. Refreshing makes the last list to arrive include the move.
+   */
   async function move(taskId: string, status: TaskStatusValue, index: number) {
     const before = tasks;
     setTasks(moveLocally(tasks, taskId, status, index));
-    const saved = await run(
-      () =>
-        apiFetch<TaskDTO>(`/api/v1/teams/${teamId}/tasks/${taskId}/move`, { method: "POST", body: { status, index } }),
-      { refresh: false },
+    const saved = await run(() =>
+      apiFetch<TaskDTO>(`/api/v1/teams/${teamId}/tasks/${taskId}/move`, { method: "POST", body: { status, index } }),
     );
     if (saved) setTasks((current) => current.map((t) => (t.id === saved.id ? saved : t)));
     else setTasks(before);

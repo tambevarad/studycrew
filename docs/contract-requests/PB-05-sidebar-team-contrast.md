@@ -1,5 +1,7 @@
 # Contract request: active team link in the sidebar fails color contrast (axe `color-contrast`, serious)
 
+> **Status: resolved by #20** (`cy.login()` retries on 429; sidebar contrast fixed). `board.cy.ts` dropped its workaround in the PB-05 move-race follow-up.
+
 Requested by: Krish Ruparel for PB-05 · Date: 2026-10-22
 
 ## What I need
