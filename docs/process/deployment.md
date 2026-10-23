@@ -7,93 +7,119 @@ Vercel's *Production* environment is our **staging**: every merge to `main` depl
 
 | What | URL |
 |---|---|
-| Staging app | _(fill in after setup: `https://<project>.vercel.app`)_ |
-| Health check | _(staging URL)_`/api/health` → `200 {"status":"ok","db":"ok",…}`, or `503 {"status":"degraded"}` if the DB is down |
-| Uptime status page | _(fill in: UptimeRobot public status page)_ |
-| Vercel project | _(fill in: `https://vercel.com/<account>/<project>`)_ (Dev's account) |
-| Neon project | Neon console → project `studycrew` (Dev's account), Postgres 16, region `aws-us-east-1` |
+| Staging app | https://studycrew-staging.vercel.app |
+| Health check | https://studycrew-staging.vercel.app/api/health → `200 {"status":"ok","db":"ok",…}`, or `503 {"status":"degraded"}` if the DB is down |
+| Uptime status page | _(added when the UptimeRobot monitor is created)_ |
+| Vercel project | https://vercel.com/devjpatells-projects/studycrew-staging (Dev's Hobby account) |
+| Neon project | https://console.neon.tech/app/projects/mute-mud-22473212 (Dev's account): project `studycrew`, branch `production`, database `studycrew`, Postgres 16, AWS US East 1 |
 
-## Environments
+## How a deploy happens
 
-| Environment | Trigger | Database | Notes |
-|---|---|---|---|
-| Local | `npm run dev` | Docker Postgres (`docker-compose.yml`) | See `CLAUDE.md` → Commands |
-| CI | every PR + push to `main` | Postgres service container | `.github/workflows/ci.yml` (`quality`, `integration`, `e2e`) |
-| Preview | every PR (Vercel) | the staging Neon database | **Sign-in does not work on preview URLs** (see below) |
-| Staging (Vercel *Production*) | merge to `main` | Neon `studycrew` | What the TA and the uptime monitor see |
+The repo lives on Varad's personal GitHub account and the Vercel project on Dev's Hobby account, so **Vercel's Git
+integration can't link the repo** ("To link a GitHub repository, you need to install the GitHub integration first").
+Hobby would also block deploys of commits written by anyone but the account owner. So we deploy with the Vercel CLI:
 
-## Environment variables (names only — values live in Vercel, never in the repo)
+1. A PR merges to `main` (branch protection: 1 approval + `quality`, `integration`, `e2e`).
+2. `.github/workflows/deploy.yml` runs `vercel deploy --prod`, which uploads the commit and **builds on Vercel**. The
+   database URLs stay in Vercel's settings and never reach GitHub.
+3. On Vercel, `npm ci` installs (`postinstall` runs `prisma generate`), then `vercel.json`'s build command runs:
+   ```sh
+   DATABASE_URL="${DATABASE_URL_UNPOOLED:-$DATABASE_URL}" npx prisma migrate deploy && next build
+   ```
+   - Migrations run over the **direct** connection. They take a session-level advisory lock, which Neon's PgBouncer
+     pooler doesn't hold reliably. Prisma 7's `prisma.config.ts` has no `directUrl`, so the build overrides
+     `DATABASE_URL` for this one command only.
+   - The running app uses the **pooled** `DATABASE_URL`.
+   - If a migration fails, the build fails and **the previous deployment keeps serving**.
+4. The workflow then polls `/api/health` until it returns 200, or fails the job.
 
-Set in Vercel → Project → Settings → Environment Variables, for **Production** and **Preview**.
+Until the repo secrets below exist, the workflow skips with a notice instead of failing. Run it again from **Actions →
+Deploy staging → Run workflow**.
+
+**Manual deploy** (from a clean checkout, never a folder with `.env` files). Run `npx vercel@latest link --project
+studycrew-staging` once in your normal checkout. Then copy its `.vercel/project.json` into the clean folder, rather than
+running `link` there, because `link` also writes a token into `.env.local`:
+```sh
+git worktree add --detach ../studycrew-deploy origin/main
+mkdir -p ../studycrew-deploy/.vercel && cp .vercel/project.json ../studycrew-deploy/.vercel/
+cd ../studycrew-deploy && npx vercel@latest deploy --prod
+```
+
+**No preview deployments.** Without the Git integration, PRs don't get Vercel previews. Reviewers run the app locally
+(`npm run build && npm run start`), and CI's `e2e` job exercises the production build. Better Auth also only trusts
+`BETTER_AUTH_URL`'s origin, so sign-in wouldn't work on preview URLs anyway.
+
+## Environment variables (names only; values live in Vercel and GitHub, never in the repo)
+
+**Vercel** → https://vercel.com/devjpatells-projects/studycrew-staging/settings/environment-variables (Production):
 
 | Name | Used by | Value comes from |
 |---|---|---|
-| `DATABASE_URL` | app at runtime (Prisma pg adapter) | Neon **pooled** connection string (host contains `-pooler`) |
-| `DATABASE_URL_UNPOOLED` | `prisma migrate deploy` during the build | Neon **direct** connection string (no `-pooler`) |
-| `BETTER_AUTH_SECRET` | Better Auth session signing | a new value from `openssl rand -base64 32` (not the local one) |
-| `BETTER_AUTH_URL` | Better Auth origin check + callback URLs | the staging URL, exactly, e.g. `https://<project>.vercel.app` (no trailing slash) |
-| `AI_PROVIDER` | PB-10 Coverage Check | `mock` until PB-10 lands; then `openai` / `gemini` / `claude` |
-| `OPENAI_API_KEY`, `OPENAI_MODEL` | PB-10 when `AI_PROVIDER=openai` | added by the PB-10 owner when needed |
-| `GOOGLE_GENERATIVE_AI_API_KEY` / `ANTHROPIC_API_KEY` | PB-10 alternatives | only if that provider is chosen |
+| `DATABASE_URL` | app at runtime (Prisma pg adapter) | Neon → Connect → database `studycrew`, **pooling on** (host contains `-pooler`) |
+| `DATABASE_URL_UNPOOLED` | `prisma migrate deploy` during the build | Neon → Connect → **pooling off** |
+| `BETTER_AUTH_SECRET` | session signing | 32 random bytes, base64. Never reuse the local one |
+| `BETTER_AUTH_URL` | Better Auth origin check + callbacks | `https://studycrew-staging.vercel.app` (exactly, no trailing slash) |
+| `AI_PROVIDER` | PB-10 Coverage Check | `mock` for now; `openai` + `OPENAI_API_KEY` when PB-10 goes live |
 
-Changing an env var only affects **new** deployments: redeploy after editing. Rotating `BETTER_AUTH_SECRET` signs
+Changing a variable only affects **new** deployments, so redeploy afterwards. Rotating `BETTER_AUTH_SECRET` signs
 everyone out.
 
-## How a deploy works and how migrations run
+**GitHub** → https://github.com/tambevarad/studycrew/settings/secrets/actions (only the repo owner can add these):
 
-`vercel.json` sets the build command:
+| Secret | Where Dev finds it |
+|---|---|
+| `VERCEL_TOKEN` | https://vercel.com/account/settings/tokens → Create (scope: Dev's Hobby team; give it an expiry) |
+| `VERCEL_ORG_ID` | https://vercel.com/account/settings → General → **Vercel ID** |
+| `VERCEL_PROJECT_ID` | Vercel project → Settings → General → **Project ID** |
 
-```sh
-DATABASE_URL="${DATABASE_URL_UNPOOLED:-$DATABASE_URL}" npx prisma migrate deploy && next build
-```
-
-1. `npm ci` installs dependencies; `postinstall` runs `prisma generate`.
-2. `prisma migrate deploy` applies any pending migrations in `prisma/migrations/` to Neon. It uses the **direct**
-   connection, because migrations take a session-level advisory lock that a PgBouncer (pooled) connection doesn't hold
-   reliably. Prisma 7's `prisma.config.ts` has no `directUrl`, so the build overrides `DATABASE_URL` for this one command
-   only. If `DATABASE_URL_UNPOOLED` isn't set, it falls back to `DATABASE_URL`.
-3. `next build`. The running app keeps using the pooled `DATABASE_URL`.
-
-If a migration fails, the build fails and the **previous deployment keeps serving**. Nothing half-deploys.
-
-**Previews share the staging database.** Because the schema is frozen (ADR 3), feature PRs have no migrations, so
-previews don't change staging. A `contract/*` PR that adds a migration **will migrate staging when its preview builds**,
-so the tech lead merges those promptly or turns off previews for that PR.
-
-**Previews can't sign in.** Better Auth rejects requests from any origin other than `BETTER_AUTH_URL` (403). Use
-previews to check pages and the build. Test signed-in flows locally or on staging after merge.
+Dev sends these to Varad **privately** (not team chat, not an AI tool), and Varad pastes them into GitHub.
 
 ## Seeding staging (once)
 
-`prisma/seed.ts` **deletes all app data** and then recreates the demo users and teams. Run it **once**, right after the
-first successful deploy, and never again once real usage starts:
+`prisma/seed.ts` **deletes all app data** and then recreates the demo users and teams. Run it **once**, after the first
+successful deploy (which applied the migrations), and never again once real usage starts. Use the Neon **direct** URL.
+`dotenv` doesn't override a variable that's already set, so your local `.env` won't redirect it.
 
-In Git Bash, from the repo folder. `read -rs` waits silently for you to paste the Neon **direct** URL, so it never shows on
-screen, in shell history, or in a file:
-
+Git Bash (the URL isn't shown on screen or saved):
 ```sh
 read -rs NEON_DIRECT && export DATABASE_URL="$NEON_DIRECT"
 npm run db:seed          # prints "Seeded 6 users, 3 teams…"
 unset DATABASE_URL NEON_DIRECT
 ```
 
-`dotenv` doesn't override variables that are already set, so your local `.env` doesn't redirect the seed. The migrations
-must already be applied (the first Vercel build does that). Never commit the URL or paste it into chat. The seed password
-is public in the repo (`prisma/seed.ts`), so staging holds **test data only**: never store anything real there.
+PowerShell:
+```powershell
+$env:DATABASE_URL = Read-Host "Paste the Neon direct URL"
+npm run db:seed
+Remove-Item Env:DATABASE_URL
+```
+
+Never commit the URL or paste it into chat. The seed password is public in the repo (`prisma/seed.ts`), so staging holds
+**test data only**: never store anything real there.
 
 ## Rollback
 
-- **App:** Vercel → Project → Deployments → pick the last good deployment → **⋯ → Promote to Production**
-  (Instant Rollback). Staging switches over within seconds, with no rebuild.
-- **Database:** migrations are not rolled back automatically. With the schema frozen this should not come up. If a
-  migration must be undone, merge a new forward migration through a `contract/*` PR, then deploy.
+- **App:** Vercel → https://vercel.com/devjpatells-projects/studycrew-staging/deployments → pick the last good deployment
+  → **⋯ → Promote to Production** (Instant Rollback). It switches within seconds, with no rebuild.
+- **Database:** migrations are not rolled back automatically. With the schema frozen (ADR 3) this should not come up. If a
+  migration must be undone, merge a new forward migration through a `contract/*` PR.
+
+## Rotating secrets
+
+- **Database password:** Neon → Roles → `studycrew_owner` → **Reset password**. Then copy both connection strings again
+  into Vercel's `DATABASE_URL` / `DATABASE_URL_UNPOOLED`, and redeploy.
+- **Auth secret:** generate a new value (`node -e "process.stdout.write(require('crypto').randomBytes(32).toString('base64'))"`),
+  update `BETTER_AUTH_SECRET` in Vercel, and redeploy. Everyone is signed out.
+- **Vercel token:** revoke it at https://vercel.com/account/settings/tokens, create a new one, and have Varad update
+  `VERCEL_TOKEN`.
 
 ## Uptime monitoring (NFR-05)
 
-UptimeRobot (free) HTTP(s) monitor on the staging `/api/health` URL every **5 minutes**. It alerts by email to Dev when
-the response isn't 2xx (a `503` means the database is unreachable). Public status page: see the URLs table.
+UptimeRobot (free) HTTP(s) monitor on https://studycrew-staging.vercel.app/api/health every **5 minutes**, alerting Dev
+by email when the response isn't 2xx (a `503` means the database is unreachable). The public status page is in the URLs
+table.
 
 ## Secrets
 
-Never commit `.env*` files (they're git-ignored), connection strings, or tokens. Never paste them into PRs, issues, chat,
-or AI tools. Values live only in Vercel (and, if we use the Actions deploy fallback, GitHub → Settings → Secrets).
+Never commit `.env*` files (they're git-ignored), `.vercel/` (git-ignored), connection strings, or tokens. Never paste
+them into PRs, issues, chat, or AI tools.
