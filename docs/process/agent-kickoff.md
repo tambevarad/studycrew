@@ -17,7 +17,7 @@ against repo history.
 ## The prompt to paste (edit the bracketed parts)
 
 ```text
-I'm [Krish Ruparel (M2)] on the StudyCrew team. My backlog items for this sprint are [PB-02, PB-03, PB-08], in that order.
+I'm [Krish Ruparel (M2)] on the StudyCrew team. My backlog items for this sprint are [PB-02, PB-05, PB-03, PB-08], in that order.
 
 1. Read CLAUDE.md, then docs/tasks/[PB-02].md, then the contracts and docs it points to. Follow the hard rules: only edit
    files my task owns, no schema/contract/package changes, use teamRoute/logActivity/notify, write the required tests.
@@ -37,12 +37,15 @@ If a shared contract blocks you, stop, write docs/contract-requests/[PB-XX]-<slu
 
 ## Who does what by Sat Oct 24
 
+We work **one after another** in this order (availability), not at the same time. Branch from the latest
+`origin/main` when your turn starts so you get everyone's merged work.
+
 | Person | Items (in order) | Review partner |
 |---|---|---|
-| Varad (M1) @tambevarad | PB-09 → PB-06 → progress report | Krish @Krishr21 |
-| Krish (M2) @Krishr21 | PB-02 → PB-03 → PB-08 | Dev @devjpatell |
-| Dev (M3) @devjpatell | PB-01 (staging + branch protection) → PB-04 | Devarsh @Mercapt-0 |
-| Devarsh (M4) @Mercapt-0 | PB-05 → PB-10 → PB-07 | Varad @tambevarad |
+| Varad (M1) @tambevarad | PB-09 → PB-07 → PB-06 → progress report | Krish @Krishr21 |
+| Krish (M2) @Krishr21 | PB-02 → PB-05 → PB-03 → PB-08 | Dev @devjpatell |
+| Dev (M3) @devjpatell | post-merge review of #18 → PB-01 staging → PB-04 → review PB-10 | Devarsh @Mercapt-0 |
+| Devarsh (M4) @Mercapt-0 | PB-10 (AI Coverage Check) | Varad @tambevarad |
 
 ## Before you ask for review — check by hand (the reviewer will ask you to explain)
 

@@ -9,9 +9,9 @@ re-baselined in `docs/process/sprint-plan.md`.
 | [PB-02](PB-02.md) | Accounts and profiles | Krish | 5 | Must | 3 |
 | [PB-03](PB-03.md) | Availability grid | Krish | 5 | Must | 3 |
 | [PB-04](PB-04.md) | Teams, invites, join requests | Dev | 8 | Must | 3 |
-| [PB-05](PB-05.md) | Task board | Devarsh | 8 | Must | 3 |
+| [PB-05](PB-05.md) | Task board | Krish (from Devarsh) | 8 | Must | 3 |
 | [PB-06](PB-06.md) | Calendar and meeting finder | Varad | 13 | Must | 3 |
-| [PB-07](PB-07.md) | Notes, links, file references | Devarsh | 5 | Must | 3 |
+| [PB-07](PB-07.md) | Notes, links, file references | Varad (from Devarsh) | 5 | Must | 3 |
 | [PB-08](PB-08.md) | In-app notifications | Krish | 5 | Must | 3 |
 | [PB-09](PB-09.md) | Activity history | Varad | 3 | Must | 3 |
 | [PB-10](PB-10.md) | AI Coverage Check | Devarsh | 13 | Must | 3 |

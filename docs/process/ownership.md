@@ -20,9 +20,9 @@ If a path isn't listed for your item, **don't edit it** (see CLAUDE.md rule 1).
 | PB-02 | M2 Krish | 3 | api `me/profile/`; pages `(auth)/**`, `(app)/profile/`; `src/components/features/{auth,profile}/`; `src/server/services/profile/` | `user` (profile fields) |
 | PB-03 | M2 Krish | 3 | api `me/availability/`, `teams/[teamId]/availability/`; page `(app)/availability/`; `components/features/availability/`; `services/availability/` | `availability` |
 | PB-04 | M3 Dev | 3 | api `teams/route.ts`, `teams/[teamId]/route.ts`, `teams/[teamId]/{invites,invite-code,join-requests,members}/`, `join/`, `join-requests/`, `me/{invites,join-requests}/`; pages `(app)/teams/page.tsx`, `(app)/teams/new/`, `(app)/join/`, `(app)/teams/[teamId]/members/`; `components/features/teams/`; `services/teams/` | `team`, `team_member`, `team_invite`, `join_request` |
-| PB-05 | M4 Devarsh | 3 | api `teams/[teamId]/tasks/`; page `(app)/teams/[teamId]/board/`; `components/features/tasks/`; `services/tasks/` | `task`, `task_assignee` |
+| PB-05 | M2 Krish (reassigned from M4, Oct 22) | 3 | api `teams/[teamId]/tasks/`; page `(app)/teams/[teamId]/board/`; `components/features/tasks/`; `services/tasks/` | `task`, `task_assignee` |
 | PB-06 | M1 Varad | 3 | api `teams/[teamId]/{meetings,meeting-suggestions}/` (except `meetings/[meetingId]/agenda/`); page `(app)/teams/[teamId]/calendar/`; `components/features/meetings/`; `services/meetings/` | `meeting`, `meeting_rsvp` |
-| PB-07 | M4 Devarsh | 3 | api `teams/[teamId]/resources/`; page `(app)/teams/[teamId]/resources/`; `components/features/resources/`; `services/resources/` | `resource` |
+| PB-07 | M1 Varad (reassigned from M4, Oct 22) | 3 | api `teams/[teamId]/resources/`; page `(app)/teams/[teamId]/resources/`; `components/features/resources/`; `services/resources/` | `resource` |
 | PB-08 | M2 Krish | 3 | api `me/notifications/`; page `(app)/notifications/`; `components/features/notifications/` (keep `NotificationBell` export); `services/notifications/` | `notification` (read state, due-soon) |
 | PB-09 | M1 Varad | 3 | api `teams/[teamId]/activity/`; page `(app)/teams/[teamId]/activity/`; `components/features/activity/` (keep `RecentActivity` export); `services/activity/` | — (reads only) |
 | PB-10 | M4 Devarsh (M3 pairs) | 3 | api `teams/[teamId]/coverage-reports/`; pages `(app)/teams/[teamId]/coverage/`; `components/features/coverage/`; `services/coverage/`; `src/server/ai/**` | `coverage_report`, `coverage_item` |
@@ -41,6 +41,10 @@ Each item also owns its own tests: `tests/unit/<item-slug>*.test.ts`, `tests/int
 was built by Varad with Claude Code on Oct 22 as the "contracts" PR so the four of us could work in parallel. Dev, as tech
 lead and PB-01 owner, reviews/merges it and then owns the remaining PB-01 work: Neon + Vercel staging, branch
 protection, CI hardening. This split is recorded honestly in the progress report.
+
+**Reassignment (Oct 22):** the team is available one after another (Varad → Krish → Dev → Devarsh), not in
+parallel. Devarsh goes last but held 26 points, which put the graded AI feature at risk for Oct 24. PB-05 moved to
+Krish and PB-07 to Varad so Devarsh can focus on PB-10. This is a change from proposal §8 / A.3 and is reported as such.
 
 ## Shared files (frozen after the foundation PR)
 
