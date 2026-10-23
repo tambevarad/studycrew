@@ -1,0 +1,21 @@
+# Shared / frozen files (CLAUDE.md rule 1): changes need the tech lead or product owner.
+# Feature folders have no code owner on purpose — each PR is reviewed by the author's review partner
+# (docs/process/ownership.md → Review pairs).
+/prisma/                          @devjpatell @tambevarad
+/src/contracts/                   @devjpatell @tambevarad
+/src/server/*.ts                  @devjpatell @tambevarad
+/src/server/shared/               @devjpatell @tambevarad
+/src/components/ui/               @devjpatell @tambevarad
+/src/components/app-shell/        @devjpatell @tambevarad
+/src/lib/                         @devjpatell @tambevarad
+/src/app/layout.tsx               @devjpatell @tambevarad
+/src/app/(app)/layout.tsx         @devjpatell @tambevarad
+/src/app/(app)/teams/[teamId]/layout.tsx @devjpatell @tambevarad
+/tests/helpers/                   @devjpatell @tambevarad
+/tests/integration/authz-sweep.test.ts @devjpatell @tambevarad
+/cypress/support/                 @devjpatell @tambevarad
+/.github/                         @devjpatell
+/package.json                     @devjpatell @tambevarad
+/package-lock.json                @devjpatell @tambevarad
+/CLAUDE.md                        @devjpatell @tambevarad
+/docs/contracts/                  @devjpatell @tambevarad

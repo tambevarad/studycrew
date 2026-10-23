@@ -6,12 +6,12 @@ Student teams form groups, paint their availability and get ranked meeting times
 links, get in-app notifications, watch a progress dashboard, and use the **AI Coverage Check** to compare assignment
 instructions with their draft and find what's missing before they submit.
 
-| Team | Role |
-|---|---|
-| Varad Tambe (M1) | Product Owner, full-stack |
-| Krish Ruparel (M2) | Scrum Master, QA lead |
-| Dev Patel (M3) | Tech lead, backend/DevOps |
-| Devarsh Soni (M4) | AI lead, frontend |
+| Team | GitHub | Role |
+|---|---|---|
+| Varad Tambe (M1) | @tambevarad | Product Owner, full-stack |
+| Krish Ruparel (M2) | @Krishr21 | Scrum Master, QA lead |
+| Dev Patel (M3) | @devjpatell | Tech lead, backend/DevOps |
+| Devarsh Soni (M4) | @Mercapt-0 | AI lead, frontend |
 
 ## Stack
 

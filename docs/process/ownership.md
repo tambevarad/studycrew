@@ -3,12 +3,12 @@
 Who builds what (from the proposal's §8 and Attachment A.3), which files each item owns, and which tables it may write.
 If a path isn't listed for your item, **don't edit it** (see CLAUDE.md rule 1).
 
-| Code | Person | Role |
-|---|---|---|
-| M1 | Varad Tambe | Product Owner, full-stack |
-| M2 | Krish Ruparel | Scrum Master, QA lead |
-| M3 | Dev Patel | Tech lead, backend/DevOps |
-| M4 | Devarsh Soni | AI lead, frontend |
+| Code | Person | GitHub | Role |
+|---|---|---|---|
+| M1 | Varad Tambe | @tambevarad | Product Owner, full-stack (repo admin) |
+| M2 | Krish Ruparel | @Krishr21 | Scrum Master, QA lead |
+| M3 | Dev Patel | @devjpatell | Tech lead, backend/DevOps |
+| M4 | Devarsh Soni | @Mercapt-0 | AI lead, frontend |
 
 ## By backlog item
 
@@ -54,9 +54,9 @@ Changes go through a contract request → separate PR approved by the tech lead 
 
 ## Review pairs (every PR needs one approval from someone who can explain it)
 
-| Author | Reviewer |
-|---|---|
-| Varad | Krish |
-| Krish | Dev |
-| Dev | Devarsh |
-| Devarsh | Varad |
+| Author | Reviewer | `gh pr create --reviewer` |
+|---|---|---|
+| Varad | Krish | `Krishr21` |
+| Krish | Dev | `devjpatell` |
+| Dev | Devarsh | `Mercapt-0` |
+| Devarsh | Varad | `tambevarad` |

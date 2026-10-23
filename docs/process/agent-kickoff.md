@@ -26,7 +26,8 @@ I'm [Krish Ruparel (M2)] on the StudyCrew team. My backlog items for this sprint
 3. Run npm run check and npm run build until both pass. Run my Cypress spec against a production build if possible.
 4. Fill in the "Implementation notes" section of my task file and write docs/ai-log/[PB-02].md with an honest log of
    what you generated and what I need to verify.
-5. Commit in small Conventional Commits ending with ([PB-02]). Push and open a PR to main with the template filled in.
+5. Commit in small Conventional Commits ending with ([PB-02]). Push and open a PR to main with the template filled in,
+   requesting my review partner from docs/process/ownership.md (gh pr create --reviewer <partner>), and "Closes #<issue>".
    Then give me: a summary, how to demo it, what to screenshot for the progress report, and anything I must check
    by hand before asking for review.
 6. Then continue with the next item on a NEW branch from origin/main.
@@ -38,10 +39,10 @@ If a shared contract blocks you, stop, write docs/contract-requests/[PB-XX]-<slu
 
 | Person | Items (in order) | Review partner |
 |---|---|---|
-| Varad (M1) | PB-09 → PB-06 → progress report | Krish |
-| Krish (M2) | PB-02 → PB-03 → PB-08 | Dev |
-| Dev (M3) | PB-01 (staging + branch protection) → PB-04 | Devarsh |
-| Devarsh (M4) | PB-05 → PB-10 → PB-07 | Varad |
+| Varad (M1) @tambevarad | PB-09 → PB-06 → progress report | Krish @Krishr21 |
+| Krish (M2) @Krishr21 | PB-02 → PB-03 → PB-08 | Dev @devjpatell |
+| Dev (M3) @devjpatell | PB-01 (staging + branch protection) → PB-04 | Devarsh @Mercapt-0 |
+| Devarsh (M4) @Mercapt-0 | PB-05 → PB-10 → PB-07 | Varad @tambevarad |
 
 ## Before you ask for review — check by hand (the reviewer will ask you to explain)
 
