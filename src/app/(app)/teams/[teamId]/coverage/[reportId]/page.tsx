@@ -62,7 +62,8 @@ export default async function CoverageReportPage({ params, searchParams }: PageP
         <Alert tone="danger">
           <p className="font-medium">This check didn&apos;t finish.</p>
           <p className="mt-1">
-            {report.errorMessage ? `${report.errorMessage}. ` : ""}Nothing was lost — go back and run it again in a minute.
+            {report.errorMessage ? `${report.errorMessage}. ` : ""}Nothing was lost, and this didn&apos;t produce any results. Your
+            instructions and draft are below if you want to run the check again.
           </p>
         </Alert>
       ) : (

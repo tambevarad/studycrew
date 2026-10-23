@@ -25,7 +25,8 @@ function fillForm(title: string) {
   cy.get("textarea[name=draft]").type(" ");
 }
 
-describe("PB-10 AI Coverage Check", () => {
+// The manual failure capture runs alone: these tests need the mock provider.
+(Cypress.expose("CAPTURE_FAILURE") ? describe.skip : describe)("PB-10 AI Coverage Check", () => {
   beforeEach(() => cy.login("devarsh"));
 
   it("AC1/AC3/AC10: paste instructions + draft, consent, run with the mock, see a Missing item — accessibly", () => {
@@ -138,6 +139,7 @@ if (Cypress.expose("CAPTURE_FAILURE")) {
       cy.visitTeam("coverage");
       fillForm(title);
       cy.contains("label", "Send this text to the AI provider (OpenAI)").click();
+      capture("PB-10-new-check", "section[aria-labelledby=new-check-heading]");
       cy.contains("button", "Run check").click();
       cy.get("[role=alert]").should("contain", "Nothing was lost — try again in a minute.");
       cy.contains("tr", title).should("contain", "Didn't finish");
