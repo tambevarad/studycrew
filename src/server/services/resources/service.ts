@@ -1,10 +1,16 @@
-import type { CreateResourceInput, ListResourcesQuery, ResourceDTO, ResourceTypeValue, UpdateResourceInput } from "@/contracts/resources";
+import type {
+  CreateResourceInput,
+  ListResourcesQuery,
+  ResourceDTO,
+  ResourceTypeValue,
+  UpdateResourceInput,
+} from "@/contracts/resources";
 import type { Prisma } from "@/generated/prisma/client";
-import { logActivity } from "../../activity";
-import { db } from "../../db";
-import { errors } from "../../errors";
-import { toUserSummary, userSummarySelect } from "../../mappers";
-import { requireMembership } from "../../permissions";
+import { logActivity } from "@/server/activity";
+import { db } from "@/server/db";
+import { errors } from "@/server/errors";
+import { toUserSummary, userSummarySelect } from "@/server/mappers";
+import { requireMembership } from "@/server/permissions";
 
 /** PB-07 · FR-05 — shared notes, links, and file references (links only; no uploads). */
 
@@ -29,7 +35,11 @@ export function toResourceDTO(row: Row): ResourceDTO {
 }
 
 /** Pinned first, then newest. `q` matches title or note text, case-insensitively. */
-export async function listResources(teamId: string, actorId: string, query: ListResourcesQuery): Promise<ResourceDTO[]> {
+export async function listResources(
+  teamId: string,
+  actorId: string,
+  query: ListResourcesQuery,
+): Promise<ResourceDTO[]> {
   await requireMembership(teamId, actorId);
   const where: Prisma.ResourceWhereInput = { teamId };
   if (query.type) where.type = query.type;
@@ -39,11 +49,29 @@ export async function listResources(teamId: string, actorId: string, query: List
       { body: { contains: query.q, mode: "insensitive" } },
     ];
   }
-  const rows = await db.resource.findMany({ where, include, orderBy: [{ pinned: "desc" }, { createdAt: "desc" }, { id: "desc" }] });
+  const rows = await db.resource.findMany({
+    where,
+    include,
+    orderBy: [{ pinned: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+  });
   return rows.map(toResourceDTO);
 }
 
-export async function createResource(teamId: string, actorId: string, input: CreateResourceInput): Promise<ResourceDTO> {
+/** For the page: the list plus what the viewer may do with it. */
+export async function getResourcesForViewer(
+  teamId: string,
+  viewerId: string,
+  query: ListResourcesQuery,
+): Promise<{ resources: ResourceDTO[]; isLeader: boolean }> {
+  const membership = await requireMembership(teamId, viewerId);
+  return { resources: await listResources(teamId, viewerId, query), isLeader: membership.role === "LEADER" };
+}
+
+export async function createResource(
+  teamId: string,
+  actorId: string,
+  input: CreateResourceInput,
+): Promise<ResourceDTO> {
   await requireMembership(teamId, actorId);
   const row = await db.$transaction(async (tx) => {
     const created = await tx.resource.create({
@@ -97,10 +125,14 @@ export async function updateResource(
     throw errors.forbidden("Only the person who added this or a team leader can edit it. Anyone can pin it.");
   }
   if (input.url !== undefined && existing.type === "NOTE") {
-    throw errors.validation("Notes don't have a link. Edit the note text instead.", { fields: { url: "Notes don't have a link." } });
+    throw errors.validation("Notes don't have a link. Edit the note text instead.", {
+      fields: { url: "Notes don't have a link." },
+    });
   }
   if (input.body !== undefined && existing.type !== "NOTE") {
-    throw errors.validation("Only notes have text. Edit the link instead.", { fields: { body: "Only notes have text." } });
+    throw errors.validation("Only notes have text. Edit the link instead.", {
+      fields: { body: "Only notes have text." },
+    });
   }
   if (input.body !== undefined && input.body.length === 0) {
     throw errors.validation("Write something in the note.", { fields: { body: "Write something in the note." } });
@@ -118,7 +150,15 @@ export async function updateResource(
         ? `updated the ${NOUN[updated.type]} “${updated.title}”`
         : `${updated.pinned ? "pinned" : "unpinned"} “${updated.title}”`;
       await logActivity(
-        { teamId, actorId, type: "RESOURCE_UPDATED", entityType: "resource", entityId: updated.id, summary, metadata: pinChanged ? { pinned: updated.pinned } : undefined },
+        {
+          teamId,
+          actorId,
+          type: "RESOURCE_UPDATED",
+          entityType: "resource",
+          entityId: updated.id,
+          summary,
+          metadata: pinChanged ? { pinned: updated.pinned } : undefined,
+        },
         tx,
       );
     }
