@@ -55,16 +55,20 @@ export function ResourceFormDialog({
 
   return (
     <Dialog open={open} onClose={onClose} title={editing ? `Edit ${current.label.toLowerCase()}` : "Add to resources"}>
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
         {editing ? null : (
           <fieldset>
             <legend className="mb-1.5 text-sm font-medium text-slate-800">Type</legend>
-            <div className="inline-flex rounded-md border border-slate-300 p-0.5" role="radiogroup" aria-label="Resource type">
+            <div
+              className="inline-flex rounded-md border border-slate-300 p-0.5"
+              role="radiogroup"
+              aria-label="Resource type"
+            >
               {TYPE_OPTIONS.map((o) => (
                 <label
                   key={o.value}
                   className={cn(
-                    "cursor-pointer rounded px-3 py-1.5 text-sm font-medium has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand-600",
+                    "has-[:focus-visible]:outline-brand-600 cursor-pointer rounded px-3 py-1.5 text-sm font-medium has-[:focus-visible]:outline has-[:focus-visible]:outline-2",
                     type === o.value ? "bg-brand-600 text-white" : "text-slate-700 hover:bg-slate-100",
                   )}
                 >
@@ -84,7 +88,12 @@ export function ResourceFormDialog({
           </fieldset>
         )}
         <FormField label="Title" required error={fieldErrors.title}>
-          <Input name="title" defaultValue={editing?.title} maxLength={150} placeholder={type === "NOTE" ? "Retro notes — Sprint 3" : "Course syllabus"} />
+          <Input
+            name="title"
+            defaultValue={editing?.title}
+            maxLength={150}
+            placeholder={type === "NOTE" ? "Retro notes — Sprint 3" : "Course syllabus"}
+          />
         </FormField>
         {type === "NOTE" ? (
           <FormField label="Note" required error={fieldErrors.body}>
@@ -95,7 +104,11 @@ export function ResourceFormDialog({
             label="Link"
             required
             error={fieldErrors.url}
-            hint={type === "FILE_REF" ? "Paste a share link from Google Drive, OneDrive, or Canvas. We don't store files." : "Starts with https://"}
+            hint={
+              type === "FILE_REF"
+                ? "Paste a share link from Google Drive, OneDrive, or Canvas. We don't store files."
+                : "Starts with https://"
+            }
           >
             <Input name="url" type="url" inputMode="url" defaultValue={editing?.url ?? ""} placeholder="https://" />
           </FormField>

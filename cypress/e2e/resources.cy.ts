@@ -15,13 +15,14 @@ describe("PB-07 resources", () => {
       cy.get("input[name=url]").type("ftp://bad.example");
       cy.contains("button", "Add link").click();
     });
-    cy.contains("Links must start with http:// or https://").should("be.visible");
+    cy.contains("Links must start with http:// or https://").should("be.visible"); // shown under the field (noValidate)
     cy.get("dialog[open] input[name=url]").clear().type("https://docs.google.com/document/d/e2e");
     cy.get("dialog[open]").contains("button", "Add link").click();
     cy.contains("Link added");
     cy.contains("li", title).should("contain", "Google Drive");
 
-    cy.get(`[aria-label="Pin “${title}”"]`).click();
+    cy.get(`[aria-label="Pin “${title}”"]`).should("have.attr", "aria-pressed", "false").click();
+    cy.get(`[aria-label="Pin “${title}”"]`).should("have.attr", "aria-pressed", "true");
     cy.contains("section", "Pinned").should("contain", title);
 
     cy.get("input[aria-label='Search resources']").type(title.slice(0, 12));
@@ -48,7 +49,7 @@ describe("PB-07 resources", () => {
     cy.visitTeam("resources");
     // "Course syllabus" was added by Varad; Krish is a member, not a leader.
     cy.contains("li", "Course syllabus").within(() => {
-      cy.get("[aria-label^='Pin'], [aria-label^='Unpin']").should("exist");
+      cy.get("[aria-label^='Pin']").should("have.attr", "aria-pressed", "true");
       cy.get("[aria-label^='Edit']").should("not.exist");
       cy.get("[aria-label^='Delete']").should("not.exist");
     });
