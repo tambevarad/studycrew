@@ -1,5 +1,10 @@
 # Contract request: success toasts fail color contrast (axe `color-contrast`, serious)
 
+> **Status: resolved by #29 for a fully shown toast** (success 5.21:1, error 5.91:1, warning 4.84:1). Toasts still fail
+> axe **while they fade in** (about 350 ms; opacity blends the colors, measured 1.21:1 at 150 ms), so specs must keep
+> waiting before `cy.checkPageA11y()`: either for `[data-sonner-toast][data-mounted=true]` plus about 400 ms, or for the
+> toast to disappear (the current pattern in `auth.cy.ts` and `teams.cy.ts`). Don't remove those waits.
+
 Requested by: Krish Ruparel for PB-02 · Date: 2026-10-22
 
 ## What I need
