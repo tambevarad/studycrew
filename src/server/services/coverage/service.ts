@@ -8,21 +8,22 @@ import {
   type RunCoverageInput,
 } from "@/contracts/coverage";
 import type { Prisma } from "@/generated/prisma/client";
-import { logActivity } from "../../activity";
-import { getCoverageModel, type CoverageModel, type CoverageModelItem } from "../../ai";
-import { MAX_QUOTE_CHARS, MAX_REQUIREMENTS, PROMPT_VERSION } from "../../ai/prompts";
-import { clampQuote, verifyQuote } from "../../ai/quotes";
-import { countByStatus, scoreItems } from "../../ai/scoring";
-import { db } from "../../db";
-import { AppError, errors } from "../../errors";
-import { toUserSummary, userSummarySelect } from "../../mappers";
-import { requireMembership } from "../../permissions";
+import { logActivity } from "@/server/activity";
+import { getCoverageModel, type CoverageModel, type CoverageModelItem } from "@/server/ai";
+import { MAX_QUOTE_CHARS, MAX_REQUIREMENTS, PROMPT_VERSION } from "@/server/ai/prompts";
+import { clampQuote, normalizeForMatch, verifyQuote } from "@/server/ai/quotes";
+import { countByStatus, scoreItems } from "@/server/ai/scoring";
+import { db } from "@/server/db";
+import { AppError, errors } from "@/server/errors";
+import { toUserSummary, userSummarySelect } from "@/server/mappers";
+import { requireMembership } from "@/server/permissions";
 
 /** PB-10 · FR-07, NFR-01, NFR-02, NFR-05 — AI Coverage Check. */
 
 export const UNVERIFIED_PREFIX = "Couldn't find this quote in your draft — ";
 export const TIMEOUT_MESSAGE = "The AI service didn't respond in time. Nothing was lost — try again in a minute.";
 export const PROVIDER_ERROR_MESSAGE = "The AI service couldn't finish this check. Nothing was lost — try again in a minute.";
+export const NO_REQUIREMENTS_ERROR = "No checkable requirements were found in the instructions";
 export const RATE_LIMIT_MESSAGE = `You've used today's ${MAX_RUNS_PER_USER_PER_DAY} checks. Try again tomorrow.`;
 
 export interface CoverageDeps {
@@ -127,6 +128,41 @@ function untilAborted<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
   });
 }
 
+export const NOT_ASSESSED_REASON = "The AI didn't assess this requirement. Check it yourself.";
+
+/**
+ * Step 1's list is the source of truth: one row per extracted requirement, in that order, with step 1's wording.
+ * Each requirement takes the model's item with the same text (normalized like quotes). If the model returned exactly one
+ * item per requirement, an unmatched requirement takes the unclaimed item at its position (the model reworded it).
+ * Anything still unmatched — the model skipped it — becomes MISSING, so a short answer lowers the score instead of
+ * hiding gaps. Items for requirements step 1 never listed are dropped.
+ */
+export function alignItems(requirements: string[], items: CoverageModelItem[]): CoverageModelItem[] {
+  const claimed = new Set<number>();
+  const key = (s: string) => normalizeForMatch(s);
+  const byText = requirements.map((r) => {
+    const i = items.findIndex((item, j) => !claimed.has(j) && key(item.requirement) === key(r));
+    if (i >= 0) claimed.add(i);
+    return i;
+  });
+  const samePositions = items.length === requirements.length;
+  return requirements.map((requirement, i): CoverageModelItem => {
+    let match = byText[i];
+    if (match < 0 && samePositions && !claimed.has(i)) {
+      match = i;
+      claimed.add(i);
+    }
+    if (match >= 0) return { ...items[match], requirement };
+    return {
+      requirement,
+      status: "MISSING",
+      evidenceQuote: null,
+      reason: NOT_ASSESSED_REASON,
+      suggestion: "Compare this requirement with your draft yourself, or run the check again.",
+    };
+  });
+}
+
 export interface VerifiedItem extends CoverageModelItem {
   evidenceVerified: boolean;
 }
@@ -183,19 +219,26 @@ export async function runCoverageCheck(
     provider: model.provider,
     model: model.model,
     promptVersion: PROMPT_VERSION,
+    // Same clock as the daily limit above, so the run lands on the day it was counted against.
+    createdAt: now,
   };
 
   let items: VerifiedItem[];
   try {
     const requirements = (await untilAborted(model.extractRequirements(modelInput, signal), signal)).slice(0, MAX_REQUIREMENTS);
     if (requirements.length === 0) {
+      // Step 1 already reached the provider, so this run is saved (FAILED) and counts toward the daily limit.
+      const latencyMs = Math.round(performance.now() - started);
+      await db.coverageReport.create({
+        data: { ...base, status: "FAILED", errorMessage: NO_REQUIREMENTS_ERROR, score: null, latencyMs },
+      });
       throw errors.validation("We couldn't find any checkable requirements in the instructions. Paste the full assignment text or rubric.", {
         fields: { instructions: "We couldn't find any requirements here." },
       });
     }
     const checked = await untilAborted(model.checkRequirements(modelInput, requirements, signal), signal);
     if (checked.length === 0) throw new Error("The model returned no items.");
-    items = verifyItems(checked, input.draft);
+    items = verifyItems(alignItems(requirements, checked), input.draft);
   } catch (err) {
     if (err instanceof AppError) throw err;
     const latencyMs = Math.round(performance.now() - started);

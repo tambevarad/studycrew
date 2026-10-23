@@ -10,6 +10,8 @@ import {
   deleteReport,
   getReport,
   listReports,
+  NO_REQUIREMENTS_ERROR,
+  NOT_ASSESSED_REASON,
   PROVIDER_ERROR_MESSAGE,
   RATE_LIMIT_MESSAGE,
   remainingRunsToday,
@@ -224,13 +226,88 @@ describe("PB-10 run a coverage check", () => {
     expect(report.counts).toEqual({ COVERED: 1, PARTIAL: 1, MISSING: 1 });
   });
 
-  it("rejects instructions with no checkable requirements (400) without saving anything", async () => {
+  it("instructions with no checkable requirements → 400, saved as FAILED, and it counts toward the daily limit", async () => {
     const { team, leader } = await makeTeam();
-    const { model } = fakeModel([], []);
+    const { model, calls } = fakeModel([], []);
     await expect(runCoverageCheck(team.id, leader.id, input(), { model, now: NOW })).rejects.toMatchObject({
       code: "VALIDATION",
     });
-    expect(await db.coverageReport.count()).toBe(0);
+    expect(calls).toEqual({ extract: 1, check: 0 });
+    const failed = await db.coverageReport.findFirstOrThrow({ where: { teamId: team.id }, include: { items: true } });
+    expect(failed).toMatchObject({ status: "FAILED", errorMessage: NO_REQUIREMENTS_ERROR, score: null, items: [] });
+    expect(await remainingRunsToday(team.id, leader.id, NOW)).toBe(9);
+    expect(await db.activityEvent.count({ where: { teamId: team.id, type: "COVERAGE_RUN" } })).toBe(0);
+  });
+
+  it("AC2/AC8: a requirement the model skips (N−1 items) becomes MISSING and lowers the score", async () => {
+    const { team, leader } = await makeTeam();
+    const requirements = ["Explain the benefits", "Explain the drawbacks", "Conclude with a recommendation"];
+    const covered = (requirement: string, evidenceQuote: string): CoverageModelItem => ({
+      requirement,
+      status: "COVERED",
+      evidenceQuote,
+      reason: "Stated.",
+      suggestion: null,
+    });
+    // The model drops "Explain the drawbacks" entirely.
+    const { model } = fakeModel(
+      [
+        covered("Explain the benefits", "A 2021 study found benefits for research collaboration"),
+        covered("Conclude with a recommendation", "We conclude with a recommendation"),
+      ],
+      requirements,
+    );
+    const report = await runCoverageCheck(team.id, leader.id, input(), { model, now: NOW });
+
+    expect(report.items.map((i) => [i.requirement, i.status])).toEqual([
+      ["Explain the benefits", "COVERED"],
+      ["Explain the drawbacks", "MISSING"],
+      ["Conclude with a recommendation", "COVERED"],
+    ]);
+    expect(report.items[1]).toMatchObject({
+      reason: NOT_ASSESSED_REASON,
+      evidenceQuote: null,
+      evidenceVerified: false,
+    });
+    expect(report.items[1].suggestion).toBeTruthy();
+    expect(report.score).toBe(67); // 2 of 3, not 100
+  });
+
+  it("AC2: step 1's wording wins — reworded items match by position, reordered ones by text, extras are dropped", async () => {
+    const { team, leader } = await makeTeam();
+    const item = (requirement: string, status: CoverageModelItem["status"]): CoverageModelItem => ({
+      requirement,
+      status,
+      evidenceQuote: null,
+      reason: `about ${requirement}`,
+      suggestion: status === "COVERED" ? null : "s",
+    });
+
+    // Same count, one reworded → matched by position, shown with step 1's text.
+    const reworded = fakeModel(
+      [item("Benefits of social media", "MISSING"), item("Explain the drawbacks", "PARTIAL")],
+      ["Explain the benefits", "Explain the drawbacks"],
+    );
+    const a = await runCoverageCheck(team.id, leader.id, input(), { model: reworded.model, now: NOW });
+    expect(a.items.map((i) => [i.requirement, i.status, i.reason])).toEqual([
+      ["Explain the benefits", "MISSING", "about Benefits of social media"],
+      ["Explain the drawbacks", "PARTIAL", "about Explain the drawbacks"],
+    ]);
+
+    // Different order, different case/spacing, plus an item step 1 never listed → matched by text; extra dropped.
+    const reordered = fakeModel(
+      [
+        item("an invented requirement", "PARTIAL"),
+        item("explain  the DRAWBACKS", "PARTIAL"),
+        item("Explain the benefits", "MISSING"),
+      ],
+      ["Explain the benefits", "Explain the drawbacks"],
+    );
+    const b = await runCoverageCheck(team.id, leader.id, input(), { model: reordered.model, now: NOW });
+    expect(b.items.map((i) => [i.requirement, i.status])).toEqual([
+      ["Explain the benefits", "MISSING"],
+      ["Explain the drawbacks", "PARTIAL"],
+    ]);
   });
 
   it("only members can run a check (403)", async () => {
