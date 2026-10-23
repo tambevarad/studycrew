@@ -1,0 +1,61 @@
+# Deploy main to the staging site (Vercel "Production" = https://studycrew-staging.vercel.app). PB-01, NFR-05.
+#
+# Why Actions instead of Vercel's Git integration: the repo lives on Varad's personal GitHub account and the Vercel
+# project on Dev's Hobby account, so Vercel can't link the repo, and Hobby would block deploys of commits by other
+# authors anyway. The CLI deploy below works for every merge.
+#
+# The build runs on Vercel ("remote build"), not on this runner: the database URLs stay in Vercel's project settings and
+# never touch GitHub. vercel.json's buildCommand runs `prisma migrate deploy` (direct URL) before `next build`.
+#
+# Needs repository secrets VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID (added by the repo owner; see
+# docs/process/deployment.md). Until they exist the job skips with a notice instead of failing.
+name: Deploy staging
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false # never cancel a deploy (and its migration) half-way
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.repository == 'tambevarad/studycrew'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Check deploy secrets
+        id: secrets
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::notice::Skipping deploy: VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID repository secrets are not set yet."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.secrets.outputs.ready == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.secrets.outputs.ready == 'true'
+        with:
+          node-version: 24
+      - name: Deploy to Vercel (production)
+        if: steps.secrets.outputs.ready == 'true'
+        run: npx --yes vercel@65.2.0 deploy --prod --yes --token="$VERCEL_TOKEN"
+      - name: Health check
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          for i in $(seq 1 10); do
+            if curl -sf https://studycrew-staging.vercel.app/api/health; then echo; echo "staging is healthy"; exit 0; fi
+            sleep 6
+          done
+          echo "::error::https://studycrew-staging.vercel.app/api/health did not return 200 after the deploy"; exit 1
