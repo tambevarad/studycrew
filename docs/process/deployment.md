@@ -9,7 +9,7 @@ Vercel's *Production* environment is our **staging**: every merge to `main` depl
 |---|---|
 | Staging app | https://studycrew-staging.vercel.app |
 | Health check | https://studycrew-staging.vercel.app/api/health → `200 {"status":"ok","db":"ok",…}`, or `503 {"status":"degraded"}` if the DB is down |
-| Uptime status page | _(added when the UptimeRobot monitor is created)_ |
+| Uptime status page | https://stats.uptimerobot.com/HoIv0SBQ5d (UptimeRobot, public) |
 | Vercel project | https://vercel.com/devjpatells-projects/studycrew-staging (Dev's Hobby account) |
 | Neon project | https://console.neon.tech/app/projects/mute-mud-22473212 (Dev's account): project `studycrew`, branch `production`, database `studycrew`, Postgres 16, AWS US East 1 |
 
