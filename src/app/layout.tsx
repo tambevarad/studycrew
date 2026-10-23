@@ -12,7 +12,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
         {children}
-        <Toaster position="top-right" richColors closeButton />
+        {/* Our status tokens instead of sonner's richColors: its success text is 4.26:1 and fails WCAG AA (NFR-03). */}
+        <Toaster
+          position="top-right"
+          closeButton
+          toastOptions={{
+            classNames: {
+              success: "border-success-100! bg-success-50! text-success-700!",
+              error: "border-danger-100! bg-danger-50! text-danger-700!",
+              warning: "border-warning-100! bg-warning-50! text-warning-700!",
+            },
+          }}
+        />
       </body>
     </html>
   );
