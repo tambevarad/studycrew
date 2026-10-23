@@ -69,6 +69,14 @@ export function NewCheckForm({ teamId, remaining, provider }: { teamId: string; 
     return () => clearInterval(tick);
   }, [running]);
 
+  /** Fixing a field removes its error; once none are left, the summary ("Some fields need attention.") goes too. */
+  function clearError(field: string) {
+    if (!fieldErrors[field]) return;
+    const rest = Object.fromEntries(Object.entries(fieldErrors).filter(([k]) => k !== field));
+    setFieldErrors(rest);
+    if (Object.keys(rest).length === 0) setError(null);
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
@@ -113,10 +121,10 @@ export function NewCheckForm({ teamId, remaining, provider }: { teamId: string; 
 
           <div className="grid gap-4 sm:grid-cols-[1fr_14rem]">
             <FormField label="Title" hint="So your team can find this check later, like “Lab 3 draft v2”." error={fieldErrors.title} required>
-              <Input name="title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} disabled={running} />
+              <Input name="title" value={title} onChange={(e) => { setTitle(e.target.value); clearError("title"); }} maxLength={120} disabled={running} />
             </FormField>
             <FormField label="Type of work" error={fieldErrors.workType}>
-              <Select name="workType" value={workType} onChange={(e) => setWorkType(e.target.value as WorkTypeValue)} disabled={running}>
+              <Select name="workType" value={workType} onChange={(e) => { setWorkType(e.target.value as WorkTypeValue); clearError("workType"); }} disabled={running}>
                 {WORK_TYPES.map((t) => (
                   <option key={t} value={t}>
                     {WORK_TYPE_LABELS[t]}
@@ -135,7 +143,7 @@ export function NewCheckForm({ teamId, remaining, provider }: { teamId: string; 
             <Textarea
               name="instructions"
               value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
+              onChange={(e) => { setInstructions(e.target.value); clearError("instructions"); }}
               placeholder="Paste the assignment prompt, rubric, or topic list."
               className="min-h-36"
               disabled={running}
@@ -146,7 +154,7 @@ export function NewCheckForm({ teamId, remaining, provider }: { teamId: string; 
             <Textarea
               name="draft"
               value={draft}
-              onChange={(e) => setDraft(e.target.value)}
+              onChange={(e) => { setDraft(e.target.value); clearError("draft"); }}
               placeholder="Paste your team's draft, outline, or slide notes."
               className="min-h-48"
               disabled={running}
@@ -160,7 +168,7 @@ export function NewCheckForm({ teamId, remaining, provider }: { teamId: string; 
                 name="consent"
                 type="checkbox"
                 checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
+                onChange={(e) => { setConsent(e.target.checked); clearError("consent"); }}
                 disabled={running}
                 aria-invalid={fieldErrors.consent ? true : undefined}
                 aria-describedby={fieldErrors.consent ? `${consentId}-error` : undefined}
