@@ -18,7 +18,7 @@ export function Avatar({ name, className }: { name: string; className?: string }
 export function AvatarStack({ names, max = 4 }: { names: string[]; max?: number }) {
   const shown = names.slice(0, max);
   return (
-    <span className="flex -space-x-2">
+    <span className="flex -space-x-1">
       {shown.map((n, i) => (
         <Avatar key={`${n}-${i}`} name={n} className="ring-2 ring-white" />
       ))}

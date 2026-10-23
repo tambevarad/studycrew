@@ -22,6 +22,8 @@ describe("smoke", () => {
     cy.visitTeam();
     cy.contains("h1", "StudyCrew Core");
     cy.get("nav[aria-label='Team sections']").should("contain", "Board");
+    // The shared shell and team frame must stay accessible on team pages too (active team row, tabs).
+    cy.checkPageA11y();
   });
 
   it("hides team content from non-members", () => {
