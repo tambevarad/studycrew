@@ -1,17 +1,21 @@
 import type { ActivityDTO, ActivityTypeValue, EntityTypeValue, ListActivityQuery } from "@/contracts/activity";
 import type { Page, UserSummaryDTO } from "@/contracts/common";
 import type { Prisma } from "@/generated/prisma/client";
-import { db } from "../../db";
-import { errors } from "../../errors";
-import { toUserSummary, userSummarySelect } from "../../mappers";
-import { requireMembership } from "../../permissions";
+import { db } from "@/server/db";
+import { errors } from "@/server/errors";
+import { toUserSummary, userSummarySelect } from "@/server/mappers";
+import { requireMembership } from "@/server/permissions";
 import { decodeCursor, encodeCursor } from "./cursor";
 
 /**
  * PB-09 · FR-06 — read side of the team activity history.
  * Writes happen elsewhere through logActivity() (src/server/activity.ts).
  */
-export async function listActivity(teamId: string, actorId: string, query: ListActivityQuery): Promise<Page<ActivityDTO>> {
+export async function listActivity(
+  teamId: string,
+  actorId: string,
+  query: ListActivityQuery,
+): Promise<Page<ActivityDTO>> {
   await requireMembership(teamId, actorId);
 
   const where: Prisma.ActivityEventWhereInput = { teamId };
@@ -65,4 +69,9 @@ export function toActivityDTO(row: Row): ActivityDTO {
     metadata: (row.metadata as Record<string, unknown> | null) ?? null,
     createdAt: row.createdAt.toISOString(),
   };
+}
+
+/** ISO timestamp of this render, passed to client components that group by day. */
+export function renderedAt(now: Date = new Date()): string {
+  return now.toISOString();
 }

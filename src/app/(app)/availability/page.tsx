@@ -1,6 +1,28 @@
-import { ComingSoon } from "@/components/ui/coming-soon";
+import Link from "next/link";
+import { AvailabilityEditor } from "@/components/features/availability/availability-editor";
+import { PageHeader } from "@/components/ui/page-header";
+import { getMyAvailability } from "@/server/services/availability/service";
+import { requirePageUser } from "@/server/session";
 
-/** Placeholder — PB-03 (Krish Ruparel) replaces this whole file. See docs/tasks/PB-03.md. */
-export default function Page() {
-  return <ComingSoon item="PB-03" title="Availability grid" owner="Krish Ruparel" />;
+export const metadata = { title: "My availability" };
+
+export default async function AvailabilityPage() {
+  const user = await requirePageUser();
+  const availability = await getMyAvailability(user.id);
+  return (
+    <>
+      <PageHeader
+        title="My availability"
+        description={
+          <>
+            Times are in your time zone: {availability.timezone.replaceAll("_", " ")} ·{" "}
+            <Link href="/profile" className="text-brand-700 font-medium hover:underline">
+              Change in Profile
+            </Link>
+          </>
+        }
+      />
+      <AvailabilityEditor initial={availability} />
+    </>
+  );
 }

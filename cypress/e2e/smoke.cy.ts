@@ -7,10 +7,22 @@ describe("smoke", () => {
   });
 
   it("rejects a wrong password with a helpful message", () => {
+    // UI sign-ins share Better Auth's 3-per-10 s limit with every spec's cy.login(). On a 429, wait the
+    // X-Retry-After the server sent and submit again (docs/contract-requests/PB-02-smoke-ui-sign-in-rate-limit.md).
+    cy.intercept("POST", "/api/auth/sign-in/email").as("signIn");
     cy.visit("/sign-in");
     cy.get("input[name=email]").type("varad@studycrew.test");
     cy.get("input[name=password]").type("wrong-password");
-    cy.contains("button", "Sign in").click();
+    const submit = (attempt = 1): void => {
+      cy.contains("button", "Sign in").click();
+      cy.wait("@signIn").then(({ response }) => {
+        if (response?.statusCode === 429 && attempt < 4) {
+          cy.wait((Number(response.headers["x-retry-after"]) || 10) * 1000 + 250);
+          submit(attempt + 1);
+        }
+      });
+    };
+    submit();
     cy.contains("don't match").should("be.visible");
   });
 

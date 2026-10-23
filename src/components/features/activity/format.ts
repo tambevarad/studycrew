@@ -32,9 +32,16 @@ export interface ActivityDayGroup<T> {
  * Groups newest-first items by calendar day in the viewer's time zone:
  * "Today", "Yesterday", then "Mon, Oct 19" (adds the year when it differs from now).
  */
-export function groupByDay<T extends { createdAt: string }>(items: T[], timeZone: string, now: Date = new Date()): ActivityDayGroup<T>[] {
+export function groupByDay<T extends { createdAt: string }>(
+  items: T[],
+  timeZone: string,
+  now: Date = new Date(),
+): ActivityDayGroup<T>[] {
   const today = dayKey(now, timeZone);
-  const yesterday = dayKey(new Date(now.getTime() - 86_400_000), timeZone);
+  // Previous CALENDAR day (not now − 24 h, which is wrong on the 25-hour day when clocks fall back).
+  const [y, m, d] = today.split("-").map(Number);
+  const prev = new Date(Date.UTC(y, m - 1, d - 1));
+  const yesterday = `${prev.getUTCFullYear()}-${String(prev.getUTCMonth() + 1).padStart(2, "0")}-${String(prev.getUTCDate()).padStart(2, "0")}`;
   const groups: ActivityDayGroup<T>[] = [];
   for (const item of items) {
     const d = new Date(item.createdAt);

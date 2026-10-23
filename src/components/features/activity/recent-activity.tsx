@@ -21,7 +21,10 @@ export async function RecentActivity({ teamId, limit = 5 }: { teamId: string; li
           ))}
         </ul>
       )}
-      <Link href={`/teams/${teamId}/activity`} className="mt-2 inline-block text-sm font-medium text-brand-700 hover:underline">
+      <Link
+        href={`/teams/${teamId}/activity`}
+        className="text-brand-700 mt-2 inline-block text-sm font-medium hover:underline"
+      >
         View all activity
       </Link>
     </div>

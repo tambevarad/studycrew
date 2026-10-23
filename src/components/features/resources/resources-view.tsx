@@ -46,17 +46,26 @@ export function ResourcesView({
   const [deleting, setDeleting] = useState<ResourceDTO | null>(null);
   const [pinningId, setPinningId] = useState<string | null>(null);
   const [search, setSearch] = useState(q);
+  // Resync the box when ?q= changes from outside (Back/Forward). Our own debounced pushes are
+  // remembered in `pushedQ` so they don't overwrite what the user is still typing.
+  const [seenQ, setSeenQ] = useState(q);
+  const [pushedQ, setPushedQ] = useState(q);
+  if (q !== seenQ) {
+    setSeenQ(q);
+    if (q !== pushedQ) setSearch(q);
+  }
   const action = useApiAction();
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Search box → ?q= (debounced) so results come from the server and the URL is shareable.
   useEffect(() => {
-    if (search === q) return;
+    if (search.trim() === q) return;
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => {
       const next = new URLSearchParams(params.toString());
       if (search.trim()) next.set("q", search.trim());
       else next.delete("q");
+      setPushedQ(search.trim());
       router.replace(next.size ? `${pathname}?${next}` : pathname, { scroll: false });
     }, 300);
     return () => {
@@ -82,9 +91,12 @@ export function ResourcesView({
 
   async function confirmDelete() {
     if (!deleting) return;
-    const ok = await action.run(() => apiFetch(`/api/v1/teams/${teamId}/resources/${deleting.id}`, { method: "DELETE" }), {
-      success: "Deleted",
-    });
+    const ok = await action.run(
+      () => apiFetch(`/api/v1/teams/${teamId}/resources/${deleting.id}`, { method: "DELETE" }),
+      {
+        success: "Deleted",
+      },
+    );
     if (ok) setDeleting(null);
   }
 
@@ -93,7 +105,7 @@ export function ResourcesView({
   const filtered = Boolean(type || q);
 
   const renderList = (items: ResourceDTO[]) => (
-    <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-surface">
+    <ul className="bg-surface divide-y divide-slate-100 rounded-lg border border-slate-200">
       {items.map((r) => (
         <ResourceRow
           key={r.id}
@@ -147,7 +159,10 @@ export function ResourcesView({
           ))}
         </nav>
         <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" aria-hidden />
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
+            aria-hidden
+          />
           <Input
             type="search"
             aria-label="Search resources"
@@ -202,14 +217,16 @@ export function ResourcesView({
           }}
         />
       ) : null}
-      <ConfirmDialog
-        open={deleting !== null}
-        onCancel={() => setDeleting(null)}
-        onConfirm={confirmDelete}
-        pending={action.pending}
-        title={`Delete “${deleting?.title ?? ""}”?`}
-        description="It will be removed for everyone on the team. This can't be undone."
-      />
+      {deleting ? (
+        <ConfirmDialog
+          open
+          onCancel={() => setDeleting(null)}
+          onConfirm={confirmDelete}
+          pending={action.pending}
+          title={`Delete “${deleting?.title ?? ""}”?`}
+          description="It will be removed for everyone on the team. This can't be undone."
+        />
+      ) : null}
     </div>
   );
 }

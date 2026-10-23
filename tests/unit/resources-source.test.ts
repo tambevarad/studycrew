@@ -16,6 +16,7 @@ describe("PB-07 detectSource", () => {
 
   it("doesn't match look-alike domains or bad input", () => {
     expect(detectSource("https://notgithub.com/x")).toBe("Web");
+    expect(detectSource("https://canvas.example.com/x")).toBe("Web");
     expect(detectSource("https://drive.google.com.evil.test/x")).toBe("Web");
     expect(detectSource(null)).toBeNull();
     expect(detectSource("not a url")).toBeNull();

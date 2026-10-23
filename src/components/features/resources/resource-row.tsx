@@ -44,7 +44,7 @@ export function ResourceRow({
           {resource.type === "NOTE" ? (
             <button
               type="button"
-              className="text-left font-medium text-slate-900 hover:text-brand-700"
+              className="hover:text-brand-700 text-left font-medium text-slate-900"
               aria-expanded={expanded}
               aria-controls={bodyId}
               onClick={() => setExpanded((v) => !v)}
@@ -56,31 +56,43 @@ export function ResourceRow({
               href={resource.url!}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-medium text-brand-700 hover:underline"
+              className="text-brand-700 inline-flex items-center gap-1 font-medium hover:underline"
             >
               {resource.title}
               <ExternalLink className="size-3.5" aria-hidden />
               <span className="sr-only">(opens in a new tab)</span>
             </a>
           )}
-          {source ? <Badge tone={source === "Web" ? "neutral" : "brand"}>{source === "Web" ? hostOf(resource.url) : source}</Badge> : null}
+          {source ? (
+            <Badge tone={source === "Web" ? "neutral" : "brand"}>
+              {source === "Web" ? hostOf(resource.url) : source}
+            </Badge>
+          ) : null}
           {resource.pinned ? <Badge tone="warning">Pinned</Badge> : null}
         </div>
         <p className="mt-0.5 text-xs text-slate-500">
           Added by {resource.createdBy.name} ·{" "}
-          <time dateTime={resource.createdAt} title={formatDateTime(resource.createdAt, timeZone)} suppressHydrationWarning>
+          <time
+            dateTime={resource.createdAt}
+            title={formatDateTime(resource.createdAt, timeZone)}
+            suppressHydrationWarning
+          >
             {relativeTime(resource.createdAt, undefined, timeZone)}
           </time>
         </p>
         {resource.type === "NOTE" ? (
-          <div id={bodyId} hidden={!expanded} className="mt-2 rounded-md bg-slate-50 px-3 py-2 text-sm whitespace-pre-wrap text-slate-800">
+          <div
+            id={bodyId}
+            hidden={!expanded}
+            className="mt-2 rounded-md bg-slate-50 px-3 py-2 text-sm whitespace-pre-wrap text-slate-800"
+          >
             {resource.body}
           </div>
         ) : null}
       </div>
       <div className="flex shrink-0 items-center gap-1">
         <IconButton
-          label={resource.pinned ? `Unpin “${resource.title}”` : `Pin “${resource.title}”`}
+          label={`Pin “${resource.title}”`}
           pressed={resource.pinned}
           disabled={pinPending}
           onClick={onTogglePin}

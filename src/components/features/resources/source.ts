@@ -12,7 +12,7 @@ export function detectSource(url: string | null): ResourceSource | null {
   const is = (domain: string) => host === domain || host.endsWith(`.${domain}`);
   if (is("drive.google.com") || is("docs.google.com")) return "Google Drive";
   if (is("onedrive.live.com") || is("1drv.ms") || host.endsWith(".sharepoint.com")) return "OneDrive";
-  if (is("instructure.com") || host.startsWith("canvas.")) return "Canvas";
+  if (is("instructure.com") || (host.startsWith("canvas.") && host.endsWith(".edu"))) return "Canvas";
   if (is("github.com")) return "GitHub";
   return "Web";
 }

@@ -2,7 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 import { GET, POST } from "@/app/api/v1/teams/[teamId]/resources/route";
 import { DELETE, PATCH } from "@/app/api/v1/teams/[teamId]/resources/[resourceId]/route";
 import { db } from "@/server/db";
-import { createResource, deleteResource, listResources, updateResource } from "@/server/services/resources/service";
+import {
+  createResource,
+  deleteResource,
+  getResourcesForViewer,
+  listResources,
+  updateResource,
+} from "@/server/services/resources/service";
 import { makeTeam, makeUser } from "../helpers/factories";
 import { callRoute } from "../helpers/route";
 import { signInAs } from "../helpers/session";
@@ -14,14 +20,29 @@ describe("PB-07 resources", () => {
     const { team, members } = await makeTeam({ members: 1 });
     const me = members[0];
     await createResource(team.id, me.id, { type: "LINK", title: "Syllabus", url: "https://example.edu/syllabus" });
-    await createResource(team.id, me.id, { type: "FILE_REF", title: "Proposal", url: "https://drive.google.com/file/d/x" });
+    await createResource(team.id, me.id, {
+      type: "FILE_REF",
+      title: "Proposal",
+      url: "https://drive.google.com/file/d/x",
+    });
     const note = await createResource(team.id, me.id, { type: "NOTE", title: "Retro", body: "Start: pairing" });
 
-    expect(note).toMatchObject({ type: "NOTE", url: null, body: "Start: pairing", pinned: false, createdBy: { id: me.id } });
+    expect(note).toMatchObject({
+      type: "NOTE",
+      url: null,
+      body: "Start: pairing",
+      pinned: false,
+      createdBy: { id: me.id },
+    });
     const list = await listResources(team.id, me.id, {});
     expect(list.map((r) => r.title)).toEqual(["Retro", "Proposal", "Syllabus"]);
 
-    const summaries = (await db.activityEvent.findMany({ where: { teamId: team.id, type: "RESOURCE_ADDED" }, orderBy: { createdAt: "asc" } })).map((e) => e.summary);
+    const summaries = (
+      await db.activityEvent.findMany({
+        where: { teamId: team.id, type: "RESOURCE_ADDED" },
+        orderBy: { createdAt: "asc" },
+      })
+    ).map((e) => e.summary);
     expect(summaries).toEqual(["added the link “Syllabus”", "added the file “Proposal”", "added the note “Retro”"]);
   });
 
@@ -60,12 +81,19 @@ describe("PB-07 resources", () => {
     const [author, other] = members;
     const r = await createResource(team.id, author.id, { type: "NOTE", title: "Mine", body: "text" });
 
-    await expect(updateResource(team.id, other.id, r.id, { title: "Hacked" })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    await expect(updateResource(team.id, other.id, r.id, { title: "Hacked" })).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
     await expect(deleteResource(team.id, other.id, r.id)).rejects.toMatchObject({ code: "FORBIDDEN" });
 
     expect((await updateResource(team.id, author.id, r.id, { title: "Mine v2", body: "more" })).title).toBe("Mine v2");
     expect((await updateResource(team.id, leader.id, r.id, { title: "Leader edit" })).title).toBe("Leader edit");
-    expect(await db.activityEvent.findFirst({ where: { teamId: team.id, type: "RESOURCE_UPDATED" }, orderBy: { createdAt: "desc" } })).toMatchObject({
+    expect(
+      await db.activityEvent.findFirst({
+        where: { teamId: team.id, type: "RESOURCE_UPDATED" },
+        orderBy: { createdAt: "desc" },
+      }),
+    ).toMatchObject({
       summary: "updated the note “Leader edit”",
     });
 
@@ -78,9 +106,15 @@ describe("PB-07 resources", () => {
     const { team, leader } = await makeTeam();
     const note = await createResource(team.id, leader.id, { type: "NOTE", title: "N", body: "b" });
     const link = await createResource(team.id, leader.id, { type: "LINK", title: "L", url: "https://a.test" });
-    await expect(updateResource(team.id, leader.id, note.id, { url: "https://x.test" })).rejects.toMatchObject({ code: "VALIDATION" });
-    await expect(updateResource(team.id, leader.id, link.id, { body: "text" })).rejects.toMatchObject({ code: "VALIDATION" });
-    await expect(updateResource(team.id, leader.id, note.id, { body: "" })).rejects.toMatchObject({ code: "VALIDATION" });
+    await expect(updateResource(team.id, leader.id, note.id, { url: "https://x.test" })).rejects.toMatchObject({
+      code: "VALIDATION",
+    });
+    await expect(updateResource(team.id, leader.id, link.id, { body: "text" })).rejects.toMatchObject({
+      code: "VALIDATION",
+    });
+    await expect(updateResource(team.id, leader.id, note.id, { body: "" })).rejects.toMatchObject({
+      code: "VALIDATION",
+    });
   });
 
   it("AC5: search matches title or note text; filters by type", async () => {
@@ -89,7 +123,10 @@ describe("PB-07 resources", () => {
     await createResource(team.id, leader.id, { type: "LINK", title: "Pairing guide", url: "https://a.test" });
     await createResource(team.id, leader.id, { type: "FILE_REF", title: "Slides", url: "https://drive.google.com/x" });
 
-    expect((await listResources(team.id, leader.id, { q: "pair" })).map((r) => r.title).sort()).toEqual(["Pairing guide", "Retro"]);
+    expect((await listResources(team.id, leader.id, { q: "pair" })).map((r) => r.title).sort()).toEqual([
+      "Pairing guide",
+      "Retro",
+    ]);
     expect((await listResources(team.id, leader.id, { type: "FILE_REF" })).map((r) => r.title)).toEqual(["Slides"]);
     expect(await listResources(team.id, leader.id, { type: "NOTE", q: "slides" })).toEqual([]);
   });
@@ -98,17 +135,36 @@ describe("PB-07 resources", () => {
     const { team, leader } = await makeTeam();
     const other = await makeTeam();
     const outsider = await makeUser();
-    const theirs = await createResource(other.team.id, other.leader.id, { type: "LINK", title: "T", url: "https://a.test" });
+    const theirs = await createResource(other.team.id, other.leader.id, {
+      type: "LINK",
+      title: "T",
+      url: "https://a.test",
+    });
 
     await expect(listResources(team.id, outsider.id, {})).rejects.toMatchObject({ code: "FORBIDDEN" });
-    await expect(updateResource(team.id, leader.id, theirs.id, { pinned: true })).rejects.toMatchObject({ code: "NOT_FOUND" });
+    await expect(updateResource(team.id, leader.id, theirs.id, { pinned: true })).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
     await expect(deleteResource(team.id, leader.id, theirs.id)).rejects.toMatchObject({ code: "NOT_FOUND" });
+  });
+
+  it("tells the page whether the viewer is a leader", async () => {
+    const { team, leader, members } = await makeTeam({ members: 1 });
+    await createResource(team.id, leader.id, { type: "LINK", title: "L", url: "https://a.test" });
+    expect(await getResourcesForViewer(team.id, leader.id, {})).toMatchObject({
+      isLeader: true,
+      resources: [{ title: "L" }],
+    });
+    expect((await getResourcesForViewer(team.id, members[0].id, {})).isLeader).toBe(false);
   });
 
   it("routes: create 201, list with query, patch, delete", async () => {
     const { team, leader } = await makeTeam();
     signInAs(leader);
-    const created = await callRoute(POST, { params: { teamId: team.id }, body: { type: "LINK", title: "  Syllabus  ", url: "https://example.edu" } });
+    const created = await callRoute(POST, {
+      params: { teamId: team.id },
+      body: { type: "LINK", title: "  Syllabus  ", url: "https://example.edu" },
+    });
     expect(created.status).toBe(201);
     expect(created.json.data.title).toBe("Syllabus");
     const id = created.json.data.id as string;
@@ -117,11 +173,17 @@ describe("PB-07 resources", () => {
     expect(list.json.data).toHaveLength(1);
     expect((await callRoute(GET, { params: { teamId: team.id }, query: { type: "VIDEO" } })).status).toBe(400);
 
-    const patched = await callRoute(PATCH, { method: "PATCH", params: { teamId: team.id, resourceId: id }, body: { pinned: true } });
+    const patched = await callRoute(PATCH, {
+      method: "PATCH",
+      params: { teamId: team.id, resourceId: id },
+      body: { pinned: true },
+    });
     expect(patched.json.data.pinned).toBe(true);
 
     const del = await callRoute(DELETE, { method: "DELETE", params: { teamId: team.id, resourceId: id } });
     expect(del).toMatchObject({ status: 200, json: { data: { deleted: true } } });
-    expect((await callRoute(DELETE, { method: "DELETE", params: { teamId: team.id, resourceId: id } })).status).toBe(404);
+    expect((await callRoute(DELETE, { method: "DELETE", params: { teamId: team.id, resourceId: id } })).status).toBe(
+      404,
+    );
   });
 });
