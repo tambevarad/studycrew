@@ -296,7 +296,7 @@ export function TaskBoard({
             </div>
             <DragOverlay>
               {active ? (
-                <div className="bg-surface border-brand-300 rounded-md border p-3 shadow-lg">
+                <div className="bg-surface border-brand-500 rounded-md border p-3 shadow-lg">
                   <TaskCardBody task={active} now={now} timeZone={timeZone} />
                 </div>
               ) : null}
