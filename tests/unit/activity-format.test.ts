@@ -7,7 +7,9 @@ const user = { id: "u1", name: "Krish Ruparel", email: "k@x.test", image: null }
 
 describe("PB-09 activity formatting", () => {
   it("AC1: builds 'Name summary' sentences", () => {
-    expect(activitySentence({ actor: user, summary: "moved “Slides” to Review" })).toBe("Krish Ruparel moved “Slides” to Review");
+    expect(activitySentence({ actor: user, summary: "moved “Slides” to Review" })).toBe(
+      "Krish Ruparel moved “Slides” to Review",
+    );
   });
 
   it("AC5: shows 'Someone' when the actor's account is gone", () => {
@@ -36,6 +38,25 @@ describe("PB-09 activity formatting", () => {
     ]);
     // Same instants in UTC split differently — proves the time zone is applied.
     expect(groupByDay(items.slice(0, 3), "UTC", now).map((g) => g.items.length)).toEqual([1, 2]);
+  });
+
+  it("AC1: 'Yesterday' is the previous calendar day even on the 25-hour DST day", () => {
+    // Sun Nov 1, 2026 has 25 hours in Chicago. At 11:30 pm CST, now − 24 h is still Nov 1 —
+    // an event at 00:30 on Sat Oct 31 must not be called "Yesterday" and one on Oct 31 must.
+    const now = new Date("2026-11-02T05:30:00Z"); // Sun Nov 1, 11:30 pm CST
+    const groups = groupByDay(
+      [
+        { createdAt: "2026-11-01T04:30:00Z" }, // Sat Oct 31, 11:30 pm CDT → Yesterday
+        { createdAt: "2026-10-31T05:30:00Z" }, // Sat Oct 31, 0:30 am CDT → Yesterday
+        { createdAt: "2026-10-31T04:30:00Z" }, // Fri Oct 30, 11:30 pm CDT → Fri, Oct 30
+      ],
+      "America/Chicago",
+      now,
+    );
+    expect(groups.map((g) => [g.label, g.items.length])).toEqual([
+      ["Yesterday", 2],
+      ["Fri, Oct 30", 1],
+    ]);
   });
 
   it("round-trips cursors and rejects garbage", () => {

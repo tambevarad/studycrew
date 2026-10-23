@@ -19,11 +19,14 @@ export function ActivityTimeline({
   initial,
   timeZone,
   filters,
+  nowIso,
 }: {
   teamId: string;
   initial: Page<ActivityDTO>;
   timeZone: string;
   filters: { actorId?: string; entityType?: string };
+  /** Server render time, so "Today"/"Yesterday" headings are identical on server and client. */
+  nowIso: string;
 }) {
   const [items, setItems] = useState(initial.items);
   const [cursor, setCursor] = useState(initial.nextCursor);
@@ -46,13 +49,13 @@ export function ActivityTimeline({
     }
   }
 
-  const groups = groupByDay(items, timeZone);
+  const groups = groupByDay(items, timeZone, new Date(nowIso));
 
   return (
     <div className="flex flex-col gap-6">
       {groups.map((g) => (
         <section key={g.key} aria-labelledby={`day-${g.key}`}>
-          <h3 id={`day-${g.key}`} className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <h3 id={`day-${g.key}`} className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
             {g.label}
           </h3>
           <ul className="divide-y divide-slate-100">
@@ -69,7 +72,9 @@ export function ActivityTimeline({
           </Button>
         </div>
       ) : items.length > 0 ? (
-        <p className="text-sm text-slate-500">That&apos;s everything — you&apos;ve reached the start of this team&apos;s history.</p>
+        <p className="text-sm text-slate-500">
+          That&apos;s everything — you&apos;ve reached the start of this team&apos;s history.
+        </p>
       ) : null}
     </div>
   );
