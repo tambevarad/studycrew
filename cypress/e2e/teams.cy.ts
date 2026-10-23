@@ -10,8 +10,8 @@ function teamIdFromPath(path: string): string {
 }
 
 /**
- * sonner's success toast is 4.25:1 and fails axe until contract PR #29 merges, so wait for it to close before an axe
- * check that follows a save (same workaround as auth.cy.ts). Remove once #29 is on main.
+ * Wait for a success toast to close before an axe check that follows a save (same pattern as auth.cy.ts). Keep this
+ * after #29: the colors pass once a toast is fully shown, but it still fails axe while fading in (~350 ms).
  */
 function waitForToastToClose(text: string) {
   cy.contains("[data-sonner-toast]", text, { timeout: 10000 }).should("not.exist");
