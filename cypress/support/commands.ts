@@ -19,16 +19,32 @@ declare global {
   }
 }
 
-Cypress.Commands.add("login", (user: SeedUser = "varad") => {
-  cy.session(user, () => {
-    cy.request({
+/**
+ * Better Auth rate-limits sign-in in production builds (a few attempts per 10 s), and a full E2E run
+ * signs in many times. Instead of weakening the limit, wait for `x-retry-after` and try again.
+ */
+function signInWithRetry(user: SeedUser, attempt = 1): Cypress.Chainable<unknown> {
+  return cy
+    .request({
       method: "POST",
       url: "/api/auth/sign-in/email",
       body: { email: `${user}@studycrew.test`, password: SEED_PASSWORD },
       headers: { origin: Cypress.config("baseUrl")! },
+      failOnStatusCode: false,
     })
-      .its("status")
-      .should("eq", 200);
+    .then((res) => {
+      if (res.status === 429 && attempt < 8) {
+        const seconds = Number(res.headers["x-retry-after"]) || 2;
+        cy.wait(seconds * 1000 + 250, { log: false });
+        return signInWithRetry(user, attempt + 1);
+      }
+      expect(res.status, `sign-in as ${user}`).to.eq(200);
+    });
+}
+
+Cypress.Commands.add("login", (user: SeedUser = "varad") => {
+  cy.session(user, () => {
+    signInWithRetry(user);
   });
 });
 

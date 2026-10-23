@@ -71,7 +71,7 @@ export function Sidebar({ user, teams }: { user: { name: string; email: string }
                   >
                     <Users className="size-4 shrink-0" aria-hidden />
                     <span className="truncate">{t.name}</span>
-                    <span className="ml-auto text-xs text-slate-500">{t.courseCode}</span>
+                    <span className={cn("ml-auto text-xs", active ? "text-brand-800" : "text-slate-600")}>{t.courseCode}</span>
                   </Link>
                 </li>
               );
