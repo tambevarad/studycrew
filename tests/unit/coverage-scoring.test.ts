@@ -9,7 +9,9 @@ describe("PB-10 scoring", () => {
     expect(scoreItems(items("COVERED", "PARTIAL", "MISSING"))).toBe(50);
     expect(scoreItems(items("COVERED", "COVERED", "PARTIAL"))).toBe(83); // 2.5 / 3 = 83.3
     expect(scoreItems(items("COVERED", "PARTIAL", "PARTIAL", "MISSING", "MISSING", "MISSING"))).toBe(33); // 2 / 6
-    expect(scoreItems(items("PARTIAL", "MISSING", "MISSING", "MISSING", "MISSING", "MISSING", "MISSING", "MISSING"))).toBe(6); // 6.25
+    expect(
+      scoreItems(items("PARTIAL", "MISSING", "MISSING", "MISSING", "MISSING", "MISSING", "MISSING", "MISSING")),
+    ).toBe(6); // 6.25
     expect(scoreItems(items("COVERED"))).toBe(100);
     expect(scoreItems(items("MISSING", "MISSING"))).toBe(0);
   });

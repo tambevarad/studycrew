@@ -109,7 +109,13 @@ describe("PB-10 run a coverage check", () => {
     const me = members[0];
     const report = await runCoverageCheck(team.id, me.id, input(), { model: new MockCoverageModel(), now: NOW });
 
-    expect(report).toMatchObject({ status: "COMPLETED", provider: "mock", model: "keyword-mock-v1", promptVersion: "v1", canDelete: true });
+    expect(report).toMatchObject({
+      status: "COMPLETED",
+      provider: "mock",
+      model: "keyword-mock-v1",
+      promptVersion: "v1",
+      canDelete: true,
+    });
     expect(report.items.map((i) => i.position)).toEqual([0, 1, 2, 3]);
     const drawbacks = report.items.find((i) => i.requirement.includes("drawbacks"))!;
     expect(drawbacks.status).not.toBe("COVERED");
@@ -127,7 +133,11 @@ describe("PB-10 run a coverage check", () => {
     const report = await runCoverageCheck(team.id, leader.id, input(), { model: new MockCoverageModel(), now: NOW });
     const events = await db.activityEvent.findMany({ where: { teamId: team.id, type: "COVERAGE_RUN" } });
     expect(events).toHaveLength(1);
-    expect(events[0]).toMatchObject({ entityType: "coverage", entityId: report.id, summary: `ran an AI check on “Psych 101 presentation” (score ${report.score})` });
+    expect(events[0]).toMatchObject({
+      entityType: "coverage",
+      entityId: report.id,
+      summary: `ran an AI check on “Psych 101 presentation” (score ${report.score})`,
+    });
   });
 
   it("AC2: every stored quote from the mock is verified against the draft", async () => {
@@ -181,7 +191,15 @@ describe("PB-10 run a coverage check", () => {
   it("AC2: quotes longer than 300 characters are shortened, and stay verified when they were verbatim", async () => {
     const { team, leader } = await makeTeam();
     const longDraft = `${"Students said the study group helped them understand the lectures. ".repeat(8)}`.trim();
-    const { model } = fakeModel([{ requirement: "Describe the study group", status: "COVERED", evidenceQuote: longDraft, reason: "Yes.", suggestion: null }]);
+    const { model } = fakeModel([
+      {
+        requirement: "Describe the study group",
+        status: "COVERED",
+        evidenceQuote: longDraft,
+        reason: "Yes.",
+        suggestion: null,
+      },
+    ]);
     const report = await runCoverageCheck(team.id, leader.id, input({ draft: longDraft }), { model, now: NOW });
     expect(report.items[0].evidenceQuote!.length).toBeLessThanOrEqual(300);
     expect(report.items[0]).toMatchObject({ status: "COVERED", evidenceVerified: true });
@@ -209,14 +227,18 @@ describe("PB-10 run a coverage check", () => {
   it("rejects instructions with no checkable requirements (400) without saving anything", async () => {
     const { team, leader } = await makeTeam();
     const { model } = fakeModel([], []);
-    await expect(runCoverageCheck(team.id, leader.id, input(), { model, now: NOW })).rejects.toMatchObject({ code: "VALIDATION" });
+    await expect(runCoverageCheck(team.id, leader.id, input(), { model, now: NOW })).rejects.toMatchObject({
+      code: "VALIDATION",
+    });
     expect(await db.coverageReport.count()).toBe(0);
   });
 
   it("only members can run a check (403)", async () => {
     const { team } = await makeTeam();
     const outsider = await makeUser();
-    await expect(runCoverageCheck(team.id, outsider.id, input(), { model: new MockCoverageModel(), now: NOW })).rejects.toMatchObject({
+    await expect(
+      runCoverageCheck(team.id, outsider.id, input(), { model: new MockCoverageModel(), now: NOW }),
+    ).rejects.toMatchObject({
       code: "FORBIDDEN",
     });
   });
@@ -226,7 +248,9 @@ describe("PB-10 failure handling (AC5)", () => {
   it("AC5: a provider that never answers is cut off, a FAILED report is saved, and the user gets 502 with a clear message", async () => {
     const { team, leader } = await makeTeam();
     const started = Date.now();
-    await expect(runCoverageCheck(team.id, leader.id, input(), { model: hangingModel, now: NOW, timeoutMs: 50 })).rejects.toMatchObject({
+    await expect(
+      runCoverageCheck(team.id, leader.id, input(), { model: hangingModel, now: NOW, timeoutMs: 50 }),
+    ).rejects.toMatchObject({
       code: "UPSTREAM",
       status: 502,
       message: TIMEOUT_MESSAGE,
@@ -234,7 +258,13 @@ describe("PB-10 failure handling (AC5)", () => {
     expect(Date.now() - started).toBeLessThan(5_000);
 
     const failed = await db.coverageReport.findFirstOrThrow({ where: { teamId: team.id }, include: { items: true } });
-    expect(failed).toMatchObject({ status: "FAILED", score: null, provider: "openai", model: "fake-gpt", promptVersion: "v1" });
+    expect(failed).toMatchObject({
+      status: "FAILED",
+      score: null,
+      provider: "openai",
+      model: "fake-gpt",
+      promptVersion: "v1",
+    });
     expect(failed.errorMessage).toMatch(/^Timed out after/);
     expect(failed.latencyMs).toBeGreaterThanOrEqual(40);
     expect(failed.items).toHaveLength(0);
@@ -257,7 +287,10 @@ describe("PB-10 failure handling (AC5)", () => {
       message: PROVIDER_ERROR_MESSAGE,
     });
     const failed = await db.coverageReport.findFirstOrThrow({ where: { teamId: team.id } });
-    expect(failed).toMatchObject({ status: "FAILED", errorMessage: "The AI provider isn't configured (missing API key)" });
+    expect(failed).toMatchObject({
+      status: "FAILED",
+      errorMessage: "The AI provider isn't configured (missing API key)",
+    });
     const logged = errorLog.mock.calls.flat().join(" ");
     expect(logged).not.toContain("Social media helps");
     expect(logged).not.toContain("peer-reviewed");
@@ -265,8 +298,15 @@ describe("PB-10 failure handling (AC5)", () => {
 
   it("AC5: the rest of the app keeps working — the FAILED run is listed and the next run succeeds", async () => {
     const { team, leader } = await makeTeam();
-    await runCoverageCheck(team.id, leader.id, input({ title: "Will fail" }), { model: hangingModel, now: NOW, timeoutMs: 20 }).catch(() => {});
-    const ok = await runCoverageCheck(team.id, leader.id, input({ title: "Works" }), { model: new MockCoverageModel(), now: NOW });
+    await runCoverageCheck(team.id, leader.id, input({ title: "Will fail" }), {
+      model: hangingModel,
+      now: NOW,
+      timeoutMs: 20,
+    }).catch(() => {});
+    const ok = await runCoverageCheck(team.id, leader.id, input({ title: "Works" }), {
+      model: new MockCoverageModel(),
+      now: NOW,
+    });
     const list = await listReports(team.id, leader.id);
     expect(list.map((r) => [r.title, r.status])).toEqual([
       ["Works", "COMPLETED"],
@@ -307,7 +347,9 @@ describe("PB-10 consent, limits, and rate limit", () => {
     for (const body of [withoutConsent, { ...withoutConsent, consent: false }]) {
       const res = await callRoute(POST, { params: { teamId: team.id }, body });
       expect(res.status).toBe(400);
-      expect(res.json.error.details.fields.consent).toBe("Please confirm you agree to send this text to the AI provider.");
+      expect(res.json.error.details.fields.consent).toBe(
+        "Please confirm you agree to send this text to the AI provider.",
+      );
     }
     expect(calls).toEqual({ extract: 0, check: 0 });
     expect(await db.coverageReport.count()).toBe(0);
@@ -316,11 +358,17 @@ describe("PB-10 consent, limits, and rate limit", () => {
   it("AC6: instructions over 15,000 or a draft over 30,000 characters → 400 with the limit in the message", async () => {
     const { team, leader } = await makeTeam();
     signInAs(leader);
-    const longInstructions = await callRoute(POST, { params: { teamId: team.id }, body: input({ instructions: "a".repeat(15_001) }) });
+    const longInstructions = await callRoute(POST, {
+      params: { teamId: team.id },
+      body: input({ instructions: "a".repeat(15_001) }),
+    });
     expect(longInstructions.status).toBe(400);
     expect(longInstructions.json.error.details.fields.instructions).toContain("15,000");
 
-    const longDraft = await callRoute(POST, { params: { teamId: team.id }, body: input({ draft: "a".repeat(30_001) }) });
+    const longDraft = await callRoute(POST, {
+      params: { teamId: team.id },
+      body: input({ draft: "a".repeat(30_001) }),
+    });
     expect(longDraft.status).toBe(400);
     expect(longDraft.json.error.details.fields.draft).toContain("30,000");
 
@@ -336,7 +384,9 @@ describe("PB-10 consent, limits, and rate limit", () => {
     const me = members[0];
     await insertReports(team.id, me.id, MAX_RUNS_PER_USER_PER_DAY, new Date("2026-10-28T00:00:00Z"));
     expect(await remainingRunsToday(team.id, me.id, NOW)).toBe(0);
-    await expect(runCoverageCheck(team.id, me.id, input(), { model: new MockCoverageModel(), now: NOW })).rejects.toMatchObject({
+    await expect(
+      runCoverageCheck(team.id, me.id, input(), { model: new MockCoverageModel(), now: NOW }),
+    ).rejects.toMatchObject({
       code: "RATE_LIMITED",
       status: 429,
       message: RATE_LIMIT_MESSAGE,
@@ -377,7 +427,11 @@ describe("PB-10 list, get, delete", () => {
     const list = await callRoute(GET, { params: { teamId: team.id } });
     expect(list.status).toBe(200);
     expect(list.json.data.map((r: { title: string }) => r.title)).toEqual(["Second", "First"]);
-    expect(list.json.data[1]).toMatchObject({ workType: "PRESENTATION", author: { id: members[0].id }, counts: first.json.data.counts });
+    expect(list.json.data[1]).toMatchObject({
+      workType: "PRESENTATION",
+      author: { id: members[0].id },
+      counts: first.json.data.counts,
+    });
     expect(list.json.data[1]).not.toHaveProperty("draft");
 
     const one = await callRoute(GET_ONE, { params: { teamId: team.id, reportId: first.json.data.id } });
@@ -388,16 +442,24 @@ describe("PB-10 list, get, delete", () => {
   it("a report from another team is 404, not leaked", async () => {
     const a = await makeTeam();
     const b = await makeTeam();
-    const report = await runCoverageCheck(a.team.id, a.leader.id, input(), { model: new MockCoverageModel(), now: NOW });
+    const report = await runCoverageCheck(a.team.id, a.leader.id, input(), {
+      model: new MockCoverageModel(),
+      now: NOW,
+    });
     await expect(getReport(b.team.id, b.leader.id, report.id)).rejects.toMatchObject({ code: "NOT_FOUND" });
     signInAs(b.leader);
     expect((await callRoute(GET_ONE, { params: { teamId: b.team.id, reportId: report.id } })).status).toBe(404);
-    expect((await callRoute(DELETE, { method: "DELETE", params: { teamId: b.team.id, reportId: report.id } })).status).toBe(404);
+    expect(
+      (await callRoute(DELETE, { method: "DELETE", params: { teamId: b.team.id, reportId: report.id } })).status,
+    ).toBe(404);
   });
 
   it("AC7: canDelete is true for the author and leaders only", async () => {
     const { team, leader, members } = await makeTeam({ members: 2 });
-    const report = await runCoverageCheck(team.id, members[0].id, input(), { model: new MockCoverageModel(), now: NOW });
+    const report = await runCoverageCheck(team.id, members[0].id, input(), {
+      model: new MockCoverageModel(),
+      now: NOW,
+    });
     expect((await getReport(team.id, members[0].id, report.id)).canDelete).toBe(true);
     expect((await getReport(team.id, leader.id, report.id)).canDelete).toBe(true);
     expect((await getReport(team.id, members[1].id, report.id)).canDelete).toBe(false);
@@ -405,7 +467,10 @@ describe("PB-10 list, get, delete", () => {
 
   it("AC7: another member gets 403 and the report stays", async () => {
     const { team, members } = await makeTeam({ members: 2 });
-    const report = await runCoverageCheck(team.id, members[0].id, input(), { model: new MockCoverageModel(), now: NOW });
+    const report = await runCoverageCheck(team.id, members[0].id, input(), {
+      model: new MockCoverageModel(),
+      now: NOW,
+    });
     await expect(deleteReport(team.id, members[1].id, report.id)).rejects.toMatchObject({ code: "FORBIDDEN" });
     signInAs(members[1]);
     const res = await callRoute(DELETE, { method: "DELETE", params: { teamId: team.id, reportId: report.id } });
@@ -416,7 +481,10 @@ describe("PB-10 list, get, delete", () => {
 
   it("AC7: the author permanently deletes a report — items are gone and COVERAGE_DELETED is logged", async () => {
     const { team, members } = await makeTeam({ members: 1 });
-    const report = await runCoverageCheck(team.id, members[0].id, input(), { model: new MockCoverageModel(), now: NOW });
+    const report = await runCoverageCheck(team.id, members[0].id, input(), {
+      model: new MockCoverageModel(),
+      now: NOW,
+    });
     signInAs(members[0]);
     const res = await callRoute(DELETE, { method: "DELETE", params: { teamId: team.id, reportId: report.id } });
     expect(res.status).toBe(200);
@@ -424,13 +492,19 @@ describe("PB-10 list, get, delete", () => {
     expect(await db.coverageReport.count({ where: { id: report.id } })).toBe(0);
     expect(await db.coverageItem.count({ where: { reportId: report.id } })).toBe(0);
     const event = await db.activityEvent.findFirstOrThrow({ where: { teamId: team.id, type: "COVERAGE_DELETED" } });
-    expect(event).toMatchObject({ actorId: members[0].id, entityId: report.id, summary: "deleted the AI check “Psych 101 presentation”" });
+    expect(event).toMatchObject({
+      actorId: members[0].id,
+      entityId: report.id,
+      summary: "deleted the AI check “Psych 101 presentation”",
+    });
   });
 
   it("AC7: a leader can delete a member's report, including a FAILED one", async () => {
     const { team, leader, members } = await makeTeam({ members: 1 });
     vi.spyOn(console, "error").mockImplementation(() => {});
-    await runCoverageCheck(team.id, members[0].id, input(), { model: hangingModel, now: NOW, timeoutMs: 20 }).catch(() => {});
+    await runCoverageCheck(team.id, members[0].id, input(), { model: hangingModel, now: NOW, timeoutMs: 20 }).catch(
+      () => {},
+    );
     const [failed] = await listReports(team.id, leader.id);
     expect(await deleteReport(team.id, leader.id, failed.id)).toEqual({ deleted: true });
     expect(await listReports(team.id, leader.id)).toEqual([]);

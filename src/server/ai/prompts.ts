@@ -36,7 +36,7 @@ export const EXTRACT_SYSTEM = [
   ROLE,
   "Your job in this step: turn the instructions into a checklist.",
   "Rules:",
-  "- List each distinct, checkable requirement as one short imperative sentence (for example, \"Cite at least three peer-reviewed sources\").",
+  '- List each distinct, checkable requirement as one short imperative sentence (for example, "Cite at least three peer-reviewed sources").',
   "- Keep concrete details from the instructions: numbers, lengths, required sections, named topics, formats.",
   "- Merge duplicates and requirements that say the same thing in different words.",
   "- Split a sentence that asks for two different things into two requirements.",
@@ -64,7 +64,7 @@ export const CHECK_SYSTEM = [
   "- status: COVERED if the draft fully addresses the requirement; PARTIAL if it addresses only part of it or only mentions it without substance; MISSING if nothing in the draft addresses it.",
   `- evidenceQuote: copy ONE continuous passage from the draft, word for word, that best supports your status (at least 3 words, at most ${MAX_QUOTE_CHARS} characters). Do not paraphrase, fix spelling, shorten with "...", or join separate passages. The quote is checked automatically against the draft; a quote that is not found there makes a COVERED verdict count as PARTIAL. Use null when the status is MISSING.`,
   "- reason: one short sentence explaining the status.",
-  "- suggestion: one concrete next step that tells the students what to add or change (for example, \"Add a slide that compares two drawbacks, each with a cited study\"). Never write the content for them. Use null when the status is COVERED.",
+  '- suggestion: one concrete next step that tells the students what to add or change (for example, "Add a slide that compares two drawbacks, each with a cited study"). Never write the content for them. Use null when the status is COVERED.',
   "- Judge only what is in the draft. Do not assume anything the draft does not say.",
   DATA_RULE,
 ].join("\n");

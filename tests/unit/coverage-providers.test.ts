@@ -22,7 +22,11 @@ function fakeLanguageModel(json: unknown) {
   });
 }
 
-const input = { workType: "PRESENTATION" as const, instructions: "- Explain the benefits", draft: "Benefits are many." };
+const input = {
+  workType: "PRESENTATION" as const,
+  instructions: "- Explain the benefits",
+  draft: "Benefits are many.",
+};
 
 describe("PB-10 provider adapters (SdkCoverageModel)", () => {
   beforeEach(() => vi.stubEnv("FAKE_API_KEY", "test-key-not-real"));
@@ -54,7 +58,13 @@ describe("PB-10 provider adapters (SdkCoverageModel)", () => {
 
   it("step 2 sends the requirements + draft and returns the model's items", async () => {
     const items = [
-      { requirement: "Explain the benefits", status: "COVERED", evidenceQuote: "Benefits are many.", reason: "Stated.", suggestion: null },
+      {
+        requirement: "Explain the benefits",
+        status: "COVERED",
+        evidenceQuote: "Benefits are many.",
+        reason: "Stated.",
+        suggestion: null,
+      },
     ];
     const lm = fakeLanguageModel({ items });
     const model = new SdkCoverageModel("claude", "fake-1", lm, "FAKE_API_KEY");

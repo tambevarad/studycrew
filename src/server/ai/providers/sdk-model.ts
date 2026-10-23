@@ -10,7 +10,9 @@ import type { CoverageModel, CoverageModelInput, CoverageModelItem, ProviderName
  * (clampQuote), not here, since not every provider supports maxLength in JSON schema.
  */
 export const requirementsSchema = z.object({
-  requirements: z.array(z.string().describe("One checkable requirement as a short imperative sentence.")).max(MAX_REQUIREMENTS),
+  requirements: z
+    .array(z.string().describe("One checkable requirement as a short imperative sentence."))
+    .max(MAX_REQUIREMENTS),
 });
 
 export const checkedItemsSchema = z.object({
@@ -18,7 +20,10 @@ export const checkedItemsSchema = z.object({
     z.object({
       requirement: z.string().describe("The requirement text, copied unchanged."),
       status: z.enum(COVERAGE_STATUSES),
-      evidenceQuote: z.string().nullable().describe("A passage copied word for word from the draft, or null when MISSING."),
+      evidenceQuote: z
+        .string()
+        .nullable()
+        .describe("A passage copied word for word from the draft, or null when MISSING."),
       reason: z.string().describe("One short sentence explaining the status."),
       suggestion: z.string().nullable().describe("One concrete next step for the students, or null when COVERED."),
     }),
@@ -50,7 +55,9 @@ export class SdkCoverageModel implements CoverageModel {
    */
   private assertConfigured() {
     if (!process.env[this.apiKeyEnv]?.trim()) {
-      throw new LoadAPIKeyError({ message: `${this.apiKeyEnv} is not set, so the ${this.provider} provider can't be used.` });
+      throw new LoadAPIKeyError({
+        message: `${this.apiKeyEnv} is not set, so the ${this.provider} provider can't be used.`,
+      });
     }
   }
 
@@ -68,7 +75,11 @@ export class SdkCoverageModel implements CoverageModel {
     return output.requirements.map((r) => r.trim()).filter(Boolean);
   }
 
-  async checkRequirements(input: CoverageModelInput, requirements: string[], signal?: AbortSignal): Promise<CoverageModelItem[]> {
+  async checkRequirements(
+    input: CoverageModelInput,
+    requirements: string[],
+    signal?: AbortSignal,
+  ): Promise<CoverageModelItem[]> {
     this.assertConfigured();
     const { output } = await generateText({
       model: this.languageModel,

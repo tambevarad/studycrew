@@ -1,7 +1,9 @@
 import { COVERAGE_STATUSES, type CoverageStatusValue } from "@/contracts/coverage";
 
 /** How many requirements have each status. Every status is present (0 when none). */
-export function countByStatus(items: ReadonlyArray<{ status: CoverageStatusValue }>): Record<CoverageStatusValue, number> {
+export function countByStatus(
+  items: ReadonlyArray<{ status: CoverageStatusValue }>,
+): Record<CoverageStatusValue, number> {
   const counts = Object.fromEntries(COVERAGE_STATUSES.map((s) => [s, 0])) as Record<CoverageStatusValue, number>;
   for (const item of items) counts[item.status] += 1;
   return counts;
