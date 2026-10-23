@@ -1,5 +1,6 @@
+import { LoadAPIKeyError } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getCoverageModel } from "@/server/ai";
 import { CHECK_SYSTEM, checkPrompt, EXTRACT_SYSTEM, extractPrompt, PROMPT_VERSION } from "@/server/ai/prompts";
 import { SdkCoverageModel } from "@/server/ai/providers/sdk-model";
@@ -24,11 +25,23 @@ function fakeLanguageModel(json: unknown) {
 const input = { workType: "PRESENTATION" as const, instructions: "- Explain the benefits", draft: "Benefits are many." };
 
 describe("PB-10 provider adapters (SdkCoverageModel)", () => {
+  beforeEach(() => vi.stubEnv("FAKE_API_KEY", "test-key-not-real"));
   afterEach(() => vi.unstubAllEnvs());
+
+  it("NFR-02: with a missing or empty API key nothing is sent to the provider", async () => {
+    for (const value of ["", "   "]) {
+      vi.stubEnv("FAKE_API_KEY", value);
+      const lm = fakeLanguageModel({ requirements: ["x"] });
+      const model = new SdkCoverageModel("openai", "fake-1", lm, "FAKE_API_KEY");
+      await expect(model.extractRequirements(input)).rejects.toSatisfy(LoadAPIKeyError.isInstance);
+      await expect(model.checkRequirements(input, ["x"])).rejects.toSatisfy(LoadAPIKeyError.isInstance);
+      expect(lm.doGenerateCalls).toHaveLength(0);
+    }
+  });
 
   it("step 1 sends the extraction prompt and returns trimmed requirements", async () => {
     const lm = fakeLanguageModel({ requirements: [" Explain the benefits ", ""] });
-    const model = new SdkCoverageModel("openai", "fake-1", lm);
+    const model = new SdkCoverageModel("openai", "fake-1", lm, "FAKE_API_KEY");
     const signal = new AbortController().signal;
     expect(await model.extractRequirements(input, signal)).toEqual(["Explain the benefits"]);
 
@@ -44,7 +57,7 @@ describe("PB-10 provider adapters (SdkCoverageModel)", () => {
       { requirement: "Explain the benefits", status: "COVERED", evidenceQuote: "Benefits are many.", reason: "Stated.", suggestion: null },
     ];
     const lm = fakeLanguageModel({ items });
-    const model = new SdkCoverageModel("claude", "fake-1", lm);
+    const model = new SdkCoverageModel("claude", "fake-1", lm, "FAKE_API_KEY");
     expect(await model.checkRequirements(input, ["Explain the benefits"])).toEqual(items);
     const prompt = JSON.stringify(lm.doGenerateCalls[0].prompt);
     expect(prompt).toContain("1. Explain the benefits");
@@ -53,7 +66,7 @@ describe("PB-10 provider adapters (SdkCoverageModel)", () => {
 
   it("rejects output that doesn't match the strict schema", async () => {
     const lm = fakeLanguageModel({ items: [{ requirement: "x", status: "DONE" }] });
-    const model = new SdkCoverageModel("gemini", "fake-1", lm);
+    const model = new SdkCoverageModel("gemini", "fake-1", lm, "FAKE_API_KEY");
     await expect(model.checkRequirements(input, ["x"])).rejects.toThrow();
   });
 

@@ -1,4 +1,4 @@
-import { generateText, Output, type LanguageModel } from "ai";
+import { generateText, LoadAPIKeyError, Output, type LanguageModel } from "ai";
 import { z } from "zod";
 import { COVERAGE_STATUSES } from "@/contracts/coverage";
 import { CHECK_SYSTEM, checkPrompt, EXTRACT_SYSTEM, extractPrompt, MAX_REQUIREMENTS } from "../prompts";
@@ -39,10 +39,23 @@ export class SdkCoverageModel implements CoverageModel {
     readonly provider: ProviderName,
     readonly model: string,
     private readonly languageModel: LanguageModel,
+    /** Env var holding the key. Checked before every call (see assertConfigured). */
+    private readonly apiKeyEnv: string,
     private readonly providerOptions?: ProviderOptions,
   ) {}
 
+  /**
+   * The SDK treats an EMPTY key as set and sends the request anyway (then gets a 401). Our .env.example ships
+   * `OPENAI_API_KEY=""`, so without this check the student's text would leave StudyCrew with no usable key.
+   */
+  private assertConfigured() {
+    if (!process.env[this.apiKeyEnv]?.trim()) {
+      throw new LoadAPIKeyError({ message: `${this.apiKeyEnv} is not set, so the ${this.provider} provider can't be used.` });
+    }
+  }
+
   async extractRequirements(input: CoverageModelInput, signal?: AbortSignal): Promise<string[]> {
+    this.assertConfigured();
     const { output } = await generateText({
       model: this.languageModel,
       instructions: EXTRACT_SYSTEM,
@@ -56,6 +69,7 @@ export class SdkCoverageModel implements CoverageModel {
   }
 
   async checkRequirements(input: CoverageModelInput, requirements: string[], signal?: AbortSignal): Promise<CoverageModelItem[]> {
+    this.assertConfigured();
     const { output } = await generateText({
       model: this.languageModel,
       instructions: CHECK_SYSTEM,
