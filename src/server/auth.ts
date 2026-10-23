@@ -1,7 +1,20 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
+import { isValidTimeZone } from "@/contracts/common";
 import { db } from "./db";
+
+/**
+ * `timezone` is accepted from the client on /api/auth/sign-up/email and /api/auth/update-user, which skip our Zod
+ * contracts. An invalid zone would make every Intl/date-fns call that renders this user's times throw (including on
+ * teammates' availability and meeting pages), so reject it here with the same message as `contracts/common#timeZone`.
+ */
+async function rejectInvalidTimeZone(user: Record<string, unknown>): Promise<void> {
+  if (user.timezone !== undefined && (typeof user.timezone !== "string" || !isValidTimeZone(user.timezone))) {
+    throw new APIError("BAD_REQUEST", { message: "Choose a valid time zone." });
+  }
+}
 
 /**
  * Better Auth instance (email + password only, per scope). Mounted at /api/auth/*.
@@ -22,6 +35,12 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       timezone: { type: "string", required: false, defaultValue: "America/Chicago", input: true },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: { before: async (user) => rejectInvalidTimeZone(user) },
+      update: { before: async (user) => rejectInvalidTimeZone(user) },
     },
   },
   session: {
