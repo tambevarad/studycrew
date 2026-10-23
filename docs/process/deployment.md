@@ -44,7 +44,7 @@ everyone out.
 `vercel.json` sets the build command:
 
 ```sh
-DATABASE_URL="${DATABASE_URL_UNPOOLED:-$DATABASE_URL}" prisma migrate deploy && next build
+DATABASE_URL="${DATABASE_URL_UNPOOLED:-$DATABASE_URL}" npx prisma migrate deploy && next build
 ```
 
 1. `npm ci` installs dependencies; `postinstall` runs `prisma generate`.
@@ -68,13 +68,18 @@ previews to check pages and the build. Test signed-in flows locally or on stagin
 `prisma/seed.ts` **deletes all app data** and then recreates the demo users and teams. Run it **once**, right after the
 first successful deploy, and never again once real usage starts:
 
+In Git Bash, from the repo folder. `read -rs` waits silently for you to paste the Neon **direct** URL, so it never shows on
+screen, in shell history, or in a file:
+
 ```sh
-DATABASE_URL="<Neon direct URL>" npm run db:seed
+read -rs NEON_DIRECT && export DATABASE_URL="$NEON_DIRECT"
+npm run db:seed          # prints "Seeded 6 users, 3 teams…"
+unset DATABASE_URL NEON_DIRECT
 ```
 
-Run it from your own terminal and paste the URL there only. Never commit it or put it in chat. The seed password is
-public in the repo (`prisma/seed.ts`), so staging's demo accounts are for demos only: don't store anything private in
-them.
+`dotenv` doesn't override variables that are already set, so your local `.env` doesn't redirect the seed. The migrations
+must already be applied (the first Vercel build does that). Never commit the URL or paste it into chat. The seed password
+is public in the repo (`prisma/seed.ts`), so staging holds **test data only**: never store anything real there.
 
 ## Rollback
 
