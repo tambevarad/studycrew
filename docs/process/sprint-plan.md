@@ -17,7 +17,7 @@ items in parallel, with human review of every PR. Sprints 4 and 5 keep their ori
 |---|---|---|
 | Thu Oct 22 | Foundation + contracts PR (schema, contracts, server core, UI kit, shell, test harness, CI, task specs) | Varad + Claude Code; Dev reviews |
 | Thu Oct 22 night | Repo, Projects board, issues PB-01…PB-17, branch protection | Varad (repo admin), Dev |
-| Fri Oct 23 | Parallel build, one branch per item (below) | everyone |
+| Thu night → Sat | Build one branch per item, **in turn**: Varad → Krish → Dev → Devarsh (team availability) | everyone |
 | Fri Oct 23 night | PRs open, cross-reviews, merges | review pairs |
 | Sat Oct 24 | Staging smoke test, screenshots, progress report, sprint review + retro after class | everyone; Varad leads the report |
 
@@ -27,13 +27,17 @@ items in parallel, with human review of every PR. Sprints 4 and 5 keep their ori
 | PB-02 Accounts and profiles | Krish | 5 | Fri |
 | PB-03 Availability grid | Krish | 5 | Fri |
 | PB-04 Teams, invites, join requests | Dev | 8 | Fri |
-| PB-05 Task board | Devarsh | 8 | Fri |
+| PB-05 Task board | Krish (from Devarsh) | 8 | Fri |
 | PB-06 Calendar and meeting finder | Varad | 13 | Fri–Sat |
-| PB-07 Notes, links, file references | Devarsh | 5 | Fri |
+| PB-07 Notes, links, file references | Varad (from Devarsh) | 5 | Fri |
 | PB-08 In-app notifications | Krish | 5 | Fri–Sat |
 | PB-09 Activity history | Varad | 3 | Fri |
 | PB-10 AI Coverage Check (Dev pairs on review) | Devarsh | 13 | Fri–Sat |
 | **Total by Oct 24** | | **73** | |
+
+**Reassignment (Oct 22):** because members are available one after another and Devarsh is last, PB-05 moved to
+Krish and PB-07 to Varad. Load by Oct 24: Varad 21 pts (PB-09, PB-07, PB-06), Krish 23 (PB-02, PB-05, PB-03, PB-08),
+Dev 8 + staging + reviews (PB-04), Devarsh 13 (PB-10).
 
 If something won't make Oct 24, it moves to Sprint 4 **in this order**: PB-07, then PB-08 polish, then PB-06 heatmap
 (keep the finder). The report states exactly what was done and what moved.
