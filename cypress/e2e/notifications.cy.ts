@@ -24,7 +24,7 @@ describe("PB-08 notifications", () => {
 
   beforeEach(() => {
     cy.login("krish");
-    cy.request("/api/v1/me/profile").then((res) => (meId = res.body.data.id));
+    cy.request("/api/auth/get-session").then((res) => (meId = res.body.user.id)); // Better Auth's own endpoint
     cy.visitTeam();
     cy.location("pathname").then((path) => (teamId = path.split("/")[2]));
   });
