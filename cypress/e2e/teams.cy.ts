@@ -65,6 +65,11 @@ describe("PB-04 teams, invites, and join requests", () => {
     waitForToastToClose("Team created");
     cy.checkPageA11y();
 
+    // AC6 in the browser: an email invite shows up on the invitee's Find teams page.
+    cy.get("textarea[name=emails]").type("outsider@studycrew.test");
+    cy.contains("button", "Send invites").click();
+    cy.contains("Invited outsider@studycrew.test").should("be.visible");
+
     cy.contains("label", "Share this link")
       .invoke("attr", "for")
       .then((id) => cy.get(`#${id}`).invoke("val"))
@@ -73,6 +78,16 @@ describe("PB-04 teams, invites, and join requests", () => {
         expect(path).to.match(/^\/join\/[A-Za-z0-9_-]{10}$/);
 
         cy.login("outsider");
+        // The invitation's date text is built on the server; the browser must hydrate it without a mismatch (#418).
+        cy.visit("/teams", { onBeforeLoad: (win) => cy.spy(win.console, "error").as("consoleError") });
+        cy.contains("h2", "Invitations")
+          .closest("section")
+          .within(() => {
+            cy.contains(name);
+            cy.contains(/Varad Tambe invited you · expires [A-Z][a-z]{2} \d{1,2}, \d{4}/);
+          });
+        cy.get("@consoleError").should("not.have.been.calledWithMatch", /hydrat|#418|#425/i);
+
         cy.visit(path);
         cy.contains("h1", `Join ${name}`);
         cy.contains("1 of 8 members");

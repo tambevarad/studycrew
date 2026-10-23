@@ -10,6 +10,7 @@ import {
   summarizeList,
   wouldRemoveLastLeader,
 } from "@/server/services/teams/rules";
+import { inviteExpiryLabels, joinRequestLabels } from "@/components/features/teams/labels";
 import { inviteLink, parseEmailList } from "@/components/features/teams/team-utils";
 
 describe("PB-04 team rules", () => {
@@ -88,5 +89,30 @@ describe("PB-04 client helpers", () => {
 
   it("builds the shareable /join link from the current origin", () => {
     expect(inviteLink("https://studycrew.example", "abc123XYZ_")).toBe("https://studycrew.example/join/abc123XYZ_");
+  });
+});
+
+describe("PB-04 server-built date labels (no Intl in client components)", () => {
+  const now = new Date("2026-10-23T17:00:00Z");
+  const user = { id: "u1", name: "Olivia", email: "o@x.edu", image: null };
+  const team = { id: "t1", name: "Core", courseCode: "CSE 6324" };
+
+  it("labels invite expiry in the viewer's time zone", () => {
+    const invite = { id: "i1", team, email: "o@x.edu", invitedBy: user, createdAt: now.toISOString(), expiresAt: "2026-11-06T03:00:00Z" };
+    expect(inviteExpiryLabels([invite], "America/Chicago")).toEqual({ i1: "expires Nov 5, 2026" });
+    expect(inviteExpiryLabels([invite], "Asia/Kolkata")).toEqual({ i1: "expires Nov 6, 2026" });
+  });
+
+  it("labels requests as sent / answered relative to now", () => {
+    const base = { team, user, message: null };
+    const labels = joinRequestLabels(
+      [
+        { ...base, id: "p", status: "PENDING", createdAt: "2026-10-23T14:00:00Z", decidedAt: null },
+        { ...base, id: "a", status: "APPROVED", createdAt: "2026-10-21T17:00:00Z", decidedAt: "2026-10-23T16:30:00Z" },
+      ],
+      now,
+      "America/Chicago",
+    );
+    expect(labels).toEqual({ p: "Sent 3 h ago", a: "Sent 2 d ago · answered 30 min ago" });
   });
 });

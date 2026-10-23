@@ -18,6 +18,8 @@ import { db } from "@/server/db";
 import { listMyTeams } from "@/server/shared/teams";
 import {
   acceptInvite,
+  cancelJoinRequest,
+  decideJoinRequest,
   getInvitePreview,
   joinByCode,
   myCourses,
@@ -380,6 +382,24 @@ describe("PB-04 team size (AC7)", () => {
       "CONFLICT",
     ]);
     expect(await db.teamMember.count({ where: { teamId: team.id } })).toBe(MAX_TEAM_SIZE);
+  });
+
+  it("a cancel racing an approval: exactly one wins, and the request status matches membership", async () => {
+    for (let round = 0; round < 10; round++) {
+      const { team, leader } = await makeTeam();
+      const me = await makeUser();
+      const request = await requestToJoin(me.id, { teamId: team.id });
+      const [cancel, approve] = await Promise.allSettled([
+        cancelJoinRequest(request.id, me.id),
+        decideJoinRequest(request.id, leader.id, { decision: "APPROVE" }),
+      ]);
+      expect([cancel.status, approve.status].sort()).toEqual(["fulfilled", "rejected"]);
+      const loser = (cancel.status === "rejected" ? cancel : approve) as PromiseRejectedResult;
+      expect(loser.reason.code).toBe("CONFLICT");
+      const stored = await db.joinRequest.findUniqueOrThrow({ where: { id: request.id } });
+      const member = (await myRoleIn(team.id, me.id)) !== null;
+      expect(stored.status).toBe(member ? "APPROVED" : "CANCELLED");
+    }
   });
 
   it("concurrent duplicate requests create only one PENDING request", async () => {
