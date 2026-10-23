@@ -1,8 +1,26 @@
 /** PB-02 accounts and profiles: sign up → welcome → courses → save; wrong password; sign out; a11y (AC1–AC4, AC9). */
+/**
+ * Better Auth allows 3 sign-in (and, separately, 3 sign-up) requests per 10 s per IP in production, and other specs'
+ * cy.login() calls share the sign-in window. UI submits here can't use cy.login's retry, so: submit, and if the server
+ * answers 429, check the form says how long to wait, wait exactly the X-Retry-After it sent, and submit again.
+ */
+function submitWaitingOutRateLimit(alias: string, submit: () => void, attempt = 1): void {
+  submit();
+  cy.wait(`@${alias}`).then(({ response }) => {
+    if (response?.statusCode !== 429 || attempt >= 4) return;
+    cy.contains("[role=alert]", /Try again in \d+ seconds?\./).should("be.visible");
+    const seconds = Number(response.headers["x-retry-after"]) || 10;
+    cy.wait(seconds * 1000 + 250);
+    submitWaitingOutRateLimit(alias, submit, attempt + 1);
+  });
+}
+
 describe("PB-02 accounts and profiles", () => {
-  // Better Auth limits sign-in to 3 attempts per 10 s per IP in production. This spec signs in several times, so let
-  // the window pass before the next spec, or its first sign-in gets 429 ("Too many attempts").
-  after(() => cy.wait(10_000));
+  beforeEach(() => {
+    cy.intercept("POST", "/api/auth/sign-in/email").as("signIn");
+    cy.intercept("POST", "/api/auth/sign-up/email").as("signUp");
+  });
+
   it("AC1/AC5/AC9: signs up, lands on the profile with a welcome, and saves courses", () => {
     const email = `e2e-${Date.now()}@studycrew.test`;
     cy.visit("/sign-up");
@@ -19,7 +37,7 @@ describe("PB-02 accounts and profiles", () => {
     cy.get("input[name=password]").type("-but-long-now");
     cy.get("button[aria-label='Show password']").click();
     cy.get("input[name=password]").should("have.attr", "type", "text");
-    cy.contains("button", "Create account").click();
+    submitWaitingOutRateLimit("signUp", () => cy.contains("button", "Create account").click());
 
     cy.location("pathname", { timeout: 15000 }).should("eq", "/profile");
     cy.contains("Welcome! Add your courses so teammates can find you.").should("be.visible");
@@ -52,7 +70,7 @@ describe("PB-02 accounts and profiles", () => {
     cy.get("input[name=name]").type("Duplicate Krish");
     cy.get("input[name=email]").type("krish@studycrew.test");
     cy.get("input[name=password]").type("another-password");
-    cy.contains("button", "Create account").click();
+    submitWaitingOutRateLimit("signUp", () => cy.contains("button", "Create account").click());
     cy.contains("An account with that email already exists.").should("be.visible");
     cy.contains("a", "Sign in instead?").should("have.attr", "href", "/sign-in");
   });
@@ -61,11 +79,13 @@ describe("PB-02 accounts and profiles", () => {
     cy.visit("/sign-in?next=/profile");
     cy.checkPageA11y();
     cy.get("input[name=email]").type("krish@studycrew.test");
-    cy.get("input[name=password]").type("wrong-password{enter}");
+    cy.get("input[name=password]").type("wrong-password");
+    submitWaitingOutRateLimit("signIn", () => cy.contains("button", "Sign in").click());
     cy.contains("don't match").should("be.visible");
     cy.location("pathname").should("eq", "/sign-in");
 
-    cy.get("input[name=password]").clear().type("studycrew-dev-pass{enter}");
+    cy.get("input[name=password]").clear().type("studycrew-dev-pass");
+    submitWaitingOutRateLimit("signIn", () => cy.contains("button", "Sign in").click());
     cy.location("pathname", { timeout: 15000 }).should("eq", "/profile");
 
     cy.visit("/dashboard");
@@ -73,6 +93,30 @@ describe("PB-02 accounts and profiles", () => {
     cy.location("pathname", { timeout: 15000 }).should("eq", "/sign-in");
     cy.visit("/profile");
     cy.location("pathname").should("eq", "/sign-in");
+  });
+
+  it("429: when sign-in is rate-limited, the form says how many seconds to wait", () => {
+    cy.visit("/sign-in");
+    cy.get("input[name=email]").type("krish@studycrew.test");
+    cy.get("input[name=password]").type("wrong-password");
+    // Submit until the 3-per-10 s limit trips (at most 4 more attempts), then check the message uses X-Retry-After.
+    const submitUntil429 = (left: number): void => {
+      cy.contains("button", "Sign in").click();
+      cy.wait("@signIn").then(({ response }) => {
+        if (response?.statusCode === 429) {
+          const seconds = Number(response.headers["x-retry-after"]);
+          expect(seconds, "X-Retry-After").to.be.within(1, 10);
+          cy.contains("[role=alert]", `Try again in ${seconds} second${seconds === 1 ? "" : "s"}.`).should(
+            "be.visible",
+          );
+          cy.location("pathname").should("eq", "/sign-in");
+        } else {
+          expect(left, "a 429 within 4 attempts").to.be.greaterThan(0);
+          submitUntil429(left - 1);
+        }
+      });
+    };
+    submitUntil429(4);
   });
 
   it("AC9: the profile form works keyboard-only", () => {

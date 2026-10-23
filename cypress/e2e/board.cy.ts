@@ -10,7 +10,13 @@ const checkBoardA11y = () => {
 };
 
 describe("PB-05 task board", () => {
-  beforeEach(() => cy.login("krish"));
+  beforeEach(() => {
+    cy.login("krish");
+    cy.intercept("POST", "**/tasks/*/move").as("move");
+  });
+  // Moves are optimistic: the card shows in its new column before POST …/move finishes. Wait for the save before a
+  // reload or leaving the page, or the navigation cancels the request (it flaked in CI that way).
+  const moveSaved = () => cy.wait("@move").its("response.statusCode").should("eq", 200);
   // Let Better Auth's sign-in rate limit (3 per 10 s) reset before the next spec
   // (docs/contract-requests/PB-05-e2e-sign-in-rate-limit.md).
   after(() => cy.wait(10_000));
@@ -39,6 +45,7 @@ describe("PB-05 task board", () => {
     cy.get(`button[aria-label='Move to… “${title}”']`).click();
     cy.get("[role=menu]").contains("[role=menuitem]", "Done").click();
     cy.get("section[aria-labelledby=column-DONE]").should("contain", title);
+    moveSaved();
 
     cy.reload();
     cy.get("section[aria-labelledby=column-DONE]").should("contain", title);
@@ -80,12 +87,14 @@ describe("PB-05 task board", () => {
     cy.get("[id^=DndLiveRegion]").should("contain", "in Review.");
     cy.focused().type(" ");
     cy.get("section[aria-labelledby=column-REVIEW]").should("contain", title);
+    moveSaved();
     cy.reload();
     cy.get("section[aria-labelledby=column-REVIEW]").should("contain", title);
     // Put it back so the seed stays as other specs expect.
     cy.get(`button[aria-label='Move to… “${title}”']`).click();
     cy.get("[role=menu]").contains("[role=menuitem]", "In Progress").click();
     cy.get("section[aria-labelledby=column-IN_PROGRESS]").should("contain", title);
+    moveSaved();
   });
 
   it("AC7: overdue tasks say “Overdue”; due-soon tasks are amber", () => {

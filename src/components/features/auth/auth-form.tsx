@@ -13,7 +13,14 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { signIn, signUp } from "@/lib/auth-client";
-import { MIN_PASSWORD, safeNextPath, validateAuthFields, type AuthFieldErrors } from "./validation";
+import {
+  MIN_PASSWORD,
+  rateLimitMessage,
+  retryAfterSeconds,
+  safeNextPath,
+  validateAuthFields,
+  type AuthFieldErrors,
+} from "./validation";
 
 type Mode = "sign-in" | "sign-up";
 
@@ -92,14 +99,22 @@ export function AuthForm({ mode }: { mode: Mode }) {
     }
 
     setPending(true);
+    // `result.error` has no headers, so read Better Auth's X-Retry-After (sent with 429) from the response here.
+    let retryAfter: string | null = null;
+    const fetchOptions = {
+      onError: (ctx: { response: Response }) => {
+        retryAfter = ctx.response.headers.get("x-retry-after");
+      },
+    };
     const result =
       mode === "sign-in"
-        ? await signIn.email({ email: email.trim(), password })
+        ? await signIn.email({ email: email.trim(), password, fetchOptions })
         : await signUp.email({
             email: email.trim(),
             password,
             name: name.trim(),
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            fetchOptions,
           } as Parameters<typeof signUp.email>[0]);
 
     if (result.error) {
@@ -117,7 +132,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
       } else if (mode === "sign-in" && (code === "INVALID_EMAIL_OR_PASSWORD" || result.error.status === 401)) {
         setError("That email and password don't match. Check them and try again.");
       } else if (result.error.status === 429) {
-        setError("Too many attempts. Wait a minute, then try again.");
+        setError(rateLimitMessage(retryAfterSeconds(retryAfter)));
       } else {
         setError(
           mode === "sign-in"
