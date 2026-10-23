@@ -45,7 +45,7 @@ function Column({ status, count, children }: { status: TaskStatusValue; count: n
     <section
       ref={setNodeRef}
       aria-labelledby={headingId}
-      className={cn("flex min-h-48 flex-col gap-3 rounded-lg bg-slate-50 p-3", isOver && "ring-brand-300 ring-2")}
+      className={cn("flex min-h-48 flex-col gap-3 rounded-lg bg-slate-50 p-3", isOver && "ring-brand-500 ring-2")}
     >
       <h3 id={headingId} className="flex items-center justify-between text-sm font-semibold text-slate-800">
         {TASK_STATUS_LABELS[status]}
