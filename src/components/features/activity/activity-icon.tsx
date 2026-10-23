@@ -1,4 +1,14 @@
-import { CalendarDays, CheckSquare, Flag, Link2, Settings, Sparkles, UserRound, Vote, type LucideIcon } from "lucide-react";
+import {
+  CalendarDays,
+  CheckSquare,
+  Flag,
+  Link2,
+  Settings,
+  Sparkles,
+  UserRound,
+  Vote,
+  type LucideIcon,
+} from "lucide-react";
 import type { EntityTypeValue } from "@/contracts/activity";
 
 const ICONS: Record<EntityTypeValue, LucideIcon> = {
