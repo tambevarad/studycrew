@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: studycrew
+      POSTGRES_PASSWORD: studycrew
+      POSTGRES_DB: studycrew
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/db-init.sql:/docker-entrypoint-initdb.d/db-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studycrew"]
+      interval: 2s
+      retries: 20
+volumes:
+  pgdata:

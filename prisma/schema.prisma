@@ -1,0 +1,545 @@
+// StudyCrew data model — SHARED CONTRACT.
+//
+// This file covers every backlog item (PB-01 … PB-17) up front so feature
+// branches never need a migration. Do NOT edit it on a feature branch.
+// If you need a change, open a "Contract change" issue (see docs/process/workflow.md).
+//
+// Conventions
+// - ids are cuid strings; timestamps are UTC (timestamptz).
+// - Everything team-scoped carries teamId and cascades when the team is deleted.
+// - Better Auth owns User/Session/Account/Verification; profile fields live on User.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────── Auth (Better Auth) ─────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+
+  // Profile (PB-02, FR-01)
+  timezone String   @default("America/Chicago") // IANA zone
+  courses  String[] @default([]) // normalized course codes, e.g. "CSE 6324"
+  skills   String[] @default([])
+  bio      String?
+
+  sessions      Session[]
+  accounts      Account[]
+  availability  Availability?
+  memberships   TeamMember[]
+  teamsCreated  Team[]           @relation("TeamCreatedBy")
+  joinRequests  JoinRequest[]    @relation("JoinRequestUser")
+  decisions     JoinRequest[]    @relation("JoinRequestDecidedBy")
+  invitesSent   TeamInvite[]     @relation("InviteCreatedBy")
+  tasksCreated  Task[]           @relation("TaskCreatedBy")
+  assignments   TaskAssignee[]
+  meetings      Meeting[]        @relation("MeetingCreatedBy")
+  rsvps         MeetingRsvp[]
+  agendaItems   AgendaItem[]
+  helpFlags     AgendaHelpFlag[]
+  resources     Resource[]
+  notifications Notification[]
+  activity      ActivityEvent[]
+  polls         Poll[]
+  pollVotes     PollVote[]
+  coverageRuns  CoverageReport[]
+  ratings       CoverageItem[]   @relation("CoverageItemRatedBy")
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime @db.Timestamptz(3)
+  token     String   @unique
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  password              String? // salted hash written by Better Auth (NFR-02)
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ───────────────────────────── Availability (PB-03) ─────────────────────────────
+
+/// Weekly availability painted on a 7 × 48 grid of 30-minute cells.
+/// slot index = day * 48 + halfHour, where day 0 = Monday … 6 = Sunday and
+/// halfHour 0 = 00:00–00:30, interpreted in User.timezone.
+model Availability {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slots     Int[]    @default([])
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@map("availability")
+}
+
+// ───────────────────────────── Teams (PB-04) ─────────────────────────────
+
+enum TeamRole {
+  LEADER
+  MEMBER
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  courseCode  String // normalized, e.g. "CSE 6324"
+  description String?
+  inviteCode  String   @unique // used in /join/[inviteCode] links
+  isOpen      Boolean  @default(true) // listed in course search, accepts join requests
+  createdById String
+  createdBy   User     @relation("TeamCreatedBy", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  members      TeamMember[]
+  invites      TeamInvite[]
+  joinRequests JoinRequest[]
+  tasks        Task[]
+  meetings     Meeting[]
+  resources    Resource[]
+  activity     ActivityEvent[]
+  milestones   Milestone[]
+  polls        Poll[]
+  coverage     CoverageReport[]
+
+  @@index([courseCode])
+  @@map("team")
+}
+
+model TeamMember {
+  teamId   String
+  userId   String
+  role     TeamRole @default(MEMBER)
+  joinedAt DateTime @default(now()) @db.Timestamptz(3)
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+  @@index([userId])
+  @@map("team_member")
+}
+
+/// Email invite. Email delivery is out of scope: the invitee sees it in-app
+/// (notification + /teams page) when signed in with that email.
+model TeamInvite {
+  id          String    @id @default(cuid())
+  teamId      String
+  email       String
+  createdById String
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  expiresAt   DateTime  @db.Timestamptz(3)
+  acceptedAt  DateTime? @db.Timestamptz(3)
+  revokedAt   DateTime? @db.Timestamptz(3)
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdBy   User      @relation("InviteCreatedBy", fields: [createdById], references: [id])
+
+  @@index([email])
+  @@index([teamId])
+  @@map("team_invite")
+}
+
+enum JoinRequestStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  CANCELLED
+}
+
+model JoinRequest {
+  id          String            @id @default(cuid())
+  teamId      String
+  userId      String
+  message     String?
+  status      JoinRequestStatus @default(PENDING)
+  createdAt   DateTime          @default(now()) @db.Timestamptz(3)
+  decidedAt   DateTime?         @db.Timestamptz(3)
+  decidedById String?
+  team        Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user        User              @relation("JoinRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy   User?             @relation("JoinRequestDecidedBy", fields: [decidedById], references: [id])
+
+  @@index([teamId, status])
+  @@index([userId])
+  @@map("join_request")
+}
+
+// ───────────────────────────── Tasks (PB-05) and milestones (PB-13) ─────────────────────────────
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Task {
+  id           String         @id @default(cuid())
+  teamId       String
+  title        String
+  description  String?
+  status       TaskStatus     @default(TODO)
+  priority     TaskPriority   @default(MEDIUM)
+  dueAt        DateTime?      @db.Timestamptz(3)
+  /// Ordering inside a column; lower comes first. Use midpoints when moving.
+  position     Float          @default(0)
+  milestoneId  String?
+  createdById  String
+  createdAt    DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime       @updatedAt @db.Timestamptz(3)
+  completedAt  DateTime?      @db.Timestamptz(3)
+  team         Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdBy    User           @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  milestone    Milestone?     @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  assignees    TaskAssignee[]
+  /// Set when the task was created from an AI suggestion (PB-11).
+  coverageItem CoverageItem?
+
+  @@index([teamId, status, position])
+  @@index([teamId, dueAt])
+  @@map("task")
+}
+
+model TaskAssignee {
+  taskId     String
+  userId     String
+  assignedAt DateTime @default(now()) @db.Timestamptz(3)
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+  @@index([userId])
+  @@map("task_assignee")
+}
+
+model Milestone {
+  id          String    @id @default(cuid())
+  teamId      String
+  title       String
+  description String?
+  dueAt       DateTime? @db.Timestamptz(3)
+  templateKey String? // e.g. "presentation", "report", "exam-prep"
+  position    Int       @default(0)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+
+  @@index([teamId])
+  @@map("milestone")
+}
+
+// ───────────────────────────── Meetings (PB-06) and agenda (PB-15) ─────────────────────────────
+
+enum RsvpResponse {
+  YES
+  NO
+  MAYBE
+}
+
+model Meeting {
+  id          String        @id @default(cuid())
+  teamId      String
+  title       String
+  description String?
+  location    String? // room or video link
+  startsAt    DateTime      @db.Timestamptz(3)
+  endsAt      DateTime      @db.Timestamptz(3)
+  createdById String
+  createdAt   DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime      @updatedAt @db.Timestamptz(3)
+  team        Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdBy   User          @relation("MeetingCreatedBy", fields: [createdById], references: [id])
+  rsvps       MeetingRsvp[]
+  agendaItems AgendaItem[]
+
+  @@index([teamId, startsAt])
+  @@map("meeting")
+}
+
+model MeetingRsvp {
+  meetingId   String
+  userId      String
+  response    RsvpResponse
+  respondedAt DateTime     @default(now()) @db.Timestamptz(3)
+  meeting     Meeting      @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([meetingId, userId])
+  @@map("meeting_rsvp")
+}
+
+model AgendaItem {
+  id        String           @id @default(cuid())
+  meetingId String
+  authorId  String
+  title     String
+  notes     String?
+  createdAt DateTime         @default(now()) @db.Timestamptz(3)
+  meeting   Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  author    User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  helpFlags AgendaHelpFlag[]
+
+  @@index([meetingId])
+  @@map("agenda_item")
+}
+
+model AgendaHelpFlag {
+  agendaItemId String
+  userId       String
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  agendaItem   AgendaItem @relation(fields: [agendaItemId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([agendaItemId, userId])
+  @@map("agenda_help_flag")
+}
+
+// ───────────────────────────── Resources (PB-07) ─────────────────────────────
+
+enum ResourceType {
+  NOTE
+  LINK
+  FILE_REF // link to a file kept in Google Drive, OneDrive, or Canvas — no uploads
+}
+
+model Resource {
+  id          String       @id @default(cuid())
+  teamId      String
+  type        ResourceType
+  title       String
+  url         String? // required for LINK and FILE_REF
+  body        String? // markdown-free plain text for NOTE
+  pinned      Boolean      @default(false)
+  createdById String
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(3)
+  team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdBy   User         @relation(fields: [createdById], references: [id])
+
+  @@index([teamId, createdAt])
+  @@map("resource")
+}
+
+// ───────────────────────────── Notifications (PB-08) ─────────────────────────────
+
+enum NotificationType {
+  TEAM_INVITE
+  JOIN_REQUEST
+  JOIN_DECISION
+  TASK_ASSIGNED
+  TASK_DUE_SOON
+  MEETING_SCHEDULED
+  MEETING_UPDATED
+  POLL_CREATED
+  POLL_CLOSED
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  teamId    String?
+  type      NotificationType
+  title     String
+  body      String?
+  link      String? // in-app path, e.g. /teams/abc/board?task=xyz
+  /// Optional idempotency key, e.g. "due:<taskId>:<userId>". Unique per user.
+  dedupeKey String?
+  readAt    DateTime?        @db.Timestamptz(3)
+  createdAt DateTime         @default(now()) @db.Timestamptz(3)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, readAt, createdAt])
+  @@map("notification")
+}
+
+// ───────────────────────────── Activity history (PB-09) ─────────────────────────────
+
+/// Append-only team history. Written only through src/server/activity.ts.
+model ActivityEvent {
+  id         String   @id @default(cuid())
+  teamId     String
+  actorId    String?
+  type       String // ActivityType from src/contracts/activity.ts
+  entityType String // "task" | "meeting" | "resource" | "team" | "member" | "poll" | "milestone" | "coverage"
+  entityId   String?
+  summary    String // human-readable, e.g. "moved “Slides” to Done"
+  metadata   Json?
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([teamId, createdAt])
+  @@map("activity_event")
+}
+
+// ───────────────────────────── Polls (PB-14) ─────────────────────────────
+
+model Poll {
+  id              String       @id @default(cuid())
+  teamId          String
+  question        String
+  closesAt        DateTime     @db.Timestamptz(3)
+  closedAt        DateTime?    @db.Timestamptz(3)
+  winningOptionId String?
+  createdById     String
+  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
+  team            Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  createdBy       User         @relation(fields: [createdById], references: [id])
+  options         PollOption[]
+  votes           PollVote[]
+
+  @@index([teamId, closesAt])
+  @@map("poll")
+}
+
+model PollOption {
+  id       String     @id @default(cuid())
+  pollId   String
+  label    String
+  position Int
+  poll     Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes    PollVote[]
+
+  @@index([pollId])
+  @@map("poll_option")
+}
+
+model PollVote {
+  pollId    String
+  userId    String
+  optionId  String
+  updatedAt DateTime   @updatedAt @db.Timestamptz(3)
+  poll      Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@id([pollId, userId])
+  @@map("poll_vote")
+}
+
+// ───────────────────────────── AI Coverage Check (PB-10, PB-11, PB-16) ─────────────────────────────
+
+enum WorkType {
+  ASSIGNMENT
+  PRESENTATION
+  REPORT
+  EXAM_PREP
+}
+
+enum CoverageRunStatus {
+  COMPLETED
+  FAILED
+}
+
+enum CoverageStatus {
+  COVERED
+  PARTIAL
+  MISSING
+}
+
+enum CoverageRating {
+  HELPFUL
+  NOT_HELPFUL
+}
+
+model CoverageReport {
+  id            String            @id @default(cuid())
+  teamId        String
+  authorId      String
+  title         String
+  workType      WorkType
+  instructions  String // ≤ 15,000 chars
+  draft         String // ≤ 30,000 chars
+  status        CoverageRunStatus
+  errorMessage  String?
+  score         Int? // 0–100, null when FAILED
+  provider      String // "openai" | "gemini" | "claude" | "mock"
+  model         String
+  promptVersion String
+  latencyMs     Int
+  createdAt     DateTime          @default(now()) @db.Timestamptz(3)
+  team          Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  author        User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  items         CoverageItem[]
+
+  @@index([teamId, createdAt])
+  @@index([authorId, createdAt])
+  @@map("coverage_report")
+}
+
+model CoverageItem {
+  id               String          @id @default(cuid())
+  reportId         String
+  position         Int
+  requirement      String
+  status           CoverageStatus
+  evidenceQuote    String?
+  /// true only if evidenceQuote appears word-for-word in the draft (server-checked)
+  evidenceVerified Boolean         @default(false)
+  reason           String
+  suggestion       String?
+  taskId           String?         @unique // PB-11: task created from this suggestion
+  rating           CoverageRating? // PB-11
+  ratedById        String?
+  report           CoverageReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  task             Task?           @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  ratedBy          User?           @relation("CoverageItemRatedBy", fields: [ratedById], references: [id], onDelete: SetNull)
+
+  @@index([reportId, position])
+  @@map("coverage_item")
+}

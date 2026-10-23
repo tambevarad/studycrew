@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/*
+ * StudyCrew design tokens — SHARED CONTRACT (see docs/contracts/ui-guidelines.md).
+ * Five semantic colors only (UI lecture: "limit to 4–5 colors, be consistent").
+ *   brand   = primary actions, links, selection
+ *   success = done / covered / available
+ *   warning = due soon / partial / review
+ *   danger  = errors, overdue, missing, destructive actions (red ALWAYS means a problem)
+ *   neutral = everything else
+ * Use these token classes (bg-brand-600, text-danger-700 …), not raw Tailwind palettes.
+ */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  --color-surface: #ffffff;
+  --color-canvas: #f8fafc;
+}
+
+html,
+body {
+  background: var(--color-canvas);
+  color: var(--color-slate-900);
+}
+
+/* Visible keyboard focus everywhere (NFR-03). */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
