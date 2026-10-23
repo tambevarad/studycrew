@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { safeNextPath, validateAuthFields } from "@/components/features/auth/validation";
+import {
+  rateLimitMessage,
+  retryAfterSeconds,
+  safeNextPath,
+  validateAuthFields,
+} from "@/components/features/auth/validation";
 import { addChip, COURSE_RULES, SKILL_RULES } from "@/components/features/profile/chips";
 import { dedupeCourses, dedupeSkills } from "@/server/services/profile/normalize";
 
@@ -58,6 +63,18 @@ describe("PB-02 auth form validation", () => {
       email: "Enter your email.",
       password: "Enter your password.",
     });
+  });
+
+  it("429: reads X-Retry-After and says how long to wait", () => {
+    expect(retryAfterSeconds("8")).toBe(8);
+    expect(retryAfterSeconds("2.2")).toBe(3);
+    expect(retryAfterSeconds("0")).toBeNull();
+    expect(retryAfterSeconds("soon")).toBeNull();
+    expect(retryAfterSeconds(null)).toBeNull();
+    expect(rateLimitMessage(8)).toBe("Too many attempts. Try again in 8 seconds.");
+    expect(rateLimitMessage(1)).toBe("Too many attempts. Try again in 1 second.");
+    expect(rateLimitMessage(61)).toBe("Too many attempts. Try again in 2 minutes.");
+    expect(rateLimitMessage(null)).toBe("Too many attempts. Wait a few seconds, then try again.");
   });
 
   it("only follows same-site ?next= paths", () => {
