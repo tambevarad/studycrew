@@ -43,7 +43,8 @@ export function CreateTeamForm({ defaultCourse }: { defaultCourse: string }) {
   return (
     <Card className="max-w-2xl">
       <CardBody>
-        <form onSubmit={onSubmit} className="flex flex-col gap-5" aria-label="Create a team">
+        {/* noValidate: show the server's specific messages under each field instead of the browser's bubbles. */}
+        <form onSubmit={onSubmit} className="flex flex-col gap-5" aria-label="Create a team" noValidate>
           <FormField label="Team name" required error={fieldErrors.name}>
             <Input name="name" maxLength={80} autoComplete="off" placeholder="e.g. Query Optimizers" />
           </FormField>
