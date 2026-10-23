@@ -517,12 +517,22 @@ export async function listMyJoinRequests(userId: string): Promise<JoinRequestDTO
   return rows.map(toJoinRequestDTO);
 }
 
-/** Requester only (others get 404 so request ids don't leak); only PENDING requests can be cancelled. */
+/**
+ * Requester only (others get 404 so request ids don't leak); only PENDING requests can be cancelled.
+ * Takes the team lock like `decideJoinRequest`, so a cancel and an approval can't both succeed (which would leave the
+ * requester a member with a CANCELLED request), and only updates the row while it's still PENDING.
+ */
 export async function cancelJoinRequest(requestId: string, userId: string): Promise<{ cancelled: true }> {
-  const request = await db.joinRequest.findUnique({ where: { id: requestId } });
+  const request = await db.joinRequest.findUnique({ where: { id: requestId }, select: { userId: true, teamId: true } });
   if (!request || request.userId !== userId) throw errors.notFound("That join request");
-  if (request.status !== "PENDING") throw errors.conflict("That request was already answered, so it can't be cancelled.");
-  await db.joinRequest.update({ where: { id: requestId }, data: { status: "CANCELLED", decidedAt: new Date() } });
+  await db.$transaction(async (tx) => {
+    await lockTeam(tx, request.teamId);
+    const { count } = await tx.joinRequest.updateMany({
+      where: { id: requestId, userId, status: "PENDING" },
+      data: { status: "CANCELLED", decidedAt: new Date() },
+    });
+    if (count === 0) throw errors.conflict("That request was already answered, so it can't be cancelled.");
+  });
   return { cancelled: true };
 }
 
