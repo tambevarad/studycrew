@@ -102,6 +102,12 @@ export async function remainingRunsToday(teamId: string, actorId: string, now: D
   return Math.max(0, MAX_RUNS_PER_USER_PER_DAY - (await runsToday(actorId, now)));
 }
 
+/** Which provider a new check would go to, so the consent text can name it. */
+export function activeProvider(): { provider: string; model: string } {
+  const { provider, model } = getCoverageModel();
+  return { provider, model };
+}
+
 /** Rejects when `signal` aborts, even if `promise` never settles (a provider that ignores the signal). */
 function untilAborted<T>(promise: Promise<T>, signal: AbortSignal): Promise<T> {
   if (signal.aborted) return Promise.reject(signal.reason);
