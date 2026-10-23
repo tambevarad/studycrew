@@ -217,14 +217,16 @@ export function ResourcesView({
           }}
         />
       ) : null}
-      <ConfirmDialog
-        open={deleting !== null}
-        onCancel={() => setDeleting(null)}
-        onConfirm={confirmDelete}
-        pending={action.pending}
-        title={`Delete “${deleting?.title ?? ""}”?`}
-        description="It will be removed for everyone on the team. This can't be undone."
-      />
+      {deleting ? (
+        <ConfirmDialog
+          open
+          onCancel={() => setDeleting(null)}
+          onConfirm={confirmDelete}
+          pending={action.pending}
+          title={`Delete “${deleting?.title ?? ""}”?`}
+          description="It will be removed for everyone on the team. This can't be undone."
+        />
+      ) : null}
     </div>
   );
 }
