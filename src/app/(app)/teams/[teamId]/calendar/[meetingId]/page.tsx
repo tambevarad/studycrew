@@ -2,6 +2,7 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MeetingAgenda } from "@/components/features/agenda/meeting-agenda";
+import { weekOfInstant } from "@/components/features/meetings/calendar-dates";
 import { MeetingDetail } from "@/components/features/meetings/meeting-detail";
 import { AppError } from "@/server/errors";
 import { requirePageUser } from "@/server/session";
@@ -22,7 +23,8 @@ export default async function MeetingPage({ params }: PageProps<"/teams/[teamId]
   return (
     <div className="flex flex-col gap-4">
       <Link
-        href={`/teams/${teamId}/calendar`}
+        // Back to the meeting's own week: a meeting scheduled for next week would not show on this week's calendar.
+        href={`/teams/${teamId}/calendar?week=${weekOfInstant(new Date(meeting.startsAt), user.timezone)}`}
         className="text-brand-700 inline-flex w-fit items-center gap-1 text-sm font-medium hover:underline"
       >
         <ChevronLeft className="size-4" aria-hidden /> Back to calendar
