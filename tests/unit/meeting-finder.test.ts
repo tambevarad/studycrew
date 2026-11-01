@@ -5,6 +5,7 @@ import {
   daysBetween,
   isValidDateKey,
   mondayOf,
+  weekOfInstant,
   todayIn,
   weekdayOf,
   zonedInstant,
@@ -214,5 +215,14 @@ describe("PB-06 week heatmap", () => {
     expect(counts[slotOf(3, 40)]).toBe(0);
     expect(counts.reduce((a, b) => a + b, 0)).toBe(4);
     expect(weekAvailability(members, "2026-10-26", CHI)[slotOf(3, 38)]).toEqual(["chi", "ny"]);
+  });
+});
+
+describe("weekOfInstant", () => {
+  it("is the Monday of the meeting's week in the viewer's zone, even when the UTC date differs", () => {
+    const sundayEveningChicago = new Date("2026-11-02T00:30:00Z"); // Sun Nov 1, 6:30 pm CST; Mon in London
+    expect(weekOfInstant(sundayEveningChicago, "America/Chicago")).toBe("2026-10-26");
+    expect(weekOfInstant(sundayEveningChicago, "Europe/London")).toBe("2026-11-02");
+    expect(weekOfInstant(new Date("2026-11-03T01:00:00Z"), "America/Chicago")).toBe("2026-11-02");
   });
 });
