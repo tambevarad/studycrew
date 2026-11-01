@@ -6,6 +6,9 @@ import {
   isValidDateKey,
   mondayOf,
   weekOfInstant,
+  monthGrid,
+  shiftMonth,
+  isValidMonthKey,
   todayIn,
   weekdayOf,
   zonedInstant,
@@ -224,5 +227,27 @@ describe("weekOfInstant", () => {
     expect(weekOfInstant(sundayEveningChicago, "America/Chicago")).toBe("2026-10-26");
     expect(weekOfInstant(sundayEveningChicago, "Europe/London")).toBe("2026-11-02");
     expect(weekOfInstant(new Date("2026-11-03T01:00:00Z"), "America/Chicago")).toBe("2026-11-02");
+  });
+});
+
+describe("PB-06b month grid", () => {
+  it("covers whole weeks from the Monday before the 1st to the Sunday after the last day", () => {
+    const nov = monthGrid("2026-11"); // Nov 1 is a Sunday, Nov 30 a Monday
+    expect(nov.first).toBe("2026-11-01");
+    expect(nov.last).toBe("2026-11-30");
+    expect(nov.days[0]).toBe("2026-10-26");
+    expect(nov.days.at(-1)).toBe("2026-12-06");
+    expect(nov.days).toHaveLength(42);
+    expect(monthGrid("2026-02").days).toHaveLength(35); // Feb 2026: Sun 1st → 5 rows
+    expect(monthGrid("2027-02").days).toHaveLength(28); // Feb 2027: Mon 1st, Sun 28th → exactly 4 rows
+  });
+
+  it("moves between months across years, and validates month keys", () => {
+    expect(shiftMonth("2026-12", 1)).toBe("2027-01");
+    expect(shiftMonth("2026-01", -1)).toBe("2025-12");
+    expect(shiftMonth("2026-11", -11)).toBe("2025-12");
+    expect(isValidMonthKey("2026-11")).toBe(true);
+    expect(isValidMonthKey("2026-13")).toBe(false);
+    expect(isValidMonthKey("Nov 2026")).toBe(false);
   });
 });
