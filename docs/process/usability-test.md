@@ -1,0 +1,227 @@
+# Usability test (PB-17 · NFR-04)
+
+> **Status: plan ready, sessions not run yet.** The results tables in §9 are deliberately empty. Krish runs the sessions
+> with at least 5 students and fills them in from the timing sheets and SUS forms. Never fill in a cell with an
+> estimate, an example, or AI-generated data. A cell stays blank until a real session produced it.
+
+Owner: Krish Ruparel (M2) · Moderator: Krish · Note-taker: a teammate who didn't build the feature being tested
+
+## 1. Goal and pass criteria
+
+Find out whether students who have never seen StudyCrew can do the core team-project jobs without help, and fix what
+gets in their way before the final demo.
+
+| Measure | Pass criterion (NFR-04) | Where it comes from |
+|---|---|---|
+| Core-flow completion | **≥ 80 %** of participants finish Tasks 1–4 **unaided within 10 minutes** in total | Timing sheet (§7) |
+| Satisfaction | Mean **SUS ≥ 70** | SUS form (§6) |
+| Problems found | Every issue logged with a severity and a link to the fix or a GitHub issue | Observation notes (§9.3) |
+
+**Core flow = Tasks 1–4** (join a team → availability → meeting → task). This follows the core flow in
+`docs/contracts/ui-guidelines.md` §8, extended with the availability step the meeting finder depends on. Task 5 (AI
+Coverage Check) is timed and scored the same way, but it doesn't count toward the 10 minutes.
+
+## 2. Participants
+
+- **At least 5** UTA students who are **not** on the StudyCrew team and have **not** used the app before. Aim for a mix
+  of programs and of experience with tools like Trello, When2meet, or Google Calendar.
+- Each participant gets a code: **P1, P2, …** Only codes go into this repo. No names, emails, student IDs, photos, or
+  recordings.
+- Sessions take about **25 minutes**. In person or over a video call with screen sharing.
+
+## 3. Setup (before each session)
+
+Use **staging** (`https://studycrew-staging.vercel.app`, see `docs/process/deployment.md`) unless it's down, then a
+local `npm run build && npm run start`. Record the commit SHA from the deploy (or `git rev-parse --short HEAD`) in the
+session log, so every result is tied to a build.
+
+For each participant **P#**, as the moderator (signed in with your own account):
+
+1. Create a team **"Usability P#"** with course **CSE 6324**. Copy the **invite link** from the Members tab.
+2. Make sure the team has at least one other member **with saved availability** that overlaps Mon–Thu 6–9 pm (your
+   own account, plus one helper account if you have one), so **Find a time** has something to suggest.
+3. Leave the board empty or with 1–2 tasks, and schedule no meetings this week.
+4. Check what `AI_PROVIDER` staging uses (`mock` or a real provider) and write it in the session log. With `mock`, the
+   Appendix A text gives a predictable result: one requirement is **Missing**.
+5. Open a fresh **private / incognito** browser window on the sign-up page. Have the invite link, the task cards, and
+   Appendix A printed or ready to paste in chat.
+6. Prepare a test email for the participant to sign up with: **`p#.usability@studycrew.test`**. It's a fake domain,
+   so no real personal data is entered.
+
+After the last session: StudyCrew has no "delete team" or "delete account" feature yet, so send Dev the list of test
+emails and team names to remove from the staging database. **Never re-run the seed on staging:** it deletes all data.
+
+## 4. Consent (read aloud; participant agrees before anything starts)
+
+> Thanks for helping us test StudyCrew, a class project for CSE 6324 at UT Arlington. We're testing **the app, not
+> you**. If something is hard, that's a problem with our design, and it's exactly what we want to find.
+>
+> - The session takes about 25 minutes. You'll try five short tasks and then fill in a 10-question form.
+> - Please think aloud as you work. I'll mostly stay quiet and won't help unless you're stuck.
+> - We'll write down **how long each task takes, where you hesitate, and what you say**. We record your answers under
+>   a code like "P3", never your name. You'll use a made-up email address, not your own.
+> - [If recording] We'd like to record the screen and audio so we don't miss anything. Only the StudyCrew team sees
+>   it, and we delete it when the course ends. You can say no to recording and still take part.
+> - Taking part is **voluntary**. You can skip a task or stop at any time, with no consequence, including for your
+>   grade in any course.
+> - Anonymous results (times, success rates, SUS scores, and quotes without names) may appear in our course report.
+>
+> Do you agree to take part? [ ] Yes  [ ] No · Do you agree to screen and audio recording? [ ] Yes  [ ] No
+
+Keep the signed or ticked consent forms **outside this repo** (for example, the team's private drive). Delete them and
+any recordings at the end of the semester.
+
+## 5. Moderator script
+
+**Before the tasks (about 2 min).**
+
+> "StudyCrew helps student teams find meeting times, track tasks, and check an assignment draft against its
+> instructions. I'll hand you five cards, one at a time. Read each card, then do it as you would on your own. There are
+> no wrong answers. Please say out loud what you're looking for and what you expect to happen. When you think you're
+> done with a task, say 'done'."
+
+**During each task.**
+
+- Hand over the task card (§5.1) and start the timer when the participant **finishes reading it**. Stop the timer when
+  they say "done" or when the success check passes, whichever is first. Then check success yourself.
+- Don't help, point, or confirm. Neutral prompts only: *"What are you looking for?"*, *"What do you expect that to
+  do?"*, *"Where would you look next?"*
+- **Hint rule:** after **3 minutes stuck**, or when the participant asks for help a **second** time, give the smallest
+  hint that unblocks them (for example *"Have a look at the tabs at the top"*) and note it. A task with a hint counts as
+  **H**, not a success, for NFR-04.
+- **Give-up rule:** after **5 minutes** on one task, or if they want to stop, mark it **F**. If a later task depends
+  on it, set that up yourself (for example, join them to the team) and continue.
+- Outcome codes: **S** = success, unaided · **H** = success with a hint · **F** = failed / gave up / timed out.
+- After each task ask: *"Was anything confusing or unexpected?"* Write their words down as close to verbatim as you can.
+
+**After the tasks.** Hand over the SUS form (§6). Then ask: *"What was the most frustrating part? What did you like?
+Would your team use this?"* Thank them and explain that their test account and team will be removed after the sessions.
+
+### 5.1 Task cards
+
+Print one card per task. Read the scenario aloud and leave the card with the participant.
+
+| # | Card text (give to the participant) | Success check (moderator only) | Watch for |
+|---|---|---|---|
+| **T1** | *"You're on a CSE 6324 project team. A teammate sent you this invite link. Create a StudyCrew account with the email on this card and join the team."* | The participant is a member: "Usability P#" is in their sidebar and they can open its Overview | **Known defect D-01** (see `docs/test-report.md`): signed out, the invite link goes to Sign in, and after signing up the student lands on their profile, not back on the invite. Note whether they reopen the link by themselves; a hint here counts as H. Are the password rules clear? |
+| **T2** | *"Tell your team when you're usually free: Monday to Thursday, 6 pm to 9 pm. Save it."* | My availability shows Mon–Thu 18:00–21:00 after a reload (24 half-hour slots) | Do they find "My availability"? Drag vs. click on the grid? Do they notice the Save button and the confirmation? |
+| **T3** | *"Your team needs a one-hour meeting this week. Use StudyCrew to find a time when everyone is free and schedule it as 'Kickoff'."* | A meeting "Kickoff" of 60 min exists this week in the team calendar, at a suggested time | Do they find **Find a time**? Do they understand the ranking and time zones? Any doubt about whether it was saved? |
+| **T4** | *"Add a task 'Draft the introduction', assign it to yourself, and make it due this Friday. Then show your team you've started working on it."* | The board shows the card in **In Progress** with the participant as assignee and a Friday due date | Do they find the board? Assignee and due-date fields? Drag vs. the "Move to…" menu? |
+| **T5** | *"Your team wrote a short draft. Use the AI Coverage Check to compare it with the assignment instructions (Appendix A), and tell me which requirement the draft is missing."* | A report is shown, and the participant names **"Recommend specific collaboration software…"** as missing | Do they find the tab? Do they read and tick the consent box? Do they understand Covered / Partial / Missing? |
+
+## 6. SUS questionnaire
+
+The System Usability Scale (John Brooke, 1986; free to use with this acknowledgement). "System" is replaced by
+"StudyCrew". The participant fills it in **alone, right after the tasks, before any discussion**. Ask them to answer
+every item and to go with their first reaction.
+
+Participant: **P\_\_** · Date: \_\_\_\_ · 1 = Strongly disagree … 5 = Strongly agree
+
+| # | Statement | 1 | 2 | 3 | 4 | 5 |
+|---|---|---|---|---|---|---|
+| 1 | I think that I would like to use StudyCrew frequently. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 2 | I found StudyCrew unnecessarily complex. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 3 | I thought StudyCrew was easy to use. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 4 | I think that I would need the support of a technical person to be able to use StudyCrew. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 5 | I found the various functions in StudyCrew were well integrated. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 6 | I thought there was too much inconsistency in StudyCrew. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 7 | I would imagine that most people would learn to use StudyCrew very quickly. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 8 | I found StudyCrew very cumbersome to use. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 9 | I felt very confident using StudyCrew. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| 10 | I needed to learn a lot of things before I could get going with StudyCrew. | ☐ | ☐ | ☐ | ☐ | ☐ |
+
+**Scoring:**
+
+- Odd items (1, 3, 5, 7, 9) contribute *answer − 1*.
+- Even items (2, 4, 6, 8, 10) contribute *5 − answer*.
+- SUS = (sum of the 10 contributions) × 2.5, which gives a score from 0 to 100.
+- If an item is left blank, ask the participant to complete it on the spot. If they decline, note it, and leave that
+  participant's SUS blank in §9 rather than guessing a value.
+
+Report each participant's score and the mean. With 5 participants, also give the range: the mean alone hides a lot.
+
+## 7. Timing sheet (one per participant)
+
+Print this, or copy it into a private spreadsheet. Use clock times (hh:mm:ss) so durations can be checked later.
+
+Participant **P\_\_** · Date \_\_\_\_ · Moderator \_\_\_\_ · Note-taker \_\_\_\_ · Build (commit) \_\_\_\_ · `AI_PROVIDER` \_\_\_\_
+· Device / browser \_\_\_\_ · Consent ☐ · Recording ☐ yes ☐ no
+
+| Task | Start | End | Duration (mm:ss) | Outcome (S / H / F) | Hints given (what, when) | Errors, hesitations, quotes |
+|---|---|---|---|---|---|---|
+| T1 join a team | | | | | | |
+| T2 availability | | | | | | |
+| T3 find a time | | | | | | |
+| T4 create + move a task | | | | | | |
+| **Core flow T1–T4** | start of T1 | end of T4 | | finished unaided within 10:00? ☐ yes ☐ no | | |
+| T5 AI Coverage Check | | | | | | |
+
+Post-task comments and the final questions: \_\_\_\_
+
+## 8. Analysis
+
+1. **Core-flow completion.** A participant passes when T1–T4 are all **S** and the core-flow time is **≤ 10:00**. The
+   rate is passing participants ÷ all participants; NFR-04 passes at ≥ 80 % (4 of 5).
+2. **SUS:** each participant's score, then the mean and the range. NFR-04 passes at a mean ≥ 70.
+3. **Issues.** Merge duplicates. Give each issue a severity:
+   - 0: not a problem.
+   - 1: cosmetic.
+   - 2: minor; it slows people down.
+   - 3: major; it causes an H or F or a wrong result.
+   - 4: blocker.
+
+   Open a GitHub issue for every severity ≥ 2 and link it in §9.3.
+4. Copy the summary rows (§9.2) into `docs/test-report.md` under NFR-04 with a link back to this file.
+
+## 9. Results (to be filled in by Krish after the sessions; empty on purpose)
+
+### 9.1 Session log
+
+| Participant | Date | Build (commit) | `AI_PROVIDER` | T1 | T2 | T3 | T4 | Core flow time (T1–T4) | Core flow unaided ≤ 10 min? | T5 | T5 time | SUS |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| P1 | | | | | | | | | | | | |
+| P2 | | | | | | | | | | | | |
+| P3 | | | | | | | | | | | | |
+| P4 | | | | | | | | | | | | |
+| P5 | | | | | | | | | | | | |
+
+Add a row for each extra participant.
+
+### 9.2 Summary
+
+| Measure | Result | Criterion | Pass? |
+|---|---|---|---|
+| Participants | | ≥ 5 | |
+| Core flow finished unaided within 10 min | \_\_ of \_\_ (\_\_ %) | ≥ 80 % | |
+| Mean SUS (range) | | ≥ 70 | |
+| T5 AI Coverage Check success | \_\_ of \_\_ | (not part of NFR-04) | |
+
+### 9.3 Issues found
+
+| # | Task | What happened | Participants | Severity (0–4) | Issue / fix PR |
+|---|---|---|---|---|---|
+| | | | | | |
+
+## Appendix A: sample text for T5
+
+Hand this to the participant to paste. It's made up for the test, so nobody's real coursework is sent anywhere. With
+the `mock` provider, it gives two **Covered** requirements and one **Missing** one (checked against
+`src/server/ai/mock-model.ts` on Nov 1, 2026). A real provider should give the same answer, but check before
+the sessions.
+
+**Assignment title:** Remote work essay
+
+**Instructions:**
+
+```text
+In 400–600 words:
+1. Summarize the benefits of remote work for software teams.
+2. Compare remote work productivity with office productivity.
+3. Recommend specific collaboration software, such as chat or video calling apps.
+```
+
+**Draft:**
+
+```text
+Remote work gives software teams real benefits: flexible hours, no commute, and access to talent in other cities. When we compare remote work productivity with office productivity, most studies find remote developers do about as much, and more on focused work. Overall, remote work suits teams that plan their week carefully.
+```
