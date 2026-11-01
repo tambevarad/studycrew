@@ -58,15 +58,27 @@ describe("PB-12 team dashboard and personal home", () => {
     cy.checkPageA11y();
   });
 
-  it("an overdue task's link opens it on the board", () => {
+  it("AC2: an overdue task's link opens it on the board", () => {
+    // Its own task, due 2 hours ago, so the test never depends on what the seed or other specs left overdue.
+    const title = `E2E overdue ${Date.now()}`;
     cy.login("varad");
     cy.visitTeam();
-    cy.get("section[aria-labelledby=overdue-heading] a").then(($links) => {
-      if ($links.length === 0) return; // nothing overdue in this database state
-      const title = $links.first().text();
-      cy.wrap($links.first()).click();
-      cy.location("pathname").should("match", /\/board$/);
-      cy.get("dialog[open] input[name=title]").should("have.value", title);
+    cy.location("pathname").then((path) => {
+      const teamId = path.split("/")[2];
+      cy.request("POST", `/api/v1/teams/${teamId}/tasks`, {
+        title,
+        dueAt: new Date(Date.now() - 2 * 3_600_000).toISOString(),
+      })
+        .its("body.data.id")
+        .then((taskId: string) => {
+          cy.reload();
+          cy.get("section[aria-labelledby=overdue-heading]")
+            .contains("a", title)
+            .should("have.attr", "href", `/teams/${teamId}/board?task=${taskId}`)
+            .click();
+          cy.location("pathname").should("match", /\/board$/);
+          cy.get("dialog[open] input[name=title]").should("have.value", title);
+        });
     });
   });
 
