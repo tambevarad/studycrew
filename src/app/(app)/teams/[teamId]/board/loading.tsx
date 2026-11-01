@@ -1,7 +1,7 @@
-/** Skeleton while the board loads (UI guidelines §6: loading state). */
+/** Skeleton while the board loads (UI guidelines §6: loading state). `role="status"` allows the aria-label. */
 export default function Loading() {
   return (
-    <div className="flex flex-col gap-4" aria-busy="true" aria-label="Loading the task board">
+    <div role="status" className="flex flex-col gap-4" aria-busy="true" aria-label="Loading the task board">
       <div className="h-7 w-40 animate-pulse rounded bg-slate-200" />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
