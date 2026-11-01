@@ -65,6 +65,33 @@ export function weekOfInstant(instant: Date | number, timeZone: string): string 
   return mondayOf(zonedParts(instant, timeZone).date);
 }
 
+/** "YYYY-MM" months for the month view. */
+export function isValidMonthKey(month: string): boolean {
+  const m = /^(\d{4})-(\d{2})$/.exec(month);
+  return !!m && Number(m[2]) >= 1 && Number(m[2]) <= 12;
+}
+
+/** The month `n` months after "YYYY-MM" (negative goes back). */
+export function shiftMonth(month: string, n: number): string {
+  const [y, m] = month.split("-").map(Number);
+  const index = y * 12 + (m - 1) + n;
+  return `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}`;
+}
+
+/**
+ * Days shown for a month view: Monday of the week holding the 1st through Sunday of the week holding the last day,
+ * so always whole weeks (4 to 6 rows).
+ */
+export function monthGrid(month: string): { first: string; last: string; days: string[] } {
+  const first = `${month}-01`;
+  const last = addDays(`${shiftMonth(month, 1)}-01`, -1);
+  const start = mondayOf(first);
+  const end = addDays(mondayOf(last), 6);
+  const days: string[] = [];
+  for (let d = start; d <= end; d = addDays(d, 1)) days.push(d);
+  return { first, last, days };
+}
+
 export function isValidDateKey(date: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
   const { y, m, d } = parseDate(date);

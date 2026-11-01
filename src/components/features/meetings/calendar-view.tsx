@@ -9,10 +9,11 @@ import { Button, LinkButton } from "@/components/ui/button";
 import { SectionHeader } from "@/components/ui/page-header";
 import type { UserSummaryDTO } from "@/contracts/common";
 import type { MeetingDTO, MeetingSuggestionDTO } from "@/contracts/meetings";
-import { addDays, parseDate, zonedParts } from "./calendar-dates";
+import { addDays, mondayOf, parseDate, shiftMonth, zonedParts } from "./calendar-dates";
 import { FindTimeDialog } from "./find-time-dialog";
 import { monthShort } from "./format";
 import { MeetingFormDialog, type MeetingDraft } from "./meeting-form-dialog";
+import { MonthView } from "./month-view";
 import { SuggestionText } from "./suggestion-text";
 import { WeekView } from "./week-view";
 
@@ -33,7 +34,30 @@ function weekLabel(weekStart: string): string {
   return a.m === b.m ? `${month(a.m)} ${a.d} – ${b.d}, ${b.y}` : `${month(a.m)} ${a.d} – ${month(b.m)} ${b.d}, ${b.y}`;
 }
 
+const MONTHS_LONG = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+function monthLabel(month: string): string {
+  const [y, m] = month.split("-").map(Number);
+  return `${MONTHS_LONG[m - 1]} ${y}`;
+}
+
+/** PB-06b: which calendar is showing. Week is the default; month adds the grid of whole weeks. */
+export type CalendarMode = { view: "week" } | { view: "month"; month: string; days: string[] };
+
 export function CalendarView({
+  mode = { view: "week" },
   teamId,
   timeZone,
   today,
@@ -46,6 +70,7 @@ export function CalendarView({
   bestTimes,
   meId,
 }: {
+  mode?: CalendarMode;
   teamId: string;
   timeZone: string;
   today: string;
@@ -65,8 +90,17 @@ export function CalendarView({
   const base = `/teams/${teamId}/calendar`;
   const iAmMissing = missing.some((m) => m.id === meId);
 
+  const thisMonth = today.slice(0, 7);
+  const firstShown = mode.view === "month" ? `${mode.month}-01` : weekStart;
   const newDefault = (): MeetingDraft => ({
-    date: today < weekStart ? weekStart : today,
+    date:
+      mode.view === "month"
+        ? today.startsWith(mode.month)
+          ? today
+          : firstShown
+        : today < weekStart
+          ? weekStart
+          : today,
     startMinute: 19 * 60,
     endMinute: 20 * 60,
   });
@@ -104,124 +138,214 @@ export function CalendarView({
         </Alert>
       ) : null}
 
-      <section aria-labelledby="best-times" className="bg-surface rounded-lg border border-slate-200 p-4">
-        <h3 id="best-times" className="text-sm font-semibold text-slate-900">
-          Best times {weekStart === thisWeekStart ? "this week" : "that week"}
-        </h3>
-        {bestTimes.length === 0 ? (
-          <p className="mt-1 text-sm text-slate-600">
-            No shared free time left in this week. Try “Find a time” for other days.
-          </p>
-        ) : (
-          <ul className="mt-2 grid gap-2 sm:grid-cols-3">
-            {bestTimes.map((s) => (
-              <li key={s.startsAt} className="flex items-start justify-between gap-2 rounded-md bg-slate-50 px-3 py-2">
-                <div className="min-w-0">
-                  <SuggestionText suggestion={s} timeZone={timeZone} members={members} />
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <Badge tone={s.availableCount === s.totalMembers ? "success" : "warning"}>
-                    {s.availableCount}/{s.totalMembers}
-                  </Badge>
-                  <button
-                    type="button"
-                    className="text-brand-700 text-xs font-medium hover:underline"
-                    onClick={() => setDraft(draftFromSuggestion(s, timeZone))}
+      <nav
+        aria-label="Calendar view"
+        className="bg-surface flex w-fit rounded-md border border-slate-300 p-0.5 text-sm font-medium"
+      >
+        {(
+          [
+            [
+              "week",
+              "Week",
+              `${base}?week=${mode.view === "month" ? mondayOf(today.startsWith(mode.month) ? today : firstShown) : weekStart}`,
+            ],
+            [
+              "month",
+              "Month",
+              `${base}?view=month&month=${mode.view === "month" ? mode.month : weekStart === thisWeekStart ? thisMonth : weekStart.slice(0, 7)}`,
+            ],
+          ] as const
+        ).map(([key, label, href]) => (
+          <Link
+            key={key}
+            href={href}
+            scroll={false}
+            aria-current={mode.view === key ? "page" : undefined}
+            className={
+              mode.view === key
+                ? "bg-brand-600 rounded px-3 py-1 text-white"
+                : "rounded px-3 py-1 text-slate-700 hover:bg-slate-100"
+            }
+          >
+            {label}
+          </Link>
+        ))}
+      </nav>
+
+      {mode.view === "month" ? (
+        <>
+          <div className="flex items-center gap-2">
+            <LinkButton
+              href={`${base}?view=month&month=${shiftMonth(mode.month, -1)}`}
+              variant="outline"
+              size="icon"
+              aria-label="Previous month"
+              scroll={false}
+            >
+              <ChevronLeft aria-hidden />
+            </LinkButton>
+            <LinkButton
+              href={`${base}?view=month&month=${shiftMonth(mode.month, 1)}`}
+              variant="outline"
+              size="icon"
+              aria-label="Next month"
+              scroll={false}
+            >
+              <ChevronRight aria-hidden />
+            </LinkButton>
+            {mode.month !== thisMonth ? (
+              <Link
+                href={`${base}?view=month`}
+                className="text-brand-700 text-sm font-medium hover:underline"
+                scroll={false}
+              >
+                This month
+              </Link>
+            ) : null}
+            <h3 id="calendar-period" className="ml-1 text-base font-semibold text-slate-900" aria-live="polite">
+              {monthLabel(mode.month)}
+            </h3>
+          </div>
+          <MonthView
+            teamId={teamId}
+            month={mode.month}
+            days={mode.days}
+            today={today}
+            timeZone={timeZone}
+            meetings={meetings}
+          />
+        </>
+      ) : (
+        <>
+          <section aria-labelledby="best-times" className="bg-surface rounded-lg border border-slate-200 p-4">
+            <h3 id="best-times" className="text-sm font-semibold text-slate-900">
+              Best times {weekStart === thisWeekStart ? "this week" : "that week"}
+            </h3>
+            {bestTimes.length === 0 ? (
+              <p className="mt-1 text-sm text-slate-600">
+                No shared free time left in this week. Try “Find a time” for other days.
+              </p>
+            ) : (
+              <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+                {bestTimes.map((s) => (
+                  <li
+                    key={s.startsAt}
+                    className="flex items-start justify-between gap-2 rounded-md bg-slate-50 px-3 py-2"
                   >
-                    Schedule
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                    <div className="min-w-0">
+                      <SuggestionText suggestion={s} timeZone={timeZone} members={members} />
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <Badge tone={s.availableCount === s.totalMembers ? "success" : "warning"}>
+                        {s.availableCount}/{s.totalMembers}
+                      </Badge>
+                      <button
+                        type="button"
+                        className="text-brand-700 text-xs font-medium hover:underline"
+                        onClick={() => setDraft(draftFromSuggestion(s, timeZone))}
+                      >
+                        Schedule
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <LinkButton
-            href={`${base}?week=${addDays(weekStart, -7)}`}
-            variant="outline"
-            size="icon"
-            aria-label="Previous week"
-            scroll={false}
-          >
-            <ChevronLeft aria-hidden />
-          </LinkButton>
-          <LinkButton
-            href={`${base}?week=${addDays(weekStart, 7)}`}
-            variant="outline"
-            size="icon"
-            aria-label="Next week"
-            scroll={false}
-          >
-            <ChevronRight aria-hidden />
-          </LinkButton>
-          {weekStart !== thisWeekStart ? (
-            <Link href={base} className="text-brand-700 text-sm font-medium hover:underline" scroll={false}>
-              This week
-            </Link>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <LinkButton
+                href={`${base}?week=${addDays(weekStart, -7)}`}
+                variant="outline"
+                size="icon"
+                aria-label="Previous week"
+                scroll={false}
+              >
+                <ChevronLeft aria-hidden />
+              </LinkButton>
+              <LinkButton
+                href={`${base}?week=${addDays(weekStart, 7)}`}
+                variant="outline"
+                size="icon"
+                aria-label="Next week"
+                scroll={false}
+              >
+                <ChevronRight aria-hidden />
+              </LinkButton>
+              {weekStart !== thisWeekStart ? (
+                <Link href={base} className="text-brand-700 text-sm font-medium hover:underline" scroll={false}>
+                  This week
+                </Link>
+              ) : null}
+              <h3 id="calendar-period" className="ml-1 text-base font-semibold text-slate-900" aria-live="polite">
+                {weekLabel(weekStart)}
+              </h3>
+            </div>
+            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-700">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={showHeatmap}
+                  onChange={(e) => setShowHeatmap(e.target.checked)}
+                  className="accent-brand-600 size-4"
+                />
+                Show who&apos;s free
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={earlyHours}
+                  onChange={(e) => setEarlyHours(e.target.checked)}
+                  className="accent-brand-600 size-4"
+                />
+                Show early hours
+              </label>
+            </div>
+          </div>
+
+          {showHeatmap ? (
+            <p className="-mt-2 flex items-center gap-2 text-xs text-slate-600">
+              <span>Fewer free</span>
+              {[0.15, 0.4, 0.65, 1].map((s) => (
+                <span
+                  key={s}
+                  className="inline-block size-3 rounded-sm"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, var(--color-success-600) ${Math.round(12 + s * 48)}%, transparent)`,
+                  }}
+                  aria-hidden
+                />
+              ))}
+              <span>Everyone free · Click an empty spot to schedule there</span>
+            </p>
           ) : null}
-          <h3 className="ml-1 text-base font-semibold text-slate-900" aria-live="polite">
-            {weekLabel(weekStart)}
-          </h3>
-        </div>
-        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-700">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={showHeatmap}
-              onChange={(e) => setShowHeatmap(e.target.checked)}
-              className="accent-brand-600 size-4"
-            />
-            Show who&apos;s free
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={earlyHours}
-              onChange={(e) => setEarlyHours(e.target.checked)}
-              className="accent-brand-600 size-4"
-            />
-            Show early hours
-          </label>
-        </div>
-      </div>
 
-      {showHeatmap ? (
-        <p className="-mt-2 flex items-center gap-2 text-xs text-slate-600">
-          <span>Fewer free</span>
-          {[0.15, 0.4, 0.65, 1].map((s) => (
-            <span
-              key={s}
-              className="inline-block size-3 rounded-sm"
-              style={{
-                backgroundColor: `color-mix(in srgb, var(--color-success-600) ${Math.round(12 + s * 48)}%, transparent)`,
-              }}
-              aria-hidden
-            />
-          ))}
-          <span>Everyone free · Click an empty spot to schedule there</span>
-        </p>
-      ) : null}
+          <WeekView
+            weekStart={weekStart}
+            today={today}
+            timeZone={timeZone}
+            meetings={meetings}
+            cells={cells}
+            members={members}
+            showHeatmap={showHeatmap}
+            firstHour={earlyHours ? 0 : 7}
+            onSlotClick={(date, minute) =>
+              setDraft({ date, startMinute: minute, endMinute: Math.min(minute + 60, 24 * 60) })
+            }
+          />
 
-      <WeekView
-        weekStart={weekStart}
-        today={today}
-        timeZone={timeZone}
-        meetings={meetings}
-        cells={cells}
-        members={members}
-        showHeatmap={showHeatmap}
-        firstHour={earlyHours ? 0 : 7}
-        onSlotClick={(date, minute) =>
-          setDraft({ date, startMinute: minute, endMinute: Math.min(minute + 60, 24 * 60) })
-        }
-      />
+          {meetings.length === 0 ? (
+            <p className="text-sm text-slate-600">
+              No meetings this week yet. Use “Find a time” to pick one everyone can make.
+            </p>
+          ) : null}
+        </>
+      )}
 
-      {meetings.length === 0 ? (
+      {mode.view === "month" && meetings.length === 0 ? (
         <p className="text-sm text-slate-600">
-          No meetings this week yet. Use “Find a time” to pick one everyone can make.
+          No meetings in {monthLabel(mode.month)} yet. Use “Find a time” to pick one everyone can make.
         </p>
       ) : null}
 
