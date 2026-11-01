@@ -64,8 +64,10 @@ export function StatTile({
   testId: string;
   children?: ReactNode;
 }) {
+  // No accessible name on the tile's <section>: a named section is a landmark region, and four of them would crowd
+  // the screen reader's landmark list. The visible label already says what the tile is.
   return (
-    <Card data-testid={testId} aria-label={label} className="flex items-center gap-4 p-4">
+    <Card data-testid={testId} className="flex items-center gap-4 p-4">
       {children}
       <div className="min-w-0">
         <p className="text-sm text-slate-600">{label}</p>
