@@ -1,14 +1,5 @@
 /** PB-05 task board: create via dialog, move via “Move to…” → Done, persists after reload; keyboard; a11y (AC1, AC2, AC7, AC8, AC10). */
 
-/**
- * Same as cy.checkPageA11y() but without the shared sidebar, whose active team link fails contrast on every team page
- * (docs/contract-requests/PB-05-sidebar-team-contrast.md). Switch back to cy.checkPageA11y() once that lands.
- */
-const checkBoardA11y = () => {
-  cy.injectAxe();
-  cy.checkA11y({ exclude: [["aside"]] }, { includedImpacts: ["serious", "critical"] });
-};
-
 describe("PB-05 task board", () => {
   beforeEach(() => {
     cy.login("krish");
@@ -25,7 +16,7 @@ describe("PB-05 task board", () => {
     const title = `E2E task ${Date.now()}`;
     cy.visitTeam("board");
     cy.contains("h2", "Task board");
-    checkBoardA11y();
+    cy.checkPageA11y();
 
     cy.contains("button", "New task").click();
     cy.get("dialog[open]").within(() => {
@@ -36,7 +27,7 @@ describe("PB-05 task board", () => {
       cy.get("select[name=priority]").select("High");
       cy.contains("label", "Dev Patel").find("input[type=checkbox]").check();
     });
-    checkBoardA11y();
+    cy.checkPageA11y();
     cy.get("dialog[open]").contains("button", "Add task").click();
     cy.get("dialog[open]").should("not.exist");
 
@@ -50,9 +41,9 @@ describe("PB-05 task board", () => {
     cy.reload();
     cy.get("section[aria-labelledby=column-DONE]").should("contain", title);
     cy.get("section[aria-labelledby=column-TODO]").should("not.contain", title);
-    // sonner's success toast is below 4.5:1 (docs/contract-requests/PB-02-toast-contrast.md); check without it.
+    // Toasts fail contrast while they fade in (docs/contract-requests/PB-02-toast-contrast.md); check once it's gone.
     cy.get("[data-sonner-toast]", { timeout: 10000 }).should("not.exist");
-    checkBoardA11y();
+    cy.checkPageA11y();
   });
 
   it("AC8: the “Move to…” menu works from the keyboard", () => {
