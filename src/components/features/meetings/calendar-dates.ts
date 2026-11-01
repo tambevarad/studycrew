@@ -60,6 +60,11 @@ export function zonedParts(instant: Date | number, timeZone: string) {
   };
 }
 
+/** Monday ("YYYY-MM-DD") of the calendar week an instant falls in, in the viewer's time zone. */
+export function weekOfInstant(instant: Date | number, timeZone: string): string {
+  return mondayOf(zonedParts(instant, timeZone).date);
+}
+
 export function isValidDateKey(date: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
   const { y, m, d } = parseDate(date);
