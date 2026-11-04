@@ -1,6 +1,8 @@
 # PB-17 · NFR-01/02/03 — nonfunctional checks. MANUAL ONLY (workflow_dispatch): never on push or PR, because the load
 # test and the ZAP scan hit a live site (staging is also our demo site) and take minutes.
 # Run from Actions → "NFR checks" → Run workflow, ticking only the checks you want.
+# The three jobs that hit target_url run one after another (zap → lighthouse → load), so the load test's latency isn't
+# inflated by ZAP's crawl and Lighthouse isn't measured under 100 VUs. audit and bundle-scan don't touch target_url.
 # Results land in the run's artifacts; copy the numbers into docs/test-report.md §5 with the run link.
 name: NFR checks
 
@@ -97,7 +99,8 @@ jobs:
           artifact_name: zap-baseline
 
   lighthouse:
-    if: inputs.lighthouse
+    needs: zap
+    if: ${{ !cancelled() && inputs.lighthouse }}
     runs-on: ubuntu-latest
     env:
       TARGET: ${{ inputs.target_url }}
@@ -133,7 +136,8 @@ jobs:
           path: perf/results/lighthouse/
 
   load:
-    if: inputs.load
+    needs: [zap, lighthouse]
+    if: ${{ !cancelled() && inputs.load }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
