@@ -1,4 +1,4 @@
-/** PB-02 accounts and profiles: sign up → welcome → courses → save; wrong password; sign out; a11y (AC1–AC4, AC9). */
+/** PB-02 accounts and profiles: sign up → welcome → courses → save; wrong password; sign out; a11y (AC1–AC4, AC9); unsafe ?next= ignored (D-01). */
 /**
  * Better Auth allows 3 sign-in (and, separately, 3 sign-up) requests per 10 s per IP in production, and other specs'
  * cy.login() calls share the sign-in window. UI submits here can't use cy.login's retry, so: submit, and if the server
@@ -93,6 +93,19 @@ describe("PB-02 accounts and profiles", () => {
     cy.location("pathname", { timeout: 15000 }).should("eq", "/sign-in");
     cy.visit("/profile");
     cy.location("pathname").should("eq", "/sign-in");
+  });
+
+  it("D-01: a ?next= that browsers would turn into another site is ignored; sign-in lands on the dashboard", () => {
+    // "/\t/evil.com": browsers drop the tab and read "//evil.com", which is another site
+    // (docs/contract-requests/PB-04-join-next-redirect.md).
+    cy.visit("/sign-in?next=%2F%09%2Fevil.com");
+    cy.checkPageA11y();
+    cy.get("input[name=email]").type("krish@studycrew.test");
+    cy.get("input[name=password]").type("studycrew-dev-pass");
+    submitWaitingOutRateLimit("signIn", () => cy.contains("button", "Sign in").click());
+    cy.location("pathname", { timeout: 15000 }).should("eq", "/dashboard");
+    cy.location("origin").should("eq", new URL(Cypress.config("baseUrl")!).origin);
+    cy.contains("h1", "Hi, Krish");
   });
 
   it("429: when sign-in is rate-limited, the form says how many seconds to wait", () => {
