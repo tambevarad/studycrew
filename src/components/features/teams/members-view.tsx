@@ -126,7 +126,8 @@ export function MembersView({
                             variant="ghost"
                             disabled={pending}
                             onClick={() => setRole(m, m.role === "LEADER" ? "MEMBER" : "LEADER")}
-                            aria-label={m.role === "LEADER" ? `Make ${m.user.name} a member` : `Make ${m.user.name} a leader`}
+                            // Label in Name (WCAG 2.5.3): the accessible name starts with the visible text (D-05).
+                            aria-label={m.role === "LEADER" ? `Make member: ${m.user.name}` : `Make leader: ${m.user.name}`}
                           >
                             {m.role === "LEADER" ? "Make member" : "Make leader"}
                           </Button>
