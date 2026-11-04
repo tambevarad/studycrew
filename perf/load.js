@@ -2,7 +2,8 @@
  * PB-17 · NFR-01 load test (k6). Pass: p95 < 800 ms and errors < 1 % for the app's own (non-AI) API calls,
  * at 100 virtual users for 5 minutes.
  *
- *   BASE_URL=https://studycrew-staging.vercel.app LOAD_TEST_PASSWORD=… k6 run perf/load.js
+ *   BASE_URL=https://studycrew-staging.vercel.app k6 run perf/load.js
+ * with LOAD_TEST_PASSWORD already in the environment (from a hidden prompt, see perf/README.md; in CI, a repo secret).
  *
  * Needs the data from `perf/seed-load.ts` (10 users load-01…load-10@studycrew.test, 50 teams in "LOAD 9000").
  * Better Auth allows only ~3 sign-ins per 10 s per IP, so `setup()` signs each load user in ONCE (waiting out 429s)

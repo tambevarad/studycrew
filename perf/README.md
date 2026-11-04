@@ -9,15 +9,26 @@
 
 ## Order of the final run (after PB-14, PB-15, and PB-16 are merged and deployed)
 
-1. **Seed the load data on staging, once.** Ask Dev first: staging is the demo site. In your own shell, with the Neon **direct**
-   URL:
-   ```sh
-   DATABASE_URL=<neon direct url> LOAD_TEST_PASSWORD=<choose one> npx tsx perf/seed-load.ts
+Staging is also the demo site and the site for the usability sessions. **Ask Dev before each step that touches it**, and
+pick a window when no usability session is scheduled (ask Krish).
+
+1. **Seed the load data on staging, once (Dev, in his own PowerShell window).** Both values are typed into a hidden
+   prompt, so they never appear on screen, on the command line, in PowerShell history, or in a file:
+   ```powershell
+   $env:DATABASE_URL = [Net.NetworkCredential]::new('', (Read-Host 'Neon DIRECT connection string' -AsSecureString)).Password
+   $env:LOAD_TEST_PASSWORD = [Net.NetworkCredential]::new('', (Read-Host 'Load-test password, 12+ characters' -AsSecureString)).Password
+   npx tsx perf/seed-load.ts --dry-run   # check "Target database:" is the Neon host, not localhost
+   npx tsx perf/seed-load.ts
+   Remove-Item Env:DATABASE_URL, Env:LOAD_TEST_PASSWORD
    ```
-   Add the same password as the GitHub secret `LOAD_TEST_PASSWORD` (repo owner).
-2. **Run** Actions → **NFR checks** → tick *load* (and *lighthouse*) → target `https://studycrew-staging.vercel.app`.
-   Or run locally: `BASE_URL=… LOAD_TEST_PASSWORD=… k6 run perf/load.js`.
-3. Copy p95, error rate, and the run link into `docs/test-report.md` §5 (NFR-01).
+   In Git Bash, use `read -rs DATABASE_URL && export DATABASE_URL` (and the same for `LOAD_TEST_PASSWORD`) instead.
+   Running it again is safe: it stops if `Load Team 01` already exists.
+2. **The repo owner (Varad) adds the same password** as the repository secret `LOAD_TEST_PASSWORD`: Settings → Secrets
+   and variables → Actions → New repository secret, or `gh secret set LOAD_TEST_PASSWORD --repo tambevarad/studycrew`
+   (it prompts for the value). Share the password through a private channel, never in chat, git, or a PR.
+3. **Run** Actions → **NFR checks** → Run workflow → tick every box → target `https://studycrew-staging.vercel.app`.
+   ZAP, Lighthouse, and k6 run one after another (about 25 min in total), so they don't skew each other's numbers.
+4. Copy the results and the run link into `docs/test-report.md` §5 (NFR-01, NFR-02, NFR-03).
 
 The load users and teams stay on staging afterwards. They're private (`isOpen: false`), so they don't show up in
-anyone's course search.
+anyone's course search. `staging-cleanup.md` lists everything the test runs leave behind.

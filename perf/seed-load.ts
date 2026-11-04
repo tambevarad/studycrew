@@ -7,9 +7,10 @@
  * - Everything it creates is recognizable: users `load-NN@studycrew.test`, teams in course `LOAD 9000` named `Load Team NN`.
  * - Idempotent: if `Load Team 01` already exists it stops, so running it twice doesn't double the data.
  *
- * Usage (DATABASE_URL = the target database; on staging use the Neon DIRECT url, typed into your own shell only):
- *   LOAD_TEST_PASSWORD=<choose one> npx tsx perf/seed-load.ts            # create
- *   npx tsx perf/seed-load.ts --dry-run                                  # print the plan only, touch nothing
+ * Usage: set DATABASE_URL (on staging, the Neon DIRECT url) and LOAD_TEST_PASSWORD in your own shell from a hidden
+ * prompt, never on the command line (perf/README.md has the exact commands), then:
+ *   npx tsx perf/seed-load.ts --dry-run    # prints the plan and the target host, touches nothing
+ *   npx tsx perf/seed-load.ts              # create
  * The password is for the load accounts only. Keep it out of git; the nfr.yml workflow reads it from a repo secret.
  */
 import "dotenv/config";
@@ -44,6 +45,9 @@ async function main() {
     `Plan: ${USERS} users (${loadEmail(1)}…${loadEmail(USERS)}), ${TEAMS} teams in "${LOAD_COURSE}", ` +
       `${TEAMS * TASKS_PER_TEAM} tasks, ${TEAMS * MEETINGS_PER_TEAM} meetings. Adds only; deletes nothing.`,
   );
+  // Host and database name only (no user or password), so whoever runs it can see which database it will write to.
+  const target = new URL(url);
+  console.log(`Target database: ${target.hostname}${target.pathname}`);
   if (dryRun) return;
   const password = process.env.LOAD_TEST_PASSWORD;
   if (!password || password.length < 12) throw new Error("Set LOAD_TEST_PASSWORD (12+ characters) for the load accounts.");
