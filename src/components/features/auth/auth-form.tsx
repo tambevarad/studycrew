@@ -147,8 +147,10 @@ export function AuthForm({ mode }: { mode: Mode }) {
     router.refresh();
   }
 
+  // method="post" (D-06): a submit before React hydrates would otherwise be a native GET that puts the email and
+  // password in the URL. Once hydrated, onSubmit prevents the native submit and signs in with fetch, as before.
   return (
-    <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
+    <form ref={formRef} method="post" onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
       <h1 className="text-xl font-semibold text-slate-900">{mode === "sign-in" ? "Sign in" : "Create your account"}</h1>
       {error ? <Alert tone="danger">{error}</Alert> : null}
       {mode === "sign-up" ? (
