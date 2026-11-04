@@ -8,12 +8,9 @@
 | Prompt | `v1` (`src/server/ai/prompts.ts`) |
 | Date | 2026-11-04 (UTC) |
 | Dataset | 30 cases, 143 labeled requirements, 39 of them Missing |
+| Labels | Drafted by the AI agent, then reviewed by Devarsh Soni on 2026-11-03: all 143 kept, none changed |
 | Results files | `tests/ai-eval/results/2026-11-04-v1.json`, `2026-11-04-v1-run2.json` |
 | Cost | $0.0214 and $0.0210 per full run (measured tokens) |
-
-**Read this first:** the expected labels were drafted by the AI agent and **haven't been checked by a person yet**. PB-16
-requires a human to label every expected status, so treat these numbers as provisional until Devarsh has done that (see
-[Limitations](#6-limitations)).
 
 ## 1. Method
 
@@ -122,7 +119,7 @@ All examples are from run 1 unless noted, and each one also appeared in run 2 un
    empty heading in case 04 ("Ethics - TODO") was handled correctly, so the model catches some placeholders, not all.
 4. **A weak sentence was accepted as a partial conclusion.** Case 13: the requirement asks whether the hypothesis was
    supported. The model said Partial, citing "The numbers drop quickly as the lamp moves away, which matches what we saw in
-   class." This label is debatable (see Limitations).
+   class." This is a close call (see Limitations).
 
 **Other disagreements (these don't affect the Missing metrics)**
 
@@ -154,10 +151,10 @@ The usability test (PB-17) is the first chance to collect real ratings.
 
 ## 6. Limitations
 
-- **The labels aren't human-verified yet** (see the top of this report). Three look debatable, and each bears on a result:
-  case 02 (means reported per block of five positions, labeled Covered; the model says Partial), case 13 (the conclusion
-  sentence, labeled Missing; the model says Partial), and case 26 (competitors mentioned but not named, labeled Partial; run 2
-  says Missing). Labels weren't changed after seeing the results. If a human changes any, re-run the evaluation.
+- **The labels are one person's judgment.** The AI agent drafted them and Devarsh reviewed all 143, keeping every one. A second
+  reviewer might differ on three close calls, which he decided after seeing the model's answers: case 02 (means reported per
+  block of five positions, kept as Covered; the model says Partial), case 13 (the conclusion sentence, kept as Missing; the
+  model says Partial), and case 26 (competitors mentioned but not named, kept as Partial; run 2 says Missing).
 - **The same model family wrote the cases and took the test.** The cases were drafted with Claude, which may make them easier
   for Claude than real student work would be.
 - **The drafts are short and clean.** They average about 70 words (32 to 118), while the app accepts 30,000 characters. Latency, quote
@@ -180,13 +177,12 @@ report and results file, so any later change can be compared against these numbe
 
 ## 8. Next steps
 
-1. **Devarsh checks all 143 labels** and resolves the three debatable ones. Re-run if any change.
-2. **Try a v2 for formatting rules.** Add fonts, spacing, and page limits to the extraction prompt's logistics rule. This should
+1. **Try a v2 for formatting rules.** Add fonts, spacing, and page limits to the extraction prompt's logistics rule. This should
    remove 3 of the 4 false alarms. Bump `PROMPT_VERSION` and compare.
-3. **Look at the Partial strictness** (error 5), for example by telling step 2 not to ask for more depth than the requirement does.
-4. **Add long, real drafts** to test latency and quotes at realistic sizes (with permission, and with no real student data
+2. **Look at the Partial strictness** (error 5), for example by telling step 2 not to ask for more depth than the requirement does.
+3. **Add long, real drafts** to test latency and quotes at realistic sizes (with permission, and with no real student data
    committed).
-5. **Re-run weekly** while prompts or models change (risk R-02):
+4. **Re-run weekly** while prompts or models change (risk R-02):
 
    ```bash
    AI_PROVIDER=claude npm run ai:eval

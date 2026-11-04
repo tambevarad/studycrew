@@ -18,6 +18,8 @@ The key comes from `.env.local`. Never run this in CI: the script refuses, and a
 
 ## How the labels work
 
+Drafted by the AI agent, then reviewed by Devarsh Soni on 2026-11-03: all 143 kept, none changed.
+
 - **Covered:** the draft fully does what the requirement asks.
 - **Partial:** the draft does part of it (one of two sources) or only mentions it with no substance.
 - **Missing:** nothing in the draft does it. An empty heading ("Ethics - TODO") or a bare placeholder counts as Missing.
