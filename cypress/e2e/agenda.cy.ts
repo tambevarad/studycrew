@@ -73,6 +73,32 @@ describe("PB-15 meeting agenda", () => {
     }
   });
 
+  it("keeps keyboard focus in the agenda after a delete is cancelled or confirmed", () => {
+    const stamp = Date.now();
+    const first = `E2E focus first ${stamp}`;
+    const second = `E2E focus second ${stamp}`;
+    const deleteButton = (title: string) => cy.get(`[aria-label="Delete “${title}”"]`);
+    cy.login("krish");
+    visitSeededMeeting();
+    addTopic(first);
+    addTopic(second);
+
+    deleteButton(first).click();
+    cy.get("dialog[open]").contains("button", "Cancel").click();
+    cy.get("dialog[open]").should("not.exist");
+    deleteButton(first).should("have.focus");
+
+    deleteButton(first).click();
+    cy.get("dialog[open]").contains("button", "Delete").click();
+    cy.contains("li", first).should("not.exist");
+    helpButton(second).should("have.focus"); // the topic that took its place
+
+    deleteButton(second).click();
+    cy.get("dialog[open]").contains("button", "Delete").click();
+    cy.contains("li", second).should("not.exist");
+    cy.get("input[name=title]").should("have.focus"); // the list is empty now
+  });
+
   it("AC3: another member can't delete a topic, but a leader can", () => {
     const title = `E2E leader delete ${Date.now()}`;
     cy.login("krish");
