@@ -62,15 +62,16 @@ passed in the CI run linked in §2.
 | FR-04 | Task board | Must | PB-05 (#25) | `board.cy.ts` (6) | `tasks.test.ts` | `tasks-board.test.ts`, `tasks-positions.test.ts` | ✅ |
 | FR-05 | Shared resources and in-app notifications (incl. notifications other features emit) | Must | PB-07 (#22, #31), PB-08 (#27); emitted by PB-04/05/06/11/14 | `resources.cy.ts` (3), `notifications.cy.ts` (2) | `resources.test.ts`, `notifications.test.ts`; `notify()` asserted in `teams`, `tasks`, `meetings`, `coverage-actions` tests | `notifications.test.ts`, `resources-source.test.ts` | ✅ (poll notifications: `polls.test.ts` "logs POLL_CREATED and notifies the other members, not the creator", "AC3: closing early records the winner in activity and notifies members (not the closer)") |
 | FR-06 | Activity history and team dashboard | Must | PB-09 (#21, #30), PB-12 (#45); activity emitted by every feature | `activity.cy.ts` (3), `dashboard.cy.ts` (3) | `activity.test.ts`, `dashboard.test.ts`; `logActivity()` asserted in `tasks`, `teams`, `meetings`, `resources`, `coverage`, `polls` tests | `activity-format.test.ts`, `dashboard.test.ts` | ✅ |
-| FR-07 | AI Coverage Check: run, report, turn a gap into a task, rate it, evaluate | Must | PB-10 (#34), PB-11 (#42); PB-16 ⏳ | `coverage.cy.ts` (3), `coverage-actions.cy.ts` (2) | `coverage.test.ts`, `coverage-actions.test.ts` | `coverage-quotes.test.ts`, `coverage-scoring.test.ts`, `coverage-providers.test.ts`, `mock-model.test.ts`, `coverage-actions.test.ts` | ✅ check + actions · ⏳ evaluation (PB-16 runs manually with `npm run ai:eval`, never in CI) |
+| FR-07 | AI Coverage Check: run, report, turn a gap into a task, rate it, evaluate | Must | PB-10 (#34), PB-11 (#42), PB-16 (#56) | `coverage.cy.ts` (3), `coverage-actions.cy.ts` (2) | `coverage.test.ts`, `coverage-actions.test.ts` | `coverage-quotes.test.ts`, `coverage-scoring.test.ts`, `coverage-providers.test.ts`, `mock-model.test.ts`, `coverage-actions.test.ts`, `ai-eval.test.ts` | ✅ check + actions · ✅ evaluation: [`docs/ai-eval-report.md`](ai-eval-report.md), all four targets met on prompt v1 in both runs (§4.2; run by hand with `npm run ai:eval`, never in CI) |
 | FR-08 | Milestones and templates | Should | PB-13 (#43) | `milestones.cy.ts` (4) | `milestones.test.ts` | `milestones.test.ts` | ✅ |
 | FR-09 | Group polls | Should | PB-14 (#50) | `polls.cy.ts` (1) | `polls.test.ts` | `polls.test.ts` | ✅ |
 | FR-10 | Meeting agenda and help-needed topics | Could | PB-15 (#58) | `agenda.cy.ts` (2) | `agenda.test.ts` | `agenda.test.ts` | ✅ |
 | (all) | Foundation: shell, auth guard, health, permissions, helpers | — | PB-01 (#18, #20, #39) | `smoke.cy.ts` (5) | `foundation.test.ts`, `health.test.ts`, `authz-sweep.test.ts` | `foundation.test.ts` | ✅ |
 
-**PB-17 AC2** ("every Must FR links to at least one passing E2E spec"): **met for FR-01 … FR-07 on `059147c`**,
-including the PB-12 dashboard part of FR-06 (`dashboard.cy.ts`). Still to add: PB-16 for FR-07, which is a manual
-evaluation, not an E2E flow.
+**PB-17 AC2** ("every Must FR links to at least one passing E2E spec"): **✅ complete.** Every Must FR, FR-01 … FR-07,
+links to at least one passing E2E spec in the CI run in §2 (`@@SHA@@`). FR-07's evaluation part (PB-16) is a manual
+evaluation by design; its evidence is [`docs/ai-eval-report.md`](ai-eval-report.md) (§4.2), and FR-07 itself already has
+`coverage.cy.ts` and `coverage-actions.cy.ts`.
 
 ## 4. Acceptance criteria → tests, per merged item
 
@@ -98,11 +99,11 @@ How to read this table:
 | PB-12 Team dashboard and home (#45) | 5 | AC1, AC2, AC4, AC5 | AC3 | — |
 | PB-14 Group polls (#50) | 4 | AC1, AC2, AC3, AC4 (one test named "AC1–AC4") | — | — |
 | PB-15 Meeting agenda and help-needed topics (#58) | 3 | AC1, AC2, AC3 | — | — |
-| PB-16 AI evaluation | — | ⏳ not merged | | |
+| PB-16 AI evaluation set and report (#56) | 3 | — (manual evaluation, no E2E by design) | AC1, AC2, AC3 | — |
 
 Every acceptance criterion of every merged item has at least one passing, named test.
 
-### 4.1 PB-12, PB-14 and PB-15: the named tests
+### 4.1 PB-12, PB-14, PB-15 and PB-16: the named tests
 
 All of these passed in the CI run in §2.
 
@@ -120,6 +121,32 @@ All of these passed in the CI run in §2.
 | PB-15 AC1: items sorted by how many members flagged them | `agenda.cy.ts` "AC1/AC2: add topics, flag one, and it moves to the top — accessibly" | `agenda.test.ts` "AC1: items are sorted by how many members flagged them, then oldest first" | — |
 | PB-15 AC2: a member can flag/unflag once; counts update | `agenda.cy.ts` "AC1/AC2: …" | `agenda.test.ts` "AC2: a member can flag and unflag once; sending it twice changes nothing"; "AC2: simultaneous flags from one member still count once" | `agenda.test.ts` "uses the right verb for one person and for several" (the count label) |
 | PB-15 AC3: only the author or a leader can delete; another team's meeting → 404 | `agenda.cy.ts` "AC3: another member can't delete a topic, but a leader can" | `agenda.test.ts` "AC3: the author and a leader can delete; another member gets 403"; "AC3: a meeting from another team is 404 for every action" | — |
+| PB-16 AC1: 30 labeled cases, 5 subjects, seeded gaps documented | — | — | `ai-eval.test.ts` "AC1: 30 labeled cases, 5 subjects of 6, all four work types, gaps documented"; "AC1: file names match ids, and seeded gaps exist beside clean drafts" |
+| PB-16 AC2: one command produces the metrics file; the report's numbers match it | — | — | `ai-eval.test.ts` "AC2: $file holds metrics that follow from its own runs"; "AC2/AC3: the report's tables for $file match it exactly" (once per results file) |
+| PB-16 AC3: the report says whether each target was met and what changed between prompt versions | — | — | `ai-eval.test.ts` "AC3: targets are met exactly at the threshold and not below it"; "AC2/AC3: the report's tables for $file match it exactly" |
+
+### 4.2 PB-16: AI evaluation results (FR-07)
+
+Copied exactly from [`docs/ai-eval-report.md`](ai-eval-report.md) (§3 Results, header table). That report has the method,
+the confusion matrices, and the error analysis.
+
+| | |
+|---|---|
+| Model / prompt | Claude Haiku 5.5 (`claude-haiku-5-5`) through `AI_PROVIDER=claude` · prompt `v1` |
+| Date | 2026-11-04 (UTC) |
+| Dataset | 30 cases, 143 labeled requirements, 39 of them Missing |
+| Labels | **Human-reviewed by Devarsh Soni** on 2026-11-03: drafted by the AI agent, all 143 reviewed and kept, none changed |
+
+| Metric | Target | Run 1 (`2026-11-04-v1.json`) | Run 2 (`2026-11-04-v1-run2.json`) | Met? |
+|---|---|---|---|---|
+| Missing recall | ≥ 0.85 | 0.949 (37/39) | 0.949 (37/39) | ✅ both runs |
+| Missing precision | ≥ 0.80 | 0.902 (37/41) | 0.881 (37/42) | ✅ both runs |
+| Quote verification rate | ≥ 95.0% | 100.0% (117/117) | 100.0% (115/115) | ✅ both runs |
+| p95 latency | ≤ 30.0 s | 8.3 s | 8.2 s | ✅ both runs |
+| Cost per full run (measured tokens) | — | $0.0214 | $0.0210 | — |
+
+Helpfulness (PB-11 ratings): the report gives **n = 0, not available yet** (its §5), with the SQL to run once real ratings
+exist. The usability sessions are the first chance to collect them.
 
 ## 5. Nonfunctional requirements
 
