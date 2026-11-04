@@ -14,7 +14,8 @@ export const createTeamInput = z.object({
 });
 export type CreateTeamInput = z.infer<typeof createTeamInput>;
 
-export const updateTeamInput = createTeamInput.partial();
+/** Edits: every field optional, and `isOpen` has no default here, so a rename never re-opens a closed team (#60). */
+export const updateTeamInput = createTeamInput.extend({ isOpen: z.boolean() }).partial();
 export type UpdateTeamInput = z.infer<typeof updateTeamInput>;
 
 export const searchTeamsQuery = z.object({

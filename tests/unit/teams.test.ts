@@ -19,8 +19,10 @@ describe("PB-04 team rules", () => {
     expect(createTeamInput.parse({ name: "Graph Wizards", courseCode: " CSE-6324 " }).courseCode).toBe("CSE 6324");
   });
 
-  it("documents the contract quirk the PATCH route works around: partial() still defaults isOpen", () => {
-    expect(updateTeamInput.parse({ name: "Renamed" })).toHaveProperty("isOpen", true);
+  it("#60: updateTeamInput leaves isOpen undefined unless it is sent, so a rename can't re-open a closed team", () => {
+    expect(updateTeamInput.parse({ name: "Renamed" })).not.toHaveProperty("isOpen");
+    expect(updateTeamInput.parse({ isOpen: false })).toEqual({ isOpen: false });
+    expect(createTeamInput.parse({ name: "New team", courseCode: "CSE 6324" })).toHaveProperty("isOpen", true);
   });
 
   it("invite codes are 10 URL-safe characters and don't repeat", () => {

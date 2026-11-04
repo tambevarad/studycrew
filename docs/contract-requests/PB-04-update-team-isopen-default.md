@@ -1,6 +1,6 @@
 # Contract request: `updateTeamInput` re-opens closed teams on every edit
 
-Requested by: Dev Patel for PB-04 · Date: 2026-10-23
+Requested by: Dev Patel for PB-04 · Date: 2026-10-23 · **Status: implemented in the `contract/update-team-isopen` PR (#60)**
 
 ## What I need
 
