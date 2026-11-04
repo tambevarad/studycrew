@@ -36,8 +36,9 @@ export function rateLimitMessage(seconds: number | null): string {
   return `Too many attempts. Try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`;
 }
 
-/** Only same-site paths are allowed after sign-in, so `?next=` can't send people to another site. */
-export function safeNextPath(raw: string | null): string | null {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\")) return null;
-  return raw;
-}
+/**
+ * Only same-site paths are allowed after sign-in, so `?next=` can't send people to another site. This is the shared
+ * helper the proxy uses too (D-01), so there is one implementation. PB-02's own version only checked the first
+ * characters and let "/\t/evil.com" and "/\n/evil.com" through, which browsers turn into //evil.com.
+ */
+export { safeNextPath } from "@/lib/safe-next";
