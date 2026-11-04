@@ -10,7 +10,7 @@
  * Manual only: it refuses to start in CI or under Vitest (docs/contracts/testing.md). No database is touched.
  * The API key is read from .env.local by the provider; this script only checks that it is set.
  */
-import { readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { anthropic } from "@ai-sdk/anthropic";
 import { wrapLanguageModel } from "ai";
@@ -179,7 +179,9 @@ async function main() {
   }
   const date = new Date().toISOString().slice(0, 10);
   mkdirSync(RESULTS_DIR, { recursive: true });
-  const file = path.join(RESULTS_DIR, `${date}-${PROMPT_VERSION}.json`);
+  // Never overwrite an earlier run: a repeat on the same day becomes -run2, -run3, …
+  let file = path.join(RESULTS_DIR, `${date}-${PROMPT_VERSION}.json`);
+  for (let n = 2; existsSync(file); n++) file = path.join(RESULTS_DIR, `${date}-${PROMPT_VERSION}-run${n}.json`);
   const results = {
     date,
     provider: model.provider,

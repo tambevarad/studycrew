@@ -1,0 +1,2451 @@
+{
+  "date": "2026-11-04",
+  "provider": "claude",
+  "model": "claude-haiku-5-5",
+  "promptVersion": "v1",
+  "metrics": {
+    "cases": 30,
+    "failedCases": 0,
+    "missingExpected": 39,
+    "missingPredicted": 41,
+    "truePositives": 37,
+    "falsePositives": 4,
+    "falseNegatives": 2,
+    "missingRecall": 0.9487179487179487,
+    "missingPrecision": 0.9024390243902439,
+    "quotes": 117,
+    "quotesVerified": 117,
+    "quoteVerificationRate": 1,
+    "p50LatencyMs": 5322,
+    "p95LatencyMs": 8312,
+    "confusion": {
+      "COVERED": {
+        "COVERED": 79,
+        "PARTIAL": 11,
+        "MISSING": 0,
+        "NOT_EXTRACTED": 0
+      },
+      "PARTIAL": {
+        "COVERED": 1,
+        "PARTIAL": 13,
+        "MISSING": 0,
+        "NOT_EXTRACTED": 0
+      },
+      "MISSING": {
+        "COVERED": 0,
+        "PARTIAL": 2,
+        "MISSING": 37,
+        "NOT_EXTRACTED": 0
+      }
+    }
+  },
+  "targets": [
+    {
+      "label": "Missing recall",
+      "target": "≥ 0.85",
+      "actual": "0.949 (37/39)",
+      "met": true
+    },
+    {
+      "label": "Missing precision",
+      "target": "≥ 0.80",
+      "actual": "0.902 (37/41)",
+      "met": true
+    },
+    {
+      "label": "Quote verification rate",
+      "target": "≥ 95.0%",
+      "actual": "100.0% (117/117)",
+      "met": true
+    },
+    {
+      "label": "p95 latency",
+      "target": "≤ 30.0 s",
+      "actual": "8.3 s",
+      "met": true
+    }
+  ],
+  "usage": {
+    "inputTokens": 60627,
+    "outputTokens": 30575,
+    "costUsd": 0.0213502
+  },
+  "runs": [
+    {
+      "id": "01-psych-social-media",
+      "latencyMs": 8312,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Explain the benefits of social media for students.",
+          "status": "COVERED",
+          "evidenceQuote": "Students use it to stay in touch with friends and to find study groups.",
+          "evidenceVerified": true,
+          "reason": "The draft names two benefits, though briefly.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Include one research example for the benefits of social media.",
+          "status": "COVERED",
+          "evidenceQuote": "Lee and Park (2021) surveyed 400 first-year students and found that those who joined course group chats reported feeling less lonely.",
+          "evidenceVerified": true,
+          "reason": "A specific study is cited as evidence for a benefit.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain the drawbacks of social media for students.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not discuss any drawbacks.",
+          "suggestion": "Add a slide that explains at least two drawbacks of social media for students, such as effects on focus or sleep."
+        },
+        {
+          "requirement": "Include one research example for the drawbacks of social media.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "No research example is given for drawbacks.",
+          "suggestion": "Find one peer-reviewed study on a drawback of social media for students and add it to the drawbacks slide with its citation."
+        },
+        {
+          "requirement": "Compare the benefits and drawbacks of social media.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not compare benefits with drawbacks.",
+          "suggestion": "Add a slide that sets the benefits and drawbacks side by side and points out where they conflict or overlap."
+        },
+        {
+          "requirement": "State which side, benefits or drawbacks, is stronger.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not state which side is stronger.",
+          "suggestion": "Add a clear statement of which side your evidence supports more strongly, with a sentence explaining why."
+        },
+        {
+          "requirement": "End the presentation with a recommendation for students.",
+          "status": "COVERED",
+          "evidenceQuote": "We recommend that students turn off notifications during study hours so they keep the social benefits without losing focus.",
+          "evidenceVerified": true,
+          "reason": "The final slide gives a recommendation for students.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Cite at least three peer-reviewed sources.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Lee and Park (2021) surveyed 400 first-year students",
+          "evidenceVerified": true,
+          "reason": "Only one source is cited, and the draft does not show it is peer-reviewed.",
+          "suggestion": "Add at least two more peer-reviewed sources, one supporting the drawbacks and one supporting the comparison, and confirm each is in a journal or other peer-reviewed venue."
+        },
+        {
+          "requirement": "Format the citations in APA format.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Lee and Park (2021)",
+          "evidenceVerified": true,
+          "reason": "The in-text citation follows APA style, but there is no reference list.",
+          "suggestion": "Add a reference list slide with full APA entries for every cited study, including journal, volume, pages, and DOI."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Psychology",
+      "workType": "PRESENTATION",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "02-psych-memory-lab",
+      "latencyMs": 4270,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "State a clear hypothesis.",
+          "status": "COVERED",
+          "evidenceQuote": "Hypothesis: We predicted that words at the start and end of a list would be recalled more often than words in the middle.",
+          "evidenceVerified": true,
+          "reason": "The draft states a specific, testable prediction about recall by list position.",
+          "suggestion": null
+        },
+        {
+          "requirement": "State the number of participants.",
+          "status": "COVERED",
+          "evidenceQuote": "24 psychology undergraduates were recruited through the department's research pool.",
+          "evidenceVerified": true,
+          "reason": "The draft gives the exact number of participants.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain how participants were recruited.",
+          "status": "PARTIAL",
+          "evidenceQuote": "24 psychology undergraduates were recruited through the department's research pool.",
+          "evidenceVerified": true,
+          "reason": "The draft names the source but does not explain the recruitment process, such as how students were invited or whether participation was voluntary.",
+          "suggestion": "Add a sentence describing how students were invited to the research pool and whether participation was voluntary or credited."
+        },
+        {
+          "requirement": "Describe the procedure used to present the word lists.",
+          "status": "COVERED",
+          "evidenceQuote": "Each participant heard three lists of 15 unrelated words, one word every two seconds, then wrote down everything they could remember.",
+          "evidenceVerified": true,
+          "reason": "The draft describes list length, presentation timing, and the recall task.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Report recall results as means for each list position.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Mean recall was 71% for the first five positions, 38% for the middle five positions, and 66% for the last five positions.",
+          "evidenceVerified": true,
+          "reason": "Results are reported as means for grouped position blocks rather than for each individual list position.",
+          "suggestion": "Report the mean recall for each of the 15 list positions, either in a table or a graph, rather than only three grouped blocks."
+        },
+        {
+          "requirement": "Describe one limitation of the study.",
+          "status": "COVERED",
+          "evidenceQuote": "The sample came from one course, so the results may not generalize to older adults.",
+          "evidenceVerified": true,
+          "reason": "The draft names a specific limitation and explains why it matters for generalizability.",
+          "suggestion": null
+        }
+      ],
+      "score": {
+        "truePositives": 0,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 4,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Psychology",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "03-psych-cbt-case",
+      "latencyMs": 7063,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Read the case of Maya, a student with social anxiety.",
+          "status": "COVERED",
+          "evidenceQuote": "This belief shows up in how she avoids class discussions and eats alone.",
+          "evidenceVerified": true,
+          "reason": "The draft draws on specific details from the case, which shows the case was read.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify Maya's core belief.",
+          "status": "COVERED",
+          "evidenceQuote": "if people really knew me, they would reject me",
+          "evidenceVerified": true,
+          "reason": "The draft states a clear core belief and ties it to Maya's behavior.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Describe two CBT techniques you would use with her.",
+          "status": "PARTIAL",
+          "evidenceQuote": "As a first step I would use cognitive restructuring.",
+          "evidenceVerified": true,
+          "reason": "Only one technique is described in any detail, and the second is missing.",
+          "suggestion": "Add a second, different CBT technique and explain how you would apply it with Maya, not just name it."
+        },
+        {
+          "requirement": "Explain how you would measure her progress.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft never explains how progress would be tracked or measured.",
+          "suggestion": "Describe one or more concrete ways to measure Maya's progress, such as a rating scale or a behavior count, and how often you would check it."
+        },
+        {
+          "requirement": "Address one ethical issue in treating a student at your own university.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention any ethical issue or the university context.",
+          "suggestion": "Choose one ethical issue that arises when treating a student at your own university, such as confidentiality or dual relationships, and explain how you would handle it."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 1,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Psychology",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "04-psych-obedience-exam",
+      "latencyMs": 4416,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Explain the procedure of Milgram's obedience study.",
+          "status": "COVERED",
+          "evidenceQuote": "participants were told to give a \"learner\" electric shocks for wrong answers, rising in 15-volt steps. An experimenter in a lab coat ordered them to continue.",
+          "evidenceVerified": true,
+          "reason": "The draft describes the shock-giving task, the escalating steps, and the experimenter's role.",
+          "suggestion": null
+        },
+        {
+          "requirement": "State Milgram's main result, including the percentage.",
+          "status": "COVERED",
+          "evidenceQuote": "Result: 65% went all the way to 450 volts.",
+          "evidenceVerified": true,
+          "reason": "The draft states the main result and gives the 65% figure.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Describe ethical criticisms of Milgram's study.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft only has a 'Ethics - TODO' placeholder with no criticisms described.",
+          "suggestion": "Write out at least two ethical criticisms, such as participant distress and deception, and support each with a cited source from your course readings."
+        },
+        {
+          "requirement": "Explain Asch's line-judgment conformity study.",
+          "status": "COVERED",
+          "evidenceQuote": "Asch (1951): people judged which of three lines matched a target line. Confederates gave the wrong answer on purpose, and about a third of real participants went along with them.",
+          "evidenceVerified": true,
+          "reason": "The draft covers the task, the confederates, and the conformity rate.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain the difference between obedience and conformity.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft never contrasts obedience with conformity.",
+          "suggestion": "Add a short comparison stating that obedience follows a direct order from an authority while conformity follows group pressure, and tie each to one of your studies."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Psychology",
+      "workType": "EXAM_PREP",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "05-psych-sleep-review",
+      "latencyMs": 6624,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Summarize at least two empirical studies on sleep deprivation and memory.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Walker and colleagues (2003) showed that participants who slept after learning a finger-tapping task improved by about 20%, while those who stayed awake did not improve.",
+          "evidenceVerified": true,
+          "reason": "Only one empirical study is summarized, and it compares sleep with wakefulness rather than examining sleep deprivation directly.",
+          "suggestion": "Add a second empirical study on sleep deprivation and memory, summarize its method and findings, and briefly compare it with the Walker study."
+        },
+        {
+          "requirement": "Explain the mechanism linking sleep to memory consolidation.",
+          "status": "COVERED",
+          "evidenceQuote": "During slow-wave sleep the hippocampus replays recent experiences, which helps move memories into long-term storage in the cortex.",
+          "evidenceVerified": true,
+          "reason": "The draft names a specific mechanism (hippocampal replay during slow-wave sleep) and links it to consolidation into cortical storage.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Discuss one point where researchers disagree.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention any disagreement among researchers.",
+          "suggestion": "Identify one debated question in the sleep and memory literature, such as the exact role of slow-wave sleep versus REM sleep, and describe the competing positions with cited sources."
+        },
+        {
+          "requirement": "State the implications for college students.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not discuss what the findings mean for college students.",
+          "suggestion": "Add a paragraph that connects the findings to student life, such as how sleep schedules around exams might affect memory, supported by your cited studies."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 1,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Psychology",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "06-psych-stress-survey",
+      "latencyMs": 6198,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "State a research question for the survey.",
+          "status": "COVERED",
+          "evidenceQuote": "Research question: Does the number of credit hours predict how much pressure undergraduates feel about their coursework?",
+          "evidenceVerified": true,
+          "reason": "The draft states a clear, researchable question about credit hours and academic pressure.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Give an operational definition of academic stress.",
+          "status": "COVERED",
+          "evidenceQuote": "In this study, academic stress means a student's self-reported worry about grades, deadlines, and workload in the past two weeks.",
+          "evidenceVerified": true,
+          "reason": "The draft defines academic stress in observable, measurable terms with a time frame.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Write five Likert-scale items.",
+          "status": "PARTIAL",
+          "evidenceQuote": "I feel I have too many deadlines.",
+          "evidenceVerified": true,
+          "reason": "The draft has a Likert scale and three items, so two more items are needed.",
+          "suggestion": "Write two more Likert-scale statements that measure academic stress, and check that all five items use the same 1-to-5 response scale."
+        },
+        {
+          "requirement": "Describe the sampling plan.",
+          "status": "COVERED",
+          "evidenceQuote": "We will post the survey in five general-education classes and invite every student there, aiming for about 150 responses.",
+          "evidenceVerified": true,
+          "reason": "The draft names the setting, the invitation method, and a target response count.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Include an informed consent statement.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft has no statement telling respondents about the study or asking for their consent.",
+          "suggestion": "Add a short consent statement at the start of the survey that explains the study's purpose, says participation is voluntary, and asks respondents to agree before continuing."
+        },
+        {
+          "requirement": "Use 12-point font.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft text does not mention font size or formatting.",
+          "suggestion": "Set the document's body text to 12-point font and confirm the setting before submitting."
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 0,
+        "falsePositives": 1,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Psychology",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "07-cs-sorting-compare",
+      "latencyMs": 8459,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "State the average-case time complexity of quicksort.",
+          "status": "COVERED",
+          "evidenceQuote": "Both algorithms run in O(n log n) time on average.",
+          "evidenceVerified": true,
+          "reason": "The draft states the average-case complexity of both algorithms, including quicksort.",
+          "suggestion": null
+        },
+        {
+          "requirement": "State the worst-case time complexity of quicksort.",
+          "status": "COVERED",
+          "evidenceQuote": "quicksort degrades to O(n^2) when the pivots are chosen badly",
+          "evidenceVerified": true,
+          "reason": "The draft gives O(n^2) as the worst case for quicksort.",
+          "suggestion": null
+        },
+        {
+          "requirement": "State the average-case time complexity of mergesort.",
+          "status": "COVERED",
+          "evidenceQuote": "Both algorithms run in O(n log n) time on average.",
+          "evidenceVerified": true,
+          "reason": "The draft states mergesort's average case as O(n log n).",
+          "suggestion": null
+        },
+        {
+          "requirement": "State the worst-case time complexity of mergesort.",
+          "status": "COVERED",
+          "evidenceQuote": "Mergesort stays O(n log n) in the worst case",
+          "evidenceVerified": true,
+          "reason": "The draft gives O(n log n) as mergesort's worst case.",
+          "suggestion": null
+        },
+        {
+          "requirement": "State the space complexity of quicksort.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft never mentions space complexity.",
+          "suggestion": "Add the space complexity of quicksort, including the stack depth it uses, and explain where it comes from."
+        },
+        {
+          "requirement": "State the space complexity of mergesort.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft never mentions space complexity.",
+          "suggestion": "Add the space complexity of mergesort and explain the auxiliary storage it needs during merging."
+        },
+        {
+          "requirement": "State whether quicksort is stable.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not discuss stability for quicksort.",
+          "suggestion": "State whether quicksort preserves the relative order of equal elements, and explain why in one or two sentences."
+        },
+        {
+          "requirement": "State whether mergesort is stable.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not discuss stability for mergesort.",
+          "suggestion": "State whether mergesort preserves the relative order of equal elements, and explain why."
+        },
+        {
+          "requirement": "Include a benchmark table.",
+          "status": "PARTIAL",
+          "evidenceQuote": "We timed both in Python on a list of one million random integers",
+          "evidenceVerified": true,
+          "reason": "The draft describes a timing run in prose but includes no table.",
+          "suggestion": "Turn the timing results into a table with one row per algorithm and one column per measurement, and label the units."
+        },
+        {
+          "requirement": "Include at least three input sizes in the benchmark table.",
+          "status": "PARTIAL",
+          "evidenceQuote": "We timed both in Python on a list of one million random integers",
+          "evidenceVerified": true,
+          "reason": "Only one input size (one million integers) is reported.",
+          "suggestion": "Run the benchmark at three or more input sizes, such as 10,000, 100,000, and 1,000,000, and add a row or column for each size."
+        },
+        {
+          "requirement": "Give a recommendation for sorting a large list of customer records.",
+          "status": "COVERED",
+          "evidenceQuote": "For a large list of customer records we recommend mergesort, because its worst case is predictable.",
+          "evidenceVerified": true,
+          "reason": "The draft gives a clear recommendation for customer records with a stated reason.",
+          "suggestion": null
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Computer Science",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "08-cs-rest-api-design",
+      "latencyMs": 4915,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "List the endpoints with their HTTP methods.",
+          "status": "COVERED",
+          "evidenceQuote": "Endpoints: GET /v1/books searches the catalog, GET /v1/books/{id} returns one book, POST /v1/loans checks a book out, and DELETE /v1/loans/{id} returns it.",
+          "evidenceVerified": true,
+          "reason": "The draft lists four endpoints, each with its HTTP method.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Specify the authentication method.",
+          "status": "COVERED",
+          "evidenceQuote": "Every request must send a JSON Web Token in the Authorization header, issued by the campus single sign-on service.",
+          "evidenceVerified": true,
+          "reason": "The draft names the method (JWT in the Authorization header) and the token issuer.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Specify the error response format.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not describe how error responses are structured.",
+          "suggestion": "Add a section that shows the structure of an error response, such as the status code, error code, and message fields, with one example body."
+        },
+        {
+          "requirement": "Describe a rate limiting policy.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft says nothing about limiting how many requests a client can make.",
+          "suggestion": "Add a short section stating the request limit per client, the time window, and what a client receives when it exceeds the limit."
+        },
+        {
+          "requirement": "Explain how the API will be versioned.",
+          "status": "COVERED",
+          "evidenceQuote": "The version is part of the URL path. When we make a breaking change we will publish /v2 and keep /v1 running for one year so existing clients keep working.",
+          "evidenceVerified": true,
+          "reason": "The draft explains the URL-path versioning scheme and how breaking changes will be handled.",
+          "suggestion": null
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Computer Science",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "09-cs-sql-injection-talk",
+      "latencyMs": 5322,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Define what a SQL injection attack is.",
+          "status": "COVERED",
+          "evidenceQuote": "A SQL injection attack happens when user input is pasted into a database query, so the attacker's text runs as part of the command.",
+          "evidenceVerified": true,
+          "reason": "The draft gives a clear definition of SQL injection.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Show a vulnerable query with an example attack string.",
+          "status": "COVERED",
+          "evidenceQuote": "If the input is ' OR '1'='1 then the query returns every user.",
+          "evidenceVerified": true,
+          "reason": "The draft shows a query built from raw input and an attack string that exploits it.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Present two defenses against SQL injection.",
+          "status": "PARTIAL",
+          "evidenceQuote": "The main defense is parameterized queries, where the database treats the input only as a value and never as code.",
+          "evidenceVerified": true,
+          "reason": "Only one defense, parameterized queries, is presented.",
+          "suggestion": "Add a second, different defense, such as input validation or least-privilege database accounts, and explain how it stops the attack shown in your example."
+        },
+        {
+          "requirement": "Describe one real-world breach caused by SQL injection.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention any real-world breach.",
+          "suggestion": "Add one documented breach that was caused by SQL injection, naming the organization, the year, and what the attacker accessed, with a cited source."
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Computer Science",
+      "workType": "PRESENTATION",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "10-cs-os-exam",
+      "latencyMs": 6553,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Explain the difference between a process and a thread.",
+          "status": "COVERED",
+          "evidenceQuote": "A process has its own address space. Threads live inside a process and share its memory, so switching between threads is cheaper.",
+          "evidenceVerified": true,
+          "reason": "The draft contrasts address space ownership and memory sharing, and notes the switching cost difference.",
+          "suggestion": null
+        },
+        {
+          "requirement": "List the four necessary conditions for deadlock.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Deadlock conditions: mutual exclusion and hold-and-wait.",
+          "evidenceVerified": true,
+          "reason": "Only two of the four necessary conditions are named.",
+          "suggestion": "Look up the four Coffman conditions in your course notes, add the two missing ones, and check that all four are named in the list."
+        },
+        {
+          "requirement": "Explain the difference between paging and segmentation.",
+          "status": "COVERED",
+          "evidenceQuote": "Segmentation uses variable-size logical units such as code and stack, so it can fragment.",
+          "evidenceVerified": true,
+          "reason": "The draft contrasts fixed-size pages with variable-size segments and their fragmentation behavior.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain how round-robin scheduling works.",
+          "status": "COVERED",
+          "evidenceQuote": "Round robin gives each ready process a fixed time slice, then moves it to the back of the queue.",
+          "evidenceVerified": true,
+          "reason": "The draft describes the time slice and the queue rotation that define round robin.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain what a semaphore is.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention semaphores.",
+          "suggestion": "Add a short section defining a semaphore, including what its counter represents and the operations used on it."
+        },
+        {
+          "requirement": "Explain how a semaphore prevents race conditions.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not discuss semaphores or race conditions.",
+          "suggestion": "Explain how the semaphore's wait and signal operations control access to a shared resource so only one thread enters the critical section at a time."
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 0,
+        "falsePositives": 1,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Computer Science",
+      "workType": "EXAM_PREP",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "11-cs-hiring-bias",
+      "latencyMs": 5120,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Describe how the screening tool works",
+          "status": "COVERED",
+          "evidenceQuote": "The company's system read past resumes and learned which words were common among people it had hired, then gave each new applicant a score from one to five stars.",
+          "evidenceVerified": true,
+          "reason": "The draft explains that the tool learns from past resumes and assigns each applicant a star score.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify the source of the bias",
+          "status": "COVERED",
+          "evidenceQuote": "The trouble started with the training data. Ten years of past hires were mostly men",
+          "evidenceVerified": true,
+          "reason": "The draft names the training data, specifically past hires being mostly men, as the source of the bias.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Name the group that was harmed",
+          "status": "COVERED",
+          "evidenceQuote": "women applicants were pushed down the ranking",
+          "evidenceVerified": true,
+          "reason": "The draft clearly names women applicants as the group harmed by the system.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Propose a mitigation",
+          "status": "COVERED",
+          "evidenceQuote": "We suggest auditing the scores across gender before each release and retraining on a balanced set of examples.",
+          "evidenceVerified": true,
+          "reason": "The draft proposes concrete mitigations: a gender audit of scores and retraining on balanced data.",
+          "suggestion": null
+        }
+      ],
+      "score": {
+        "truePositives": 0,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 4,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Computer Science",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "12-cs-git-workflow",
+      "latencyMs": 5468,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Describe the team's branch naming convention.",
+          "status": "COVERED",
+          "evidenceQuote": "Branches are named feat/<ticket>-<short-name> or fix/<ticket>-<short-name>.",
+          "evidenceVerified": true,
+          "reason": "The draft states the exact naming pattern for branches.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Describe the code review rule that must be satisfied before merging.",
+          "status": "COVERED",
+          "evidenceQuote": "Every pull request needs one approval from a teammate who did not write the code.",
+          "evidenceVerified": true,
+          "reason": "The draft states the review rule that must be met before merging.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Describe which checks run in continuous integration.",
+          "status": "COVERED",
+          "evidenceQuote": "On each push, GitHub Actions runs the linter, the type checker, and the unit tests.",
+          "evidenceVerified": true,
+          "reason": "The draft names the three checks that run in continuous integration.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Describe how the team resolves merge conflicts.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft says nothing about how merge conflicts are handled.",
+          "suggestion": "Add a section that describes your team's steps for resolving merge conflicts, such as who resolves them and how the result is tested before merging."
+        },
+        {
+          "requirement": "Describe the team's release process.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not describe any release process.",
+          "suggestion": "Add a section that explains how your team prepares, approves, and ships a release, including any version tagging or deployment steps."
+        },
+        {
+          "requirement": "Double-space the document.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft text does not show any line spacing, so this formatting requirement is not addressed.",
+          "suggestion": "Set the line spacing of the whole document to double in your word processor before you submit it."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 1,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Computer Science",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "13-bio-photosynthesis-lab",
+      "latencyMs": 7947,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Write a testable hypothesis about light intensity and the rate of photosynthesis.",
+          "status": "COVERED",
+          "evidenceQuote": "We hypothesized that moving the lamp closer to the Elodea would increase the rate of photosynthesis.",
+          "evidenceVerified": true,
+          "reason": "The draft states a testable prediction linking lamp distance (which sets light intensity) to photosynthesis rate, though it does not use the phrase light intensity.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify the independent variable.",
+          "status": "COVERED",
+          "evidenceQuote": "The independent variable was the distance of the lamp from the plant.",
+          "evidenceVerified": true,
+          "reason": "The draft explicitly names the independent variable.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify the dependent variable.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Distance (cm) / Bubbles per minute",
+          "evidenceVerified": true,
+          "reason": "Bubbles per minute appears only as a table header and is never named as the dependent variable.",
+          "suggestion": "Add a sentence such as 'The dependent variable was the number of oxygen bubbles produced per minute, used as a measure of photosynthesis rate.'"
+        },
+        {
+          "requirement": "Include a data table of bubbles counted at each distance.",
+          "status": "COVERED",
+          "evidenceQuote": "Distance (cm) / Bubbles per minute: 10 / 34, 20 / 21, 30 / 12, 40 / 6.",
+          "evidenceVerified": true,
+          "reason": "The draft gives bubble counts for each of the four distances, though in inline text rather than a formatted table.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify at least two sources of error.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention any sources of error.",
+          "suggestion": "Name at least two sources of error, such as counting bubbles by eye, lamp heat changing water temperature, or uneven bubble release, and briefly explain how each could affect the results."
+        },
+        {
+          "requirement": "Write a conclusion that states whether the hypothesis was supported.",
+          "status": "PARTIAL",
+          "evidenceQuote": "The numbers drop quickly as the lamp moves away, which matches what we saw in class.",
+          "evidenceVerified": true,
+          "reason": "The draft describes the trend but never explicitly states that the hypothesis was supported, and it refers to class rather than the data as the basis.",
+          "suggestion": "Write a conclusion that says directly whether the hypothesis was supported, citing the bubble counts at the closest and farthest distances as evidence."
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 1,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 1,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Biology",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "14-bio-crispr-talk",
+      "latencyMs": 4296,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Explain how CRISPR-Cas9 cuts DNA.",
+          "status": "COVERED",
+          "evidenceQuote": "A guide RNA leads it to a matching DNA sequence, where it makes a cut.",
+          "evidenceVerified": true,
+          "reason": "The draft explains that a guide RNA directs Cas9 to a matching DNA sequence where it cuts.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Describe one medical application of CRISPR.",
+          "status": "COVERED",
+          "evidenceQuote": "In 2023 regulators approved the first CRISPR therapy for sickle cell disease, which edits a patient's own blood stem cells.",
+          "evidenceVerified": true,
+          "reason": "The draft names a medical application (sickle cell therapy) and describes how it works.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Describe one agricultural application of CRISPR.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft contains no agricultural application.",
+          "suggestion": "Add a slide on a crop or livestock use of CRISPR, explaining what trait is edited and why it matters, with a cited source."
+        },
+        {
+          "requirement": "Identify a specific ethical concern about CRISPR.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Some people have concerns about this technology.",
+          "evidenceVerified": true,
+          "reason": "The draft mentions concerns exist but does not name a specific ethical concern.",
+          "suggestion": "Name one specific ethical issue, such as heritable human germline editing or unequal access to expensive therapies, and explain why it is a concern."
+        },
+        {
+          "requirement": "State what you expect CRISPR to achieve in the next ten years.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft has no statement about future expectations for CRISPR.",
+          "suggestion": "Add a closing slide stating one concrete outcome you expect within ten years and the evidence or trend supporting it."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Biology",
+      "workType": "PRESENTATION",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "15-bio-pond-food-web",
+      "latencyMs": 5428,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Name two producers in the freshwater pond food web.",
+          "status": "COVERED",
+          "evidenceQuote": "Algae and duckweed are the producers because they make their own food from sunlight.",
+          "evidenceVerified": true,
+          "reason": "The draft names two producers, algae and duckweed, and explains why they qualify.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Name two primary consumers in the freshwater pond food web.",
+          "status": "COVERED",
+          "evidenceQuote": "Tadpoles and water snails eat the algae, so they are primary consumers.",
+          "evidenceVerified": true,
+          "reason": "The draft names two primary consumers, tadpoles and water snails, and links them to eating producers.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify the top predator in the freshwater pond food web.",
+          "status": "COVERED",
+          "evidenceQuote": "The largemouth bass sits at the top of this food web, since nothing in the pond eats it.",
+          "evidenceVerified": true,
+          "reason": "The draft identifies the largemouth bass as the top predator and gives a reason.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain the role of decomposers in the food web.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft never mentions decomposers or what they do in the food web.",
+          "suggestion": "Add a sentence or two that names a decomposer in the pond and explains how it breaks down dead matter and returns nutrients to the producers."
+        },
+        {
+          "requirement": "Predict what happens if the top predator is removed from the food web.",
+          "status": "COVERED",
+          "evidenceQuote": "Without the bass, the number of small fish would grow quickly.",
+          "evidenceVerified": true,
+          "reason": "The draft predicts that small fish would increase and explains the knock-on effect on insects, tadpoles, and algae.",
+          "suggestion": null
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 4,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Biology",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "16-bio-cell-exam",
+      "latencyMs": 3860,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Know the phases of mitosis in order",
+          "status": "COVERED",
+          "evidenceQuote": "Mitosis goes in this order: prophase, metaphase, anaphase, telophase.",
+          "evidenceVerified": true,
+          "reason": "The draft lists all four phases of mitosis in the correct order.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Know two differences between mitosis and meiosis",
+          "status": "COVERED",
+          "evidenceQuote": "Mitosis makes two identical diploid cells, but meiosis makes four genetically different haploid cells. Meiosis also has crossing over, which mitosis does not.",
+          "evidenceVerified": true,
+          "reason": "The draft gives two clear differences: number and type of daughter cells, and crossing over.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Know the function of mitochondria",
+          "status": "COVERED",
+          "evidenceQuote": "Mitochondria produce ATP through cellular respiration.",
+          "evidenceVerified": true,
+          "reason": "The draft states the function of mitochondria as producing ATP via cellular respiration.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Know the function of ribosomes",
+          "status": "COVERED",
+          "evidenceQuote": "Ribosomes build proteins from mRNA.",
+          "evidenceVerified": true,
+          "reason": "The draft correctly states that ribosomes build proteins from mRNA.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Know what osmosis is",
+          "status": "COVERED",
+          "evidenceQuote": "Osmosis is the movement of water across a selectively permeable membrane toward the side with more solute.",
+          "evidenceVerified": true,
+          "reason": "The draft defines osmosis as water movement across a selectively permeable membrane toward higher solute concentration.",
+          "suggestion": null
+        }
+      ],
+      "score": {
+        "truePositives": 0,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 4,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Biology",
+      "workType": "EXAM_PREP",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "17-bio-mrna-vaccines",
+      "latencyMs": 6000,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Explain how an mRNA vaccine triggers immunity",
+          "status": "COVERED",
+          "evidenceQuote": "The immune system sees the protein and makes antibodies and memory cells against it.",
+          "evidenceVerified": true,
+          "reason": "The draft explains the mechanism: cells make a spike protein, and the immune system responds with antibodies and memory cells.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Compare mRNA vaccines with traditional inactivated vaccines",
+          "status": "PARTIAL",
+          "evidenceQuote": "Unlike older vaccines, mRNA vaccines can be manufactured quickly.",
+          "evidenceVerified": true,
+          "reason": "The draft makes one vague contrast with older vaccines and never names or explains inactivated vaccines.",
+          "suggestion": "Name inactivated vaccines directly and compare at least two points, such as how each one presents the antigen to the immune system and how each is made, with a source for each claim."
+        },
+        {
+          "requirement": "Define herd immunity",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft never mentions herd immunity.",
+          "suggestion": "Add a short definition of herd immunity in your own words, explaining how a population becomes protected when enough people are immune."
+        },
+        {
+          "requirement": "List common side effects of mRNA vaccines",
+          "status": "COVERED",
+          "evidenceQuote": "Common side effects are a sore arm, tiredness, headache, and mild fever, which usually pass within two days.",
+          "evidenceVerified": true,
+          "reason": "The draft lists several common side effects with their typical duration.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Include data from a public health agency",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft contains no data and no reference to any public health agency.",
+          "suggestion": "Find a figure or statistic from an agency such as the CDC, WHO, or your national health authority, cite it with its source and date, and place it where it supports a claim in the report."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Biology",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "18-bio-punnett",
+      "latencyMs": 5905,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "State the genotypes of the parents in a cross between two pink snapdragon flowers.",
+          "status": "COVERED",
+          "evidenceQuote": "Both parents are heterozygous: RW and RW.",
+          "evidenceVerified": true,
+          "reason": "The draft gives both parent genotypes explicitly as RW and RW.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Draw the Punnett square for the cross.",
+          "status": "COVERED",
+          "evidenceQuote": "R   RR   RW",
+          "evidenceVerified": true,
+          "reason": "The draft includes a 2x2 Punnett square with the parental alleles and offspring genotypes.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Give the genotype ratio of the offspring.",
+          "status": "COVERED",
+          "evidenceQuote": "The genotype ratio is 1 RR : 2 RW : 1 WW.",
+          "evidenceVerified": true,
+          "reason": "The draft states the offspring genotype ratio, which matches its Punnett square.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Give the phenotype ratio of the offspring.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft never states the offspring phenotype ratio.",
+          "suggestion": "Add a line that links each genotype to its flower color under incomplete dominance, then state the resulting phenotype ratio."
+        },
+        {
+          "requirement": "Explain how incomplete dominance differs from complete dominance.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft has no explanation of incomplete dominance or how it differs from complete dominance.",
+          "suggestion": "Add a short section that defines both inheritance patterns and compares how heterozygotes look under each, using the snapdragon cross as the example."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Biology",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "19-hist-french-revolution",
+      "latencyMs": 5018,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Explain the economic causes of the French Revolution.",
+          "status": "COVERED",
+          "evidenceQuote": "By 1789 France was close to bankruptcy. Wars, including support for the American Revolution, had drained the treasury, and poor harvests pushed bread prices so high that many families spent most of their income on food.",
+          "evidenceVerified": true,
+          "reason": "The draft names bankruptcy, war debt, and poor harvests with rising bread prices as economic causes.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain the social causes of the French Revolution, including the three estates.",
+          "status": "PARTIAL",
+          "evidenceQuote": "French society was split into three estates. The clergy and nobles paid little tax, while the Third Estate, about 97% of the population, carried nearly all of it.",
+          "evidenceVerified": true,
+          "reason": "The draft describes the three estates and their unequal taxation but does not explain how this inequality caused the Revolution.",
+          "suggestion": "Explain how the tax burden on the Third Estate fueled resentment and contributed to the outbreak of revolution, and connect it to the privileges of the clergy and nobles."
+        },
+        {
+          "requirement": "Describe the Reign of Terror.",
+          "status": "PARTIAL",
+          "evidenceQuote": "In 1793 and 1794 Robespierre and the Committee of Public Safety sent thousands of suspected enemies to the guillotine in what became known as the Terror.",
+          "evidenceVerified": true,
+          "reason": "The draft gives the dates, key figures, and method of execution but says little about how the Terror worked or why it happened.",
+          "suggestion": "Describe how the Committee of Public Safety operated, such as the trials and the laws against suspects, and explain why the Terror ended in 1794."
+        },
+        {
+          "requirement": "Explain how Napoleon rose to power.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention Napoleon at all.",
+          "suggestion": "Add a section covering Napoleon's military successes, his role after the Directory, and the coup that brought him to power."
+        },
+        {
+          "requirement": "Use at least two primary sources.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft cites no primary sources such as letters, decrees, or eyewitness accounts.",
+          "suggestion": "Quote or cite at least two primary sources, such as the Declaration of the Rights of Man and of the Citizen or a cahier de doléances, and explain what each shows."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 1,
+            "PARTIAL": 2,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "History",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "20-hist-civil-rights-talk",
+      "latencyMs": 4573,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Explain what triggered the Montgomery Bus Boycott.",
+          "status": "COVERED",
+          "evidenceQuote": "On December 1, 1955, Rosa Parks was arrested for refusing to give up her bus seat to a white passenger.",
+          "evidenceVerified": true,
+          "reason": "The draft names Rosa Parks's arrest for refusing to give up her bus seat as the trigger.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify who organized the Montgomery Bus Boycott.",
+          "status": "COVERED",
+          "evidenceQuote": "The Women's Political Council and E. D. Nixon started the protest, and the Montgomery Improvement Association, led by Martin Luther King Jr., ran it.",
+          "evidenceVerified": true,
+          "reason": "The draft names the groups and leaders who started and ran the boycott.",
+          "suggestion": null
+        },
+        {
+          "requirement": "State how long the Montgomery Bus Boycott lasted.",
+          "status": "COVERED",
+          "evidenceQuote": "Black residents stayed off the buses for 381 days, walking or sharing rides.",
+          "evidenceVerified": true,
+          "reason": "The draft gives the duration as 381 days.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Describe the Supreme Court ruling that ended the Montgomery Bus Boycott.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Browder v. Gayle (1956) ruled that segregated buses were unconstitutional.",
+          "evidenceVerified": true,
+          "reason": "The draft names the case and its holding but does not say the ruling was from the Supreme Court or explain how it ended the boycott.",
+          "suggestion": "On slide 4, state that the U.S. Supreme Court issued the ruling, and explain how the ruling led to the end of the boycott."
+        },
+        {
+          "requirement": "Explain why the Montgomery Bus Boycott mattered for the wider civil rights movement.",
+          "status": "PARTIAL",
+          "evidenceQuote": "The boycott showed that mass nonviolent protest could win, and it made King a national leader.",
+          "evidenceVerified": true,
+          "reason": "The draft mentions a broader effect but only briefly, without explaining its impact on the wider movement.",
+          "suggestion": "Add a point on slide 5 that names at least one specific way the boycott influenced later civil rights actions, supported by a cited source."
+        }
+      ],
+      "score": {
+        "truePositives": 0,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 2,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "History",
+      "workType": "PRESENTATION",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "21-hist-rome-exam",
+      "latencyMs": 5331,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Prepare notes on the reforms of the Gracchi brothers",
+          "status": "COVERED",
+          "evidenceQuote": "The Gracchi tried to give public land to poor citizens.",
+          "evidenceVerified": true,
+          "reason": "The draft describes the land reform the Gracchi proposed and the Senate's opposition.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Prepare notes on Marius and his army reforms",
+          "status": "COVERED",
+          "evidenceQuote": "Marius let landless men join the army, so soldiers became loyal to their generals instead of the state.",
+          "evidenceVerified": true,
+          "reason": "The draft states the key change Marius made to recruitment and its effect on loyalty.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Prepare notes on Julius Caesar crossing the Rubicon",
+          "status": "COVERED",
+          "evidenceQuote": "In 49 BC Caesar crossed the Rubicon with his legion, which started a civil war with Pompey.",
+          "evidenceVerified": true,
+          "reason": "The draft gives the date, the event, and its consequence.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Prepare notes on the assassination of Caesar",
+          "status": "COVERED",
+          "evidenceQuote": "Caesar was stabbed by senators on the Ides of March, 44 BC.",
+          "evidenceVerified": true,
+          "reason": "The draft gives the date, the method, and the perpetrators of the assassination.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Prepare notes on how Augustus became the first emperor",
+          "status": "PARTIAL",
+          "evidenceQuote": "Augustus - mention him.",
+          "evidenceVerified": true,
+          "reason": "The draft only names Augustus as a topic to mention and gives no content about how he gained power.",
+          "suggestion": "Write notes on the steps that made Augustus the first emperor, such as his victory over Antony at Actium and the powers the Senate granted him in 27 BC, with dates for each step."
+        }
+      ],
+      "score": {
+        "truePositives": 0,
+        "falseNegatives": 1,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 4,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "History",
+      "workType": "EXAM_PREP",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "22-hist-wwi-causes",
+      "latencyMs": 4433,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Explain the alliance system.",
+          "status": "COVERED",
+          "evidenceQuote": "Europe in 1914 was split into two armed camps. Germany, Austria-Hungary, and Italy stood on one side, and France, Russia, and Britain on the other, so a local quarrel could pull in every great power.",
+          "evidenceVerified": true,
+          "reason": "The draft names the two opposing blocs and explains how they would drag in other powers.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain the role of militarism.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Each country had been building up its forces for years. Germany and Britain raced to build battleships, and generals drew up rigid mobilization plans that left leaders little time to think.",
+          "evidenceVerified": true,
+          "reason": "The draft describes arms races and rigid mobilization plans but does not explain how these raised the risk of war.",
+          "suggestion": "Explain how the rigid mobilization plans turned a crisis into a general war, citing at least one source."
+        },
+        {
+          "requirement": "Explain how nationalism raised tensions in the Balkans.",
+          "status": "PARTIAL",
+          "evidenceQuote": "In the Balkans, Serbs and other Slavic peoples wanted their own states, which threatened Austria-Hungary's hold on the region.",
+          "evidenceVerified": true,
+          "reason": "The draft mentions Slavic desire for states but does not explain the specific nationalist actions or groups that raised tensions.",
+          "suggestion": "Name a specific nationalist movement or group in the Balkans and describe what it did that increased tension with Austria-Hungary."
+        },
+        {
+          "requirement": "Describe the assassination that triggered the war.",
+          "status": "PARTIAL",
+          "evidenceQuote": "On June 28, Gavrilo Princip shot Archduke Franz Ferdinand in Sarajevo.",
+          "evidenceVerified": true,
+          "reason": "The draft gives the date, shooter, victim, and place but no further description of the event or its immediate consequences.",
+          "suggestion": "Add a sentence or two on the circumstances of the attack and how Austria-Hungary responded to it."
+        },
+        {
+          "requirement": "Argue which cause mattered most.",
+          "status": "PARTIAL",
+          "evidenceQuote": "I believe the web of treaties was the most important factor, because without it the shooting would have stayed a local crisis.",
+          "evidenceVerified": true,
+          "reason": "The draft states a position but gives only one sentence of reasoning and no evidence or comparison with other causes.",
+          "suggestion": "Compare the treaty web with at least one other cause and support your claim with evidence showing why it outweighs the others."
+        }
+      ],
+      "score": {
+        "truePositives": 0,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 1,
+            "PARTIAL": 4,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "History",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "23-hist-industrial-report",
+      "latencyMs": 5374,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Cover working conditions in textile mills.",
+          "status": "COVERED",
+          "evidenceQuote": "Children in textile mills worked twelve hours or more a day. They crawled under moving machines to clear cotton and were often injured, and overseers beat those who fell asleep.",
+          "evidenceVerified": true,
+          "reason": "The draft describes long hours, dangerous work under machines, and abuse by overseers.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain why factory owners hired children.",
+          "status": "COVERED",
+          "evidenceQuote": "Owners preferred children because they could be paid a fraction of an adult wage and their small hands could fit between the machines.",
+          "evidenceVerified": true,
+          "reason": "The draft gives two clear reasons: lower wages and small hands that fit between machines.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Cover the Factory Act of 1833.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Parliament later passed laws about this.",
+          "evidenceVerified": true,
+          "reason": "The draft mentions later laws in general terms but never names the 1833 Act or says what it required.",
+          "suggestion": "Name the Factory Act of 1833 and explain what it changed for child workers, such as age limits or hour restrictions, citing a source for each point."
+        },
+        {
+          "requirement": "Explain how historians use the Sadler Report as evidence.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention the Sadler Report or how historians use it.",
+          "suggestion": "Add a section that identifies the Sadler Report, summarizes what its testimony revealed, and explains how historians use it as a primary source, with citations."
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "History",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "24-hist-cold-war-sources",
+      "latencyMs": 4877,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "State who wrote the document and when",
+          "status": "COVERED",
+          "evidenceQuote": "President Harry Truman delivered this speech on March 12, 1947.",
+          "evidenceVerified": true,
+          "reason": "The draft names the speaker and the exact date of the speech.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify the intended audience",
+          "status": "COVERED",
+          "evidenceQuote": "He spoke to a joint session of Congress, and through the press to the American public.",
+          "evidenceVerified": true,
+          "reason": "The draft names both the direct audience in Congress and the wider public reached through the press.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Summarize the main argument",
+          "status": "COVERED",
+          "evidenceQuote": "Truman argued that the United States must support free peoples who resist outside pressure, and he asked for $400 million in aid for Greece and Turkey.",
+          "evidenceVerified": true,
+          "reason": "The draft states Truman's central claim and the specific request that followed from it.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain the historical context",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft gives the date but does not explain the events or conditions that led to the speech.",
+          "suggestion": "Add a paragraph describing what was happening in 1947 that prompted the speech, such as the situation in Greece and Turkey, and cite a source for those events."
+        },
+        {
+          "requirement": "Assess one bias or limitation of the source",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not evaluate any bias or limitation of the speech.",
+          "suggestion": "Add a short section that identifies one possible bias or limitation of the speech, such as its Cold War framing or its goal of winning public support for aid, and supports it with evidence."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "History",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "25-biz-swot-report",
+      "latencyMs": 4084,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "List at least two strengths of the local coffee chain.",
+          "status": "COVERED",
+          "evidenceQuote": "The chain has a loyal customer base, and its stores sit next to three college campuses.",
+          "evidenceVerified": true,
+          "reason": "Two distinct strengths are listed with some detail.",
+          "suggestion": null
+        },
+        {
+          "requirement": "List at least two weaknesses of the local coffee chain.",
+          "status": "COVERED",
+          "evidenceQuote": "It has no mobile ordering, and it depends on one roaster for all of its beans.",
+          "evidenceVerified": true,
+          "reason": "Two distinct weaknesses are listed.",
+          "suggestion": null
+        },
+        {
+          "requirement": "List at least two opportunities for the local coffee chain.",
+          "status": "PARTIAL",
+          "evidenceQuote": "A new office park is opening nearby.",
+          "evidenceVerified": true,
+          "reason": "Only one opportunity is listed, and it is stated as a fact without explaining how the chain could use it.",
+          "suggestion": "Add a second opportunity, such as a market trend or partnership, and explain how the chain could act on each one."
+        },
+        {
+          "requirement": "List at least two threats to the local coffee chain.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention any threats.",
+          "suggestion": "Add at least two threats, such as new competitors or rising bean prices, and briefly explain how each could hurt the chain."
+        },
+        {
+          "requirement": "Recommend one strategic action based on the SWOT analysis.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft has no recommended action.",
+          "suggestion": "Write one recommended action that links back to a specific strength, weakness, opportunity, or threat from your SWOT lists."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Business",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "26-biz-marketing-pitch",
+      "latencyMs": 4408,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Define the target customer",
+          "status": "COVERED",
+          "evidenceQuote": "We serve busy graduate students who live off campus and have under 30 minutes to cook.",
+          "evidenceVerified": true,
+          "reason": "The draft names a specific customer segment with clear traits.",
+          "suggestion": null
+        },
+        {
+          "requirement": "State the value proposition",
+          "status": "COVERED",
+          "evidenceQuote": "Fresh dinners in 20 minutes for less than a delivery order.",
+          "evidenceVerified": true,
+          "reason": "The draft states the core benefit of speed and lower cost versus delivery.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Explain the pricing",
+          "status": "PARTIAL",
+          "evidenceQuote": "Each box costs $9 per meal, with a 10% discount for a weekly plan.",
+          "evidenceVerified": true,
+          "reason": "A per-meal price and a discount are given, but the pricing rationale or how the discount applies is not explained.",
+          "suggestion": "Add a line explaining how the $9 price was set (for example, cost of ingredients and margin) and what the weekly plan includes beyond the 10% discount."
+        },
+        {
+          "requirement": "Name two competitors",
+          "status": "PARTIAL",
+          "evidenceQuote": "We'd compete with the usual players in the space.",
+          "evidenceVerified": true,
+          "reason": "The draft refers to competitors generically without naming any.",
+          "suggestion": "Name at least two specific competing meal kit or delivery services and note how your offering differs from each."
+        },
+        {
+          "requirement": "Give a launch budget",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft contains no budget or cost figures for launching.",
+          "suggestion": "Add a slide with a launch budget listing the main expense categories and a total dollar amount for launch."
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 2,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Business",
+      "workType": "PRESENTATION",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "27-biz-startup-canvas",
+      "latencyMs": 4910,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Fill in the Customer segments section of the business model canvas.",
+          "status": "COVERED",
+          "evidenceQuote": "Who we sell to: Small restaurants within ten miles of downtown that want to cut food waste.",
+          "evidenceVerified": true,
+          "reason": "The draft names a specific customer segment with location and motivation.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Fill in the Revenue streams section of the business model canvas.",
+          "status": "COVERED",
+          "evidenceQuote": "How we make money: A $49 monthly subscription for each location, plus a small fee on every unsold meal we help them resell.",
+          "evidenceVerified": true,
+          "reason": "The draft lists two revenue streams with pricing.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Fill in the Key partners section of the business model canvas.",
+          "status": "COVERED",
+          "evidenceQuote": "Who we work with: A local food bank handles pickups, and a payment company processes the fees.",
+          "evidenceVerified": true,
+          "reason": "The draft names two key partners and their roles.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Fill in the Cost structure section of the business model canvas.",
+          "status": "COVERED",
+          "evidenceQuote": "What it costs to run: Our largest expenses are two developers, cloud hosting, and a part-time driver.",
+          "evidenceVerified": true,
+          "reason": "The draft identifies the main cost items for the business.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Base the canvas on your startup idea.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Who we sell to: Small restaurants within ten miles of downtown that want to cut food waste.",
+          "evidenceVerified": true,
+          "reason": "The draft describes a food-waste idea but never states the startup idea itself or ties all sections to it explicitly.",
+          "suggestion": "Add a short opening statement that names your startup idea and explain how each canvas section follows from it."
+        }
+      ],
+      "score": {
+        "truePositives": 0,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 4,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Business",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "28-biz-accounting-exam",
+      "latencyMs": 5334,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Review the accounting equation.",
+          "status": "COVERED",
+          "evidenceQuote": "Assets = Liabilities + Equity. Every transaction keeps this balanced.",
+          "evidenceVerified": true,
+          "reason": "The draft states the accounting equation and notes that every transaction keeps it balanced.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Review the difference between accrual and cash accounting.",
+          "status": "COVERED",
+          "evidenceQuote": "With the accrual method, revenue is recorded when it's earned, not when cash arrives. The cash method records it when money changes hands.",
+          "evidenceVerified": true,
+          "reason": "The draft contrasts the two methods by when revenue is recorded.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Review straight-line depreciation and include a worked example.",
+          "status": "PARTIAL",
+          "evidenceQuote": "Straight-line depreciation spreads an asset's cost evenly over its useful life.",
+          "evidenceVerified": true,
+          "reason": "The draft defines straight-line depreciation but has no worked example.",
+          "suggestion": "Add a worked example with a sample asset cost, useful life, and the resulting annual depreciation amount."
+        },
+        {
+          "requirement": "Review how to calculate the current ratio.",
+          "status": "COVERED",
+          "evidenceQuote": "Current ratio = current assets / current liabilities.",
+          "evidenceVerified": true,
+          "reason": "The draft gives the formula for calculating the current ratio.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Review what appears on a cash flow statement.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention the cash flow statement or its contents.",
+          "suggestion": "Add a section listing the main parts of a cash flow statement (operating, investing, and financing activities) with a brief description of each."
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Business",
+      "workType": "EXAM_PREP",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "29-biz-supply-chain",
+      "latencyMs": 4656,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Describe the supply chain disruption at the bicycle maker.",
+          "status": "COVERED",
+          "evidenceQuote": "In March a fire closed the only factory that supplied the company's gear shifters, and production stopped for six weeks.",
+          "evidenceVerified": true,
+          "reason": "The draft describes the fire, the closed supplier factory, and the six-week production stoppage.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Quantify the financial impact of the disruption.",
+          "status": "COVERED",
+          "evidenceQuote": "The shutdown cost about $2.1 million in lost sales and $300,000 in overtime to catch up.",
+          "evidenceVerified": true,
+          "reason": "The draft gives specific dollar figures for lost sales and overtime costs.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Identify the root cause of the disruption.",
+          "status": "COVERED",
+          "evidenceQuote": "The real problem was buying a critical part from a single source, with no backup and only two weeks of stock on hand.",
+          "evidenceVerified": true,
+          "reason": "The draft names single-source purchasing with no backup and low inventory as the root cause.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Compare two alternative suppliers.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not name or evaluate any alternative suppliers.",
+          "suggestion": "Identify two alternative gear shifter suppliers and add a comparison of them on criteria such as cost, lead time, capacity, and location, citing sources for each."
+        },
+        {
+          "requirement": "Propose a contingency plan.",
+          "status": "PARTIAL",
+          "evidenceQuote": "To avoid this happening again, the company should keep eight weeks of safety stock and qualify a second supplier by next year.",
+          "evidenceVerified": true,
+          "reason": "The draft proposes safety stock and a second supplier but gives no steps, owners, or timeline beyond a single sentence.",
+          "suggestion": "Expand the plan with concrete steps, responsible roles, a timeline for qualifying the second supplier, and triggers for activating the backup plan."
+        },
+        {
+          "requirement": "Keep the report between 4 and 6 pages long.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft is only four short sentences, far below the four-page minimum.",
+          "suggestion": "Expand the report with supporting sections (background, impact analysis, supplier comparison, contingency plan, conclusion) until it runs four to six pages."
+        }
+      ],
+      "score": {
+        "truePositives": 1,
+        "falseNegatives": 0,
+        "falsePositives": 1,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 1,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 1,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Business",
+      "workType": "REPORT",
+      "downgraded": 0,
+      "notAssessed": 0
+    },
+    {
+      "id": "30-biz-ethics-memo",
+      "latencyMs": 5465,
+      "error": null,
+      "predicted": [
+        {
+          "requirement": "Identify the stakeholders in the scenario.",
+          "status": "COVERED",
+          "evidenceQuote": "The people affected are customers who bought the product, the employees who built it, shareholders, and the regulator.",
+          "evidenceVerified": true,
+          "reason": "The draft names customers, employees, shareholders, and the regulator as affected parties.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Apply one ethical framework, named explicitly.",
+          "status": "COVERED",
+          "evidenceQuote": "Using utilitarianism, the right choice is the one that causes the least total harm.",
+          "evidenceVerified": true,
+          "reason": "The draft names utilitarianism and applies it to the decision.",
+          "suggestion": null
+        },
+        {
+          "requirement": "List the legal risks.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft does not mention any legal risks.",
+          "suggestion": "Add a list of the legal risks the company faces, such as liability for injuries or regulatory penalties, and tie each one to the scenario."
+        },
+        {
+          "requirement": "Recommend a course of action.",
+          "status": "COVERED",
+          "evidenceQuote": "I recommend an immediate voluntary recall.",
+          "evidenceVerified": true,
+          "reason": "The draft states a clear recommended action.",
+          "suggestion": null
+        },
+        {
+          "requirement": "Draft the first sentence of a customer notice.",
+          "status": "MISSING",
+          "evidenceQuote": null,
+          "evidenceVerified": false,
+          "reason": "The draft contains no customer notice or opening sentence for one.",
+          "suggestion": "Write an opening sentence for a customer notice that states the product affected and the action customers should take."
+        }
+      ],
+      "score": {
+        "truePositives": 2,
+        "falseNegatives": 0,
+        "falsePositives": 0,
+        "confusion": {
+          "COVERED": {
+            "COVERED": 3,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "PARTIAL": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 0,
+            "NOT_EXTRACTED": 0
+          },
+          "MISSING": {
+            "COVERED": 0,
+            "PARTIAL": 0,
+            "MISSING": 2,
+            "NOT_EXTRACTED": 0
+          }
+        }
+      },
+      "subject": "Business",
+      "workType": "ASSIGNMENT",
+      "downgraded": 0,
+      "notAssessed": 0
+    }
+  ]
+}
