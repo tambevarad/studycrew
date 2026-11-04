@@ -160,4 +160,39 @@ describe("PB-04 teams, invites, and join requests", () => {
     cy.contains("button", "Leave team").should("be.disabled");
     cy.contains("You're the only leader. Make someone else a leader before you leave").should("be.visible");
   });
+
+  it("D-01: a signed-out student opens an invite link, signs up, and ends up on the team", () => {
+    // A fresh team per run, so reruns never fill a seeded team.
+    const teamName = `Invite Flow ${Date.now()}`;
+    cy.login("varad");
+    cy.request("POST", "/api/v1/teams", { name: teamName, courseCode: "CSE 6324" }).then(({ body }) => {
+      const joinPath = `/join/${body.data.inviteCode as string}`;
+      const email = `d01-${Date.now()}@studycrew.test`;
+
+      Cypress.session.clearAllSavedSessions();
+      cy.clearAllCookies();
+      cy.visit(joinPath);
+      cy.location("pathname").should("eq", "/sign-in");
+      cy.location("search").should("eq", `?next=${encodeURIComponent(joinPath)}`);
+
+      // "Create an account" keeps ?next=, then sign-up returns to the invite link.
+      cy.contains("a", "Create an account").click();
+      cy.location("pathname").should("eq", "/sign-up");
+      cy.location("search").should("eq", `?next=${encodeURIComponent(joinPath)}`);
+      cy.get("input[name=name]").type("Invited Student");
+      cy.get("input[name=email]").type(email);
+      cy.get("input[name=password]").type("invited-pass-123");
+      cy.contains("button", "Create account").click();
+
+      cy.location("pathname", { timeout: 15000 }).should("eq", joinPath);
+      cy.contains("h1", `Join ${teamName}`);
+      cy.checkPageA11y();
+      cy.contains("button", "Join team").click();
+      cy.location("pathname", { timeout: 15000 }).should("match", /^\/teams\/[^/]+$/);
+      cy.contains("h1", teamName);
+      cy.location("pathname").then((teamPath) => {
+        cy.request(`/api/v1${teamPath}`).its("body.data.myRole").should("eq", "MEMBER");
+      });
+    });
+  });
 });
