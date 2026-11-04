@@ -32,13 +32,16 @@ export function AgendaCard({
   const flag = useApiAction();
   const remove = useApiAction();
 
-  // The list re-sorts after a flag, which moves the button in the DOM and drops keyboard focus. Put it back.
-  const refocus = useRef<string | null>(null);
+  // Re-sorting moves a button in the DOM, and closing the dialog removes what had focus, so keyboard users would be sent
+  // back to the top of the page. Each action says where focus goes next; this runs once that change is on screen.
+  const titleInput = useRef<HTMLInputElement>(null);
+  const refocus = useRef<(() => void) | null>(null);
   useEffect(() => {
-    if (!refocus.current) return;
-    document.getElementById(`help-${refocus.current}`)?.focus();
+    refocus.current?.();
     refocus.current = null;
-  }, [items]);
+  }, [items, deleting]);
+
+  const focusById = (id: string) => () => document.getElementById(id)?.focus();
 
   async function onAdd(e: FormEvent) {
     e.preventDefault();
@@ -51,11 +54,16 @@ export function AgendaCard({
   }
 
   async function toggleHelp(item: AgendaItemDTO) {
-    refocus.current = item.id;
+    refocus.current = focusById(`help-${item.id}`);
     const updated = await flag.run(() =>
       apiFetch<AgendaItemDTO>(`${base}/${item.id}/help`, { method: "PUT", body: { needsHelp: !item.flaggedByMe } }),
     );
     if (!updated) refocus.current = null;
+  }
+
+  function cancelDelete() {
+    if (deleting) refocus.current = focusById(`delete-${deleting.id}`);
+    setDeleting(null);
   }
 
   async function confirmDelete() {
@@ -63,7 +71,11 @@ export function AgendaCard({
     const ok = await remove.run(() => apiFetch(`${base}/${deleting.id}`, { method: "DELETE" }), {
       success: "Topic deleted",
     });
-    if (ok) setDeleting(null);
+    if (!ok) return;
+    const index = items.findIndex((i) => i.id === deleting.id);
+    const neighbor = items[index + 1] ?? items[index - 1];
+    refocus.current = neighbor ? focusById(`help-${neighbor.id}`) : () => titleInput.current?.focus();
+    setDeleting(null);
   }
 
   return (
@@ -107,6 +119,7 @@ export function AgendaCard({
                   </Button>
                   {me.isLeader || item.author.id === me.id ? (
                     <Button
+                      id={`delete-${item.id}`}
                       variant="ghost"
                       size="icon"
                       aria-label={`Delete “${item.title}”`}
@@ -123,7 +136,13 @@ export function AgendaCard({
 
         <form onSubmit={onAdd} noValidate className="flex flex-col gap-3 border-t border-slate-100 pt-4">
           <FormField label="Topic" error={add.fieldErrors.title} required>
-            <Input name="title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} />
+            <Input
+              ref={titleInput}
+              name="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={200}
+            />
           </FormField>
           <FormField
             label="Notes (optional)"
@@ -144,7 +163,7 @@ export function AgendaCard({
       {deleting ? (
         <ConfirmDialog
           open
-          onCancel={() => setDeleting(null)}
+          onCancel={cancelDelete}
           onConfirm={confirmDelete}
           pending={remove.pending}
           title={`Delete “${deleting.title}”?`}
