@@ -1,0 +1,30 @@
+{
+  "id": "04-psych-obedience-exam",
+  "subject": "Psychology",
+  "workType": "EXAM_PREP",
+  "instructions": "Midterm study guide. Be ready to answer on:\n- The procedure of Milgram's obedience study\n- Milgram's main result, with the percentage\n- Ethical criticisms of Milgram's study\n- Asch's line-judgment conformity study\n- The difference between obedience and conformity",
+  "draft": "Milgram (1963): participants were told to give a \"learner\" electric shocks for wrong answers, rising in 15-volt steps. An experimenter in a lab coat ordered them to continue. The learner was an actor and no real shocks were given.\nResult: 65% went all the way to 450 volts.\nEthics - TODO\nAsch (1951): people judged which of three lines matched a target line. Confederates gave the wrong answer on purpose, and about a third of real participants went along with them.",
+  "expected": [
+    {
+      "requirementHint": "procedure Milgram obedience study",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Milgram main result percentage",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "ethical criticisms Milgram study",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "Asch line-judgment conformity study",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "difference obedience conformity",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Empty 'Ethics - TODO' heading is a keyword trap; the obedience/conformity contrast is absent."
+}

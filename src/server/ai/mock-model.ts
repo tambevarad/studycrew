@@ -8,7 +8,7 @@ import type { CoverageModel, CoverageModelInput, CoverageModelItem } from "./typ
  * - Matching: share of the requirement's keywords found in the best draft sentence.
  *   ≥ 0.6 → COVERED, ≥ 0.3 → PARTIAL, else MISSING. Quote = that sentence, verbatim.
  */
-const STOPWORDS = new Set(
+export const STOPWORDS = new Set(
   "a an and are as at be by for from has have how in include includes including is it its of on or that the their this to was were what when where which who why will with your you must should each least one two three explain describe discuss provide give use using about into than then also make".split(
     " ",
   ),

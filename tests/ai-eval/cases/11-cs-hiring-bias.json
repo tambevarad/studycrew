@@ -1,0 +1,26 @@
+{
+  "id": "11-cs-hiring-bias",
+  "subject": "Computer Science",
+  "workType": "REPORT",
+  "instructions": "Case report: Bias in an automated hiring tool.\nYour report must:\n- Describe how the screening tool works\n- Identify the source of the bias\n- Name the group that was harmed\n- Propose a mitigation",
+  "draft": "The company's system read past resumes and learned which words were common among people it had hired, then gave each new applicant a score from one to five stars.\nThe trouble started with the training data. Ten years of past hires were mostly men, so the model learned to treat that history as the definition of a good candidate.\nAs a result, women applicants were pushed down the ranking, and resumes that mentioned a women's college scored lower.\nWe suggest auditing the scores across gender before each release and retraining on a balanced set of examples.",
+  "expected": [
+    {
+      "requirementHint": "describe screening tool works",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "identify source bias",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "name group harmed",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "propose mitigation",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Clean draft written in different words from the instructions ('women applicants', 'we suggest'). Any Missing is a false alarm."
+}

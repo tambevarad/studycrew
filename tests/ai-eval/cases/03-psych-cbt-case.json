@@ -1,0 +1,26 @@
+{
+  "id": "03-psych-cbt-case",
+  "subject": "Psychology",
+  "workType": "ASSIGNMENT",
+  "instructions": "Case analysis: Read the case of \"Maya\", a student with social anxiety.\nYour analysis must:\n- Identify Maya's core belief\n- Describe two CBT techniques you would use with her\n- Explain how you would measure her progress\n- Address one ethical issue in treating a student at your own university",
+  "draft": "Maya's core belief seems to be \"if people really knew me, they would reject me.\" This belief shows up in how she avoids class discussions and eats alone.\nAs a first step I would use cognitive restructuring. Maya would write down an automatic thought, such as \"everyone noticed my voice shaking,\" and then list the evidence for and against it. Over several sessions this helps her see that her predictions of rejection rarely come true.",
+  "expected": [
+    {
+      "requirementHint": "identify core belief Maya",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "two CBT techniques",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "measure progress",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "ethical issue treating student university",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Only one of two techniques; no progress measure; no ethics."
+}

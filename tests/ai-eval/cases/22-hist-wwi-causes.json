@@ -1,0 +1,30 @@
+{
+  "id": "22-hist-wwi-causes",
+  "subject": "History",
+  "workType": "ASSIGNMENT",
+  "instructions": "Short essay: Why did World War I begin in 1914?\nYour essay must:\n- Explain the alliance system\n- Explain the role of militarism\n- Explain how nationalism raised tensions in the Balkans\n- Describe the assassination that triggered the war\n- Argue which cause mattered most",
+  "draft": "Europe in 1914 was split into two armed camps. Germany, Austria-Hungary, and Italy stood on one side, and France, Russia, and Britain on the other, so a local quarrel could pull in every great power.\nEach country had been building up its forces for years. Germany and Britain raced to build battleships, and generals drew up rigid mobilization plans that left leaders little time to think.\nIn the Balkans, Serbs and other Slavic peoples wanted their own states, which threatened Austria-Hungary's hold on the region.\nOn June 28, Gavrilo Princip shot Archduke Franz Ferdinand in Sarajevo.\nI believe the web of treaties was the most important factor, because without it the shooting would have stayed a local crisis.",
+  "expected": [
+    {
+      "requirementHint": "explain alliance system",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "role militarism",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "nationalism tensions Balkans",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "assassination triggered war",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "argue cause mattered most",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Clean draft in different words: never says 'alliance' or 'militarism'. Any Missing is a false alarm."
+}

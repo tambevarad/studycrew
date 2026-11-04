@@ -1,0 +1,30 @@
+{
+  "id": "24-hist-cold-war-sources",
+  "subject": "History",
+  "workType": "ASSIGNMENT",
+  "instructions": "Document analysis: The Truman Doctrine speech (1947).\nFor this assignment:\n- State who wrote the document and when\n- Identify the intended audience\n- Summarize the main argument\n- Explain the historical context\n- Assess one bias or limitation of the source\nBring a printed copy to class on Tuesday.",
+  "draft": "President Harry Truman delivered this speech on March 12, 1947.\nHe spoke to a joint session of Congress, and through the press to the American public.\nTruman argued that the United States must support free peoples who resist outside pressure, and he asked for $400 million in aid for Greece and Turkey.",
+  "expected": [
+    {
+      "requirementHint": "who wrote document when",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "intended audience",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "summarize main argument",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "historical context",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "bias limitation source",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Context and bias absent. 'Bring a printed copy' shouldn't become a requirement."
+}
