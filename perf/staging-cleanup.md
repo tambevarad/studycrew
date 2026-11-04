@@ -19,18 +19,22 @@ Everything is recognizable by name. Counts are what the seeder creates. Fill in 
 | Meetings | in those teams, title `Load meeting 1` … `6` | 300 | DB (go with the team) |
 | Activity | in those teams, "created “Load task …”" | 1,000 | DB (go with the team) |
 
-Seeded on staging: **not yet** (date, by whom).
+Seeded on staging: **2026-11-03, about 11:01 pm CST, by Dev** (`npx tsx perf/seed-load.ts`). An earlier attempt the
+same evening didn't reach Neon (it found 0 load users), so there is exactly one copy.
 
 ## 2. Left by the NFR runs (`nfr.yml`)
 
 | Run | What it leaves | Undo |
 |---|---|---|
-| k6 load test | Tasks titled `k6 task <vu>-<iteration>` in the load teams (about 10 % of iterations create one and move it), with their "created" and "moved" activity rows. 10 sign-in sessions for the load users | DB, with the load teams. Sessions expire on their own |
+| k6 load test | **4,146 tasks** titled `k6 task <vu>-<iteration>` in the load teams (2,021 from run 41777022628, 2,125 from run 41777216556), each created and then moved, with their activity rows. Sign-in sessions for the load users (10 per run) | DB, with the load teams. Sessions expire on their own |
 | Lighthouse | Sign-in sessions for the demo account `varad@studycrew.test` (one from the workflow's team lookup, one per Chrome run) | None needed: sessions expire |
-| ZAP baseline | Passive scan: it reads pages and doesn't submit data. **Check anyway**: list the users created while the ZAP job ran whose email isn't `@studycrew.test`. Expected: none | DB, only if any show up |
+| ZAP baseline | Passive scan. Its spider submitted the sign-in and sign-up forms as plain GETs (`?email=zaproxy@example.com…`, see D-06), which only load the page, so no account should exist. **Check anyway**: users created during the three ZAP jobs (04:44, 05:05, 05:11 UTC on Nov 4) whose email isn't `@studycrew.test`. Expected: none | DB, only if any show up |
 | npm audit, bundle scan | Nothing on staging (they run on the GitHub runner) | — |
 
-Run link and time window: **not yet**.
+Runs: [41774963775](https://github.com/tambevarad/studycrew/actions/runs/41774963775) (04:44–04:46 UTC Nov 4; k6 stopped
+at its first sign-in), [41777022628](https://github.com/tambevarad/studycrew/actions/runs/41777022628) (05:04–05:11), and
+[41777216556](https://github.com/tambevarad/studycrew/actions/runs/41777216556) (05:11–05:24). Plus the /sign-in
+Lighthouse rerun, if it happens.
 
 ## 3. Usability dry run (`docs/process/usability-test.md` §3.1, Nov 3)
 
@@ -51,8 +55,8 @@ The script (§3) creates one set per participant P#. Krish fills in this table a
 
 | What | How to recognize it | Undo |
 |---|---|---|
-| Participant accounts | `p1.usability@studycrew.test`, `p2.usability@…`, … | DB |
-| Teams | `Usability P1`, `Usability P2`, … in `CSE 6324` | DB (tasks, meetings, coverage reports, activity, and notifications go with the team) |
+| Participant accounts | `p1.usability@studycrew.test` … `p6.usability@studycrew.test` (Krish's plan on issue #17; P6 is a spare) | DB |
+| Teams | `Usability P1` … `Usability P6` in `CSE 6324` | DB (tasks, meetings, coverage reports, activity, and notifications go with the team) |
 | Helper accounts, if any | Krish lists them here | DB |
 | Changes to the moderator's own account (availability, team memberships) | Krish lists them here | App |
 
