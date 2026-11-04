@@ -1,0 +1,30 @@
+{
+  "id": "28-biz-accounting-exam",
+  "subject": "Business",
+  "workType": "EXAM_PREP",
+  "instructions": "Accounting midterm prep. Review:\n- The accounting equation\n- The difference between accrual and cash accounting\n- Straight-line depreciation with a worked example\n- How to calculate the current ratio\n- What appears on a cash flow statement",
+  "draft": "Assets = Liabilities + Equity. Every transaction keeps this balanced.\nWith the accrual method, revenue is recorded when it's earned, not when cash arrives. The cash method records it when money changes hands.\nStraight-line depreciation spreads an asset's cost evenly over its useful life.\nCurrent ratio = current assets / current liabilities.",
+  "expected": [
+    {
+      "requirementHint": "accounting equation",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "difference accrual cash accounting",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "straight-line depreciation worked example",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "calculate current ratio",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "cash flow statement",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Depreciation defined without the worked example; cash flow statement absent."
+}

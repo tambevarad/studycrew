@@ -1,0 +1,26 @@
+{
+  "id": "16-bio-cell-exam",
+  "subject": "Biology",
+  "workType": "EXAM_PREP",
+  "instructions": "Unit test review. Know the following:\n- The phases of mitosis in order\n- Two differences between mitosis and meiosis\n- The function of mitochondria and ribosomes\n- What osmosis is",
+  "draft": "Mitosis goes in this order: prophase, metaphase, anaphase, telophase.\nMitosis makes two identical diploid cells, but meiosis makes four genetically different haploid cells. Meiosis also has crossing over, which mitosis does not.\nMitochondria produce ATP through cellular respiration. Ribosomes build proteins from mRNA.\nOsmosis is the movement of water across a selectively permeable membrane toward the side with more solute.",
+  "expected": [
+    {
+      "requirementHint": "phases mitosis order",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "differences mitosis meiosis",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "function mitochondria ribosomes",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "what osmosis water",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Clean draft, no gaps. Any Missing is a false alarm."
+}

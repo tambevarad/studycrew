@@ -1,0 +1,30 @@
+{
+  "id": "19-hist-french-revolution",
+  "subject": "History",
+  "workType": "REPORT",
+  "instructions": "Research report: Causes and course of the French Revolution.\nYour report must:\n- Explain the economic causes of the revolution\n- Explain the social causes, including the three estates\n- Describe the Reign of Terror\n- Explain how Napoleon rose to power\n- Use at least two primary sources",
+  "draft": "By 1789 France was close to bankruptcy. Wars, including support for the American Revolution, had drained the treasury, and poor harvests pushed bread prices so high that many families spent most of their income on food.\nFrench society was split into three estates. The clergy and nobles paid little tax, while the Third Estate, about 97% of the population, carried nearly all of it.\nIn 1793 and 1794 Robespierre and the Committee of Public Safety sent thousands of suspected enemies to the guillotine in what became known as the Terror.",
+  "expected": [
+    {
+      "requirementHint": "economic causes revolution",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "social causes three estates",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Reign of Terror",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Napoleon rose power",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "use two primary sources",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Stops before Napoleon; no primary sources at all."
+}

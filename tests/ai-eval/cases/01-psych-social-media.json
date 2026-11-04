@@ -1,0 +1,30 @@
+{
+  "id": "01-psych-social-media",
+  "subject": "Psychology",
+  "workType": "PRESENTATION",
+  "instructions": "Group presentation: Social media and student wellbeing.\nYour presentation must:\n- Explain the benefits of social media for students, with one research example\n- Explain the drawbacks of social media for students, with one research example\n- Compare the two sides and state which is stronger\n- End with a recommendation for students\n- Cite at least three peer-reviewed sources in APA format\nSlides are due Friday at 5 pm on Canvas.",
+  "draft": "Slide 1: Social media is part of daily life for most college students.\nSlide 2: Benefits. Students use it to stay in touch with friends and to find study groups. Lee and Park (2021) surveyed 400 first-year students and found that those who joined course group chats reported feeling less lonely.\nSlide 3: What students should do. We recommend that students turn off notifications during study hours so they keep the social benefits without losing focus.",
+  "expected": [
+    {
+      "requirementHint": "benefits social media students research example",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "drawbacks social media students research example",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "compare two sides stronger",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "recommendation students",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "cite peer-reviewed sources APA format",
+      "status": "PARTIAL"
+    }
+  ],
+  "notes": "Proposal example. Drawbacks and the comparison are absent; one of three sources cited. Logistics line (due date)."
+}

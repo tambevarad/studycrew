@@ -1,0 +1,30 @@
+{
+  "id": "18-bio-punnett",
+  "subject": "Biology",
+  "workType": "ASSIGNMENT",
+  "instructions": "Genetics problem set. Flower color in snapdragons shows incomplete dominance.\nFor a cross between two pink flowers:\n1. State the genotypes of the parents\n2. Draw the Punnett square\n3. Give the genotype ratio of the offspring\n4. Give the phenotype ratio of the offspring\n5. Explain how incomplete dominance differs from complete dominance",
+  "draft": "1. Both parents are heterozygous: RW and RW.\n2. Punnett square:\n     R    W\nR   RR   RW\nW   RW   WW\n3. The genotype ratio is 1 RR : 2 RW : 1 WW.",
+  "expected": [
+    {
+      "requirementHint": "genotypes parents",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Punnett square",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "genotype ratio offspring",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "phenotype ratio offspring",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "incomplete dominance differs complete dominance",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Stops after part 3. Genotype and phenotype ratio requirements are near-twins, so matching must keep them apart."
+}

@@ -23,7 +23,8 @@
     "db:reset": "prisma migrate reset --force",
     "db:generate": "prisma generate",
     "postinstall": "prisma generate",
-    "check": "npm run lint && npm run typecheck && npm run test"
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "ai:eval": "tsx scripts/ai-eval.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.87",

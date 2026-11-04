@@ -1,0 +1,26 @@
+{
+  "id": "23-hist-industrial-report",
+  "subject": "History",
+  "workType": "REPORT",
+  "instructions": "Report: Child labor in the British Industrial Revolution.\nCover:\n- Working conditions in textile mills\n- Why factory owners hired children\n- The Factory Act of 1833\n- How historians use the Sadler Report as evidence",
+  "draft": "Children in textile mills worked twelve hours or more a day. They crawled under moving machines to clear cotton and were often injured, and overseers beat those who fell asleep.\nOwners preferred children because they could be paid a fraction of an adult wage and their small hands could fit between the machines.\nParliament later passed laws about this.",
+  "expected": [
+    {
+      "requirementHint": "working conditions textile mills",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "factory owners hired children",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Factory Act 1833",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "historians Sadler Report evidence",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "One vague sentence stands in for the Factory Act; the Sadler Report is absent."
+}

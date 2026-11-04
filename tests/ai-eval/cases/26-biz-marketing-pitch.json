@@ -1,0 +1,30 @@
+{
+  "id": "26-biz-marketing-pitch",
+  "subject": "Business",
+  "workType": "PRESENTATION",
+  "instructions": "Marketing pitch for a campus meal-kit startup.\nYour pitch must:\n- Define the target customer\n- State the value proposition\n- Explain the pricing\n- Name two competitors\n- Give a launch budget",
+  "draft": "Slide 1: We serve busy graduate students who live off campus and have under 30 minutes to cook.\nSlide 2: Fresh dinners in 20 minutes for less than a delivery order.\nSlide 3: Each box costs $9 per meal, with a 10% discount for a weekly plan.\nSlide 4: We'd compete with the usual players in the space.",
+  "expected": [
+    {
+      "requirementHint": "define target customer",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "state value proposition",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "explain pricing",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "name two competitors",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "launch budget",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Competitors mentioned but none named (thin); no budget. Value proposition is never called that."
+}
