@@ -1,6 +1,6 @@
 # Test report (PB-17)
 
-> **Status: draft, 2026-11-03, `main` @ `059147c`.** The FR traceability for merged items (§3, §4) and the CI and
+> **Status: draft, 2026-11-03, `main` @ `6e7eb07`.** The FR traceability for merged items (§3, §4) and the CI and
 > coverage evidence (§2) are filled in. NFR results that come from later runs are marked **⏳ pending** with the
 > owner who will fill them in (§5). Nothing marked pending has been run yet; nothing in this file is estimated.
 >
@@ -18,7 +18,7 @@ when).
 | 3 | NFR-03 Lighthouse CI on 6 pages (`lighthouserc.json`) and the 19-page axe sweep (`cypress/e2e/a11y-sweep.cy.ts`) | Dev | Files in #52 (the sweep then runs in every CI `e2e`). **Pending final run** (Lighthouse on staging) after PB-14, PB-15, PB-16 merge |
 | 4 | NFR-04 usability sessions (≥ 5 students) and SUS: copy the §9.2 summary from `docs/process/usability-test.md` | Krish | after the sessions |
 | 5 | NFR-05 uptime export for the last 4 weeks (UptimeRobot on `/api/health`) | Dev | end of Sprint 5 |
-| 6 | FR rows for **PB-15** and **PB-16** (§3, §4). PB-12 and PB-14 are done | Krish | as each one merges |
+| 6 | FR rows for every merged item, PB-01 … PB-16 (§3, §4): **done** 2026-11-03 | Krish | — |
 | 7 | Refresh §2 (test counts, coverage, CI history) on the **final** `main` commit | Krish | before the final report |
 | 8 | File a GitHub issue for D-02 (root cause still unknown) and link it in §6 | Krish | now |
 
@@ -38,15 +38,15 @@ CI (`.github/workflows/ci.yml`) runs three jobs on every PR and every push to `m
 - `integration`: migrations, then `test:coverage` against Postgres 16.
 - `e2e`: seed, build, start, then every Cypress spec in Chrome.
 
-## 2. Automated suites on `main` @ `059147c`
+## 2. Automated suites on `main` @ `6e7eb07`
 
 | Suite | Result | Evidence |
 |---|---|---|
-| Vitest unit + integration | **399 tests in 38 files, all passing** | CI `integration` job (`test:coverage`) in [run 41768691827](https://github.com/tambevarad/studycrew/actions/runs/41768691827), 2026-11-04 03:41 UTC (latest green run on `main`) |
-| Coverage | **96.56 % lines** (1180/1222) · 95.78 % statements · 88.86 % branches · 97.03 % functions | Same CI job; it uploads the `coverage` artifact |
-| Cypress E2E | **69 tests in 15 specs, all passing** ("All specs passed!", 69/69; 20 of them are the 19-page axe sweep) | CI `e2e` job in [run 41768691827](https://github.com/tambevarad/studycrew/actions/runs/41768691827) |
-| Authorization sweep (NFR-02) | Discovers routes automatically: all **42** `route.ts` files under `api/v1/` return 401 when signed out, and all **28** under `teams/[teamId]/` return 403 to a non-member, on every method | `tests/integration/authz-sweep.test.ts`, in the same run |
-| CI history on `main` | **35 of 37** runs green; 1 red `e2e` run (see D-02); 1 cancelled (the #54 run, replaced by #55's push) | `gh run list --workflow ci.yml --branch main`, 2026-11-03 |
+| Vitest unit + integration | **444 tests in 41 files, all passing** | CI `integration` job (`test:coverage`) in [run 41772661620](https://github.com/tambevarad/studycrew/actions/runs/41772661620), 2026-11-04 04:21 UTC (latest green run on `main`) |
+| Coverage | **96.8 % lines** (1210/1250) · 96 % statements (1395/1453) · 89.01 % branches (802/901) · 97.09 % functions (368/379) | Same CI job; it uploads the `coverage` artifact |
+| Cypress E2E | **71 tests in 16 specs, all passing** ("All specs passed!", 71/71; 20 of them are the 19-page axe sweep) | CI `e2e` job in [run 41772661620](https://github.com/tambevarad/studycrew/actions/runs/41772661620) |
+| Authorization sweep (NFR-02) | Discovers routes automatically: all **45** `route.ts` files under `api/v1/` return 401 when signed out, and all **31** under `teams/[teamId]/` return 403 to a non-member, on every method | `tests/integration/authz-sweep.test.ts`, in the same run |
+| CI history on `main` | **38 of 40** completed runs green; 1 red `e2e` run (see D-02); 1 cancelled (the #54 run, replaced by #55's push) | `gh run list --workflow ci.yml --branch main`, 2026-11-03 |
 
 ## 3. FR → test traceability
 
@@ -69,7 +69,7 @@ passed in the CI run linked in §2.
 | (all) | Foundation: shell, auth guard, health, permissions, helpers | — | PB-01 (#18, #20, #39) | `smoke.cy.ts` (5) | `foundation.test.ts`, `health.test.ts`, `authz-sweep.test.ts` | `foundation.test.ts` | ✅ |
 
 **PB-17 AC2** ("every Must FR links to at least one passing E2E spec"): **✅ complete.** Every Must FR, FR-01 … FR-07,
-links to at least one passing E2E spec in the CI run in §2 (`@@SHA@@`). FR-07's evaluation part (PB-16) is a manual
+links to at least one passing E2E spec in the CI run in §2 (`6e7eb07`). FR-07's evaluation part (PB-16) is a manual
 evaluation by design; its evidence is [`docs/ai-eval-report.md`](ai-eval-report.md) (§4.2), and FR-07 itself already has
 `coverage.cy.ts` and `coverage-actions.cy.ts`.
 
