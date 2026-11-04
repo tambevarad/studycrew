@@ -39,8 +39,3 @@ export function closedSummary(question: string, winner: TallyRow | null, automat
     : "no winner (no votes)";
   return `closed the poll “${question}”${how} — ${result}`;
 }
-
-/** Percent of all votes, rounded, for bars and screen-reader text. 0 when nobody voted. */
-export function percent(votes: number, total: number): number {
-  return total === 0 ? 0 : Math.round((votes / total) * 100);
-}
