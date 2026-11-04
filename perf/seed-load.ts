@@ -3,7 +3,8 @@
  * rows per team so the board, calendar, and activity pages have realistic sizes.
  *
  * SAFE FOR STAGING (it's also the demo site):
- * - Only ADDS rows. It never deletes or updates anything, and never imports `prisma/seed.ts` (which wipes all data).
+ * - Only ADDS rows. It never deletes anything, and never imports `prisma/seed.ts` (which wipes all data). The one update
+ *   is `--reset-password`, which touches only the load accounts' own password hash.
  * - Everything it creates is recognizable: users `load-NN@studycrew.test`, teams in course `LOAD 9000` named `Load Team NN`.
  * - Idempotent: if `Load Team 01` already exists it stops, so running it twice doesn't double the data.
  *
@@ -11,6 +12,7 @@
  * prompt, never on the command line (perf/README.md has the exact commands), then:
  *   npx tsx perf/seed-load.ts --dry-run    # prints the plan and the target host, touches nothing
  *   npx tsx perf/seed-load.ts              # create
+ *   npx tsx perf/seed-load.ts --reset-password   # only re-sets the 10 load accounts' password (e.g. after a typo)
  * The password is for the load accounts only. Keep it out of git; the nfr.yml workflow reads it from a repo secret.
  */
 import "dotenv/config";
@@ -54,6 +56,17 @@ async function main() {
 
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
   try {
+    if (process.argv.includes("--reset-password")) {
+      // Only the load accounts' password hash changes; their teams and every other row stay as they are.
+      const emails = Array.from({ length: USERS }, (_, i) => loadEmail(i + 1));
+      const users = await db.user.findMany({ where: { email: { in: emails } }, select: { id: true } });
+      const { count } = await db.account.updateMany({
+        where: { userId: { in: users.map((u) => u.id) }, providerId: "credential" },
+        data: { password: await hashPassword(password) },
+      });
+      console.log(`Found ${users.length} of ${USERS} load users; set a new password on ${count} of their accounts.`);
+      return;
+    }
     if (await db.team.findFirst({ where: { courseCode: LOAD_COURSE, name: loadTeamName(1) }, select: { id: true } })) {
       console.log(`"${loadTeamName(1)}" already exists: load data is already seeded. Nothing to do.`);
       return;

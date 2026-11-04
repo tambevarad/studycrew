@@ -16,13 +16,18 @@ pick a window when no usability session is scheduled (ask Krish).
    prompt, so they never appear on screen, on the command line, in PowerShell history, or in a file:
    ```powershell
    $env:DATABASE_URL = [Net.NetworkCredential]::new('', (Read-Host 'Neon DIRECT connection string' -AsSecureString)).Password
-   $env:LOAD_TEST_PASSWORD = [Net.NetworkCredential]::new('', (Read-Host 'Load-test password, 12+ characters' -AsSecureString)).Password
+   $a = [Net.NetworkCredential]::new('', (Read-Host 'Load-test password, 12+ characters' -AsSecureString)).Password
+   $b = [Net.NetworkCredential]::new('', (Read-Host 'Same password again' -AsSecureString)).Password
+   if ($a -ceq $b) { $env:LOAD_TEST_PASSWORD = $a; 'Passwords match' } else { 'They do not match: run these three lines again' }; Remove-Variable a, b
    npx tsx perf/seed-load.ts --dry-run   # check "Target database:" is the Neon host, not localhost
    npx tsx perf/seed-load.ts
    Remove-Item Env:DATABASE_URL, Env:LOAD_TEST_PASSWORD
    ```
    In Git Bash, use `read -rs DATABASE_URL && export DATABASE_URL` (and the same for `LOAD_TEST_PASSWORD`) instead.
-   Running it again is safe: it stops if `Load Team 01` already exists.
+   Running it again is safe: it stops if `Load Team 01` already exists. Paste the password from your password manager
+   rather than typing it, since the prompt is hidden. If the load users can't sign in later (HTTP 401), the password
+   was mistyped: set it again as above and run `npx tsx perf/seed-load.ts --reset-password`, which changes only the
+   10 load accounts' password.
 2. **The repo owner (Varad) adds the same password** as the repository secret `LOAD_TEST_PASSWORD`: Settings → Secrets
    and variables → Actions → New repository secret, or `gh secret set LOAD_TEST_PASSWORD --repo tambevarad/studycrew`
    (it prompts for the value). Share the password through a private channel, never in chat, git, or a PR.
