@@ -59,7 +59,9 @@ cd ../studycrew-deploy && npx vercel@latest deploy --prod
 | `DATABASE_URL_UNPOOLED` | `prisma migrate deploy` during the build | Neon → Connect → **pooling off** |
 | `BETTER_AUTH_SECRET` | session signing | 32 random bytes, base64. Never reuse the local one |
 | `BETTER_AUTH_URL` | Better Auth origin check + callbacks | `https://studycrew-staging.vercel.app` (exactly, no trailing slash) |
-| `AI_PROVIDER` | PB-10 Coverage Check | `mock` for now; `openai` + `OPENAI_API_KEY` when PB-10 goes live |
+| `AI_PROVIDER` | PB-10 Coverage Check | `claude` (live since Nov 3, 2026). `mock` turns the real provider off |
+| `ANTHROPIC_API_KEY` | PB-10 Coverage Check, with `AI_PROVIDER=claude` | Anthropic Console → API keys (Varad's account). Mark it **Sensitive** |
+| `CLAUDE_MODEL` | optional | Leave unset to use `claude-haiku-5-5` (the default in `src/server/ai/providers/claude.ts`) |
 
 Changing a variable only affects **new** deployments, so redeploy afterwards. Rotating `BETTER_AUTH_SECRET` signs
 everyone out.
@@ -71,6 +73,7 @@ everyone out.
 | `VERCEL_TOKEN` | https://vercel.com/account/settings/tokens → Create (scope: Dev's Hobby team; give it an expiry) |
 | `VERCEL_ORG_ID` | `orgId` in `.vercel/project.json` of a linked checkout (the **team** ID of "devjpatell's projects", starts with `team_`) |
 | `VERCEL_PROJECT_ID` | `projectId` in the same file (= Vercel project → Settings → General → **Project ID**, starts with `prj_`) |
+| `LOAD_TEST_PASSWORD` | Chosen by whoever seeds the load data (`perf/README.md`). Only `nfr.yml` reads it |
 
 Dev sends these to Varad **privately** (not team chat, not an AI tool), and Varad pastes them into GitHub.
 

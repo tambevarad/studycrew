@@ -16,7 +16,7 @@ instructions with their draft and find what's missing before they submit.
 ## Stack
 
 TypeScript · Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · Better Auth · Prisma 7 + PostgreSQL 16 · Zod 4 ·
-FullCalendar · dnd-kit · Recharts · TanStack Query · Vercel AI SDK (OpenAI default; Gemini/Claude swappable; mock in tests) ·
+FullCalendar · dnd-kit · Recharts · TanStack Query · Vercel AI SDK (Claude Haiku 5.5 on staging; OpenAI/Gemini swappable; mock in tests) ·
 Vitest · Cypress + cypress-axe · GitHub Actions · Vercel + Neon.
 
 ## Quick start
