@@ -1,0 +1,30 @@
+{
+  "id": "21-hist-rome-exam",
+  "subject": "History",
+  "workType": "EXAM_PREP",
+  "instructions": "Exam review: The fall of the Roman Republic.\nPrepare notes on:\n- The reforms of the Gracchi brothers\n- Marius and his army reforms\n- Julius Caesar crossing the Rubicon\n- The assassination of Caesar\n- How Augustus became the first emperor",
+  "draft": "The Gracchi tried to give public land to poor citizens. The Senate opposed them and both brothers were killed.\nMarius let landless men join the army, so soldiers became loyal to their generals instead of the state.\nIn 49 BC Caesar crossed the Rubicon with his legion, which started a civil war with Pompey.\nCaesar was stabbed by senators on the Ides of March, 44 BC.\nAugustus - mention him.",
+  "expected": [
+    {
+      "requirementHint": "reforms Gracchi brothers",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Marius army reforms",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Caesar crossing Rubicon",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "assassination Caesar",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Augustus first emperor",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "'Augustus - mention him' is a placeholder with no content, a keyword trap."
+}

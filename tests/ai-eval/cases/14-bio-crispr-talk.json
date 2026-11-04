@@ -1,0 +1,30 @@
+{
+  "id": "14-bio-crispr-talk",
+  "subject": "Biology",
+  "workType": "PRESENTATION",
+  "instructions": "Presentation: CRISPR gene editing.\nCover:\n- How CRISPR-Cas9 cuts DNA\n- One medical application\n- One agricultural application\n- A specific ethical concern\n- What you expect in the next ten years",
+  "draft": "Slide 1: Cas9 is an enzyme that works like molecular scissors. A guide RNA leads it to a matching DNA sequence, where it makes a cut.\nSlide 2: Medicine. In 2023 regulators approved the first CRISPR therapy for sickle cell disease, which edits a patient's own blood stem cells.\nSlide 3: Some people have concerns about this technology.",
+  "expected": [
+    {
+      "requirementHint": "CRISPR-Cas9 cuts DNA",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "medical application",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "agricultural application",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "specific ethical concern",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "expect next ten years",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Agriculture and outlook absent; ethics is a vague mention with no specific concern."
+}

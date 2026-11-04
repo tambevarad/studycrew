@@ -1,0 +1,30 @@
+{
+  "id": "10-cs-os-exam",
+  "subject": "Computer Science",
+  "workType": "EXAM_PREP",
+  "instructions": "Operating systems final, topics to prepare:\n- Difference between a process and a thread\n- The four necessary conditions for deadlock\n- Paging versus segmentation\n- How round-robin scheduling works\n- What a semaphore is and how it prevents race conditions",
+  "draft": "A process has its own address space. Threads live inside a process and share its memory, so switching between threads is cheaper.\nDeadlock conditions: mutual exclusion and hold-and-wait.\nPaging splits memory into fixed-size pages, which avoids external fragmentation. Segmentation uses variable-size logical units such as code and stack, so it can fragment.\nRound robin gives each ready process a fixed time slice, then moves it to the back of the queue.",
+  "expected": [
+    {
+      "requirementHint": "difference process thread",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "four necessary conditions deadlock",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "paging segmentation",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "round-robin scheduling",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "semaphore prevents race conditions",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Two of four deadlock conditions; semaphores absent."
+}

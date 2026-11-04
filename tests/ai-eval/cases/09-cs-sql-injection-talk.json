@@ -1,0 +1,26 @@
+{
+  "id": "09-cs-sql-injection-talk",
+  "subject": "Computer Science",
+  "workType": "PRESENTATION",
+  "instructions": "Security talk: SQL injection.\nYour talk needs to:\n- Define what a SQL injection attack is\n- Show a vulnerable query with an example attack string\n- Present two defenses\n- Describe one real-world breach caused by SQL injection",
+  "draft": "A SQL injection attack happens when user input is pasted into a database query, so the attacker's text runs as part of the command.\nExample: the code builds \"SELECT * FROM users WHERE name = '\" + input + \"'\". If the input is ' OR '1'='1 then the query returns every user.\nThe main defense is parameterized queries, where the database treats the input only as a value and never as code.",
+  "expected": [
+    {
+      "requirementHint": "define SQL injection attack",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "vulnerable query example attack string",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "present two defenses",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "real-world breach SQL injection",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "One of two defenses; no real-world breach."
+}

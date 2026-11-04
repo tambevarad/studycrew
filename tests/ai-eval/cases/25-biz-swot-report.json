@@ -1,0 +1,30 @@
+{
+  "id": "25-biz-swot-report",
+  "subject": "Business",
+  "workType": "REPORT",
+  "instructions": "Strategy report: SWOT analysis of a local coffee chain.\nYour report must:\n- List at least two strengths\n- List at least two weaknesses\n- List at least two opportunities\n- List at least two threats\n- Recommend one strategic action based on the analysis",
+  "draft": "Strengths: The chain has a loyal customer base, and its stores sit next to three college campuses.\nWeaknesses: It has no mobile ordering, and it depends on one roaster for all of its beans.\nOpportunities: A new office park is opening nearby.",
+  "expected": [
+    {
+      "requirementHint": "list strengths SWOT",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "list weaknesses SWOT",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "list opportunities SWOT",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "list threats SWOT",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "recommend strategic action analysis",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "One of two opportunities; threats and the recommendation absent. Four similar requirements test matching."
+}

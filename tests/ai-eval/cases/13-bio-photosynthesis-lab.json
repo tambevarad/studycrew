@@ -1,0 +1,30 @@
+{
+  "id": "13-bio-photosynthesis-lab",
+  "subject": "Biology",
+  "workType": "REPORT",
+  "instructions": "Lab report: Light intensity and the rate of photosynthesis.\nYour report must include:\n- A testable hypothesis\n- The independent and dependent variables\n- A data table of bubbles counted at each distance\n- At least two sources of error\n- A conclusion that says whether the hypothesis was supported",
+  "draft": "We hypothesized that moving the lamp closer to the Elodea would increase the rate of photosynthesis.\nThe independent variable was the distance of the lamp from the plant.\nDistance (cm) / Bubbles per minute: 10 / 34, 20 / 21, 30 / 12, 40 / 6.\nThe numbers drop quickly as the lamp moves away, which matches what we saw in class.",
+  "expected": [
+    {
+      "requirementHint": "testable hypothesis photosynthesis",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "independent dependent variables",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "data table bubbles counted distance",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "sources error",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "conclusion hypothesis supported",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Dependent variable never named; no sources of error; no explicit conclusion on the hypothesis."
+}
