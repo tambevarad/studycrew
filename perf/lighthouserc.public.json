@@ -3,8 +3,7 @@
     "collect": {
       "url": ["http://localhost:3000/sign-in"],
       "numberOfRuns": 3,
-      "puppeteerLaunchOptions": { "args": ["--no-sandbox"] },
-      "settings": { "preset": "desktop" }
+      "settings": { "preset": "desktop", "chromeFlags": "--no-sandbox" }
     },
     "assert": {
       "assertions": {
