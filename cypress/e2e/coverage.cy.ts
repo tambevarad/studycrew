@@ -122,7 +122,14 @@ function fillForm(title: string) {
       "The AI service didn't respond in time. Nothing was lost — try again in a minute.",
     );
     cy.get("input[name=title]").should("not.have.value", ""); // input kept for a retry
-    cy.checkPageA11y();
+    cy.get("[data-sonner-toast]", { timeout: 10000 }).should("not.exist");
+    // D-02: this check went red once in CI and the log only said "1 accessibility violation", so name the rule on failure.
+    cy.injectAxe();
+    cy.checkA11y(undefined, { includedImpacts: ["serious", "critical"] }, (violations) => {
+      throw new Error(
+        `axe: ${JSON.stringify(violations.map((v) => ({ id: v.id, nodes: v.nodes.map((n) => n.html) })))}`,
+      );
+    });
   });
 });
 
