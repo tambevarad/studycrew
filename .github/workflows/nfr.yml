@@ -110,6 +110,8 @@ jobs:
         with:
           node-version: 24
       - run: npm install --no-save puppeteer@24
+      # LHCI finds no Chrome on the runner by itself ("Chrome installation not found"); use the one puppeteer downloaded.
+      - run: echo "CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")" >> "$GITHUB_ENV"
       - name: Find the seeded "StudyCrew Core" team (for the board and calendar pages)
         id: team
         run: |
