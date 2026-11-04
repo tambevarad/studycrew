@@ -65,7 +65,7 @@ passed in the CI run linked in §2.
 | FR-07 | AI Coverage Check: run, report, turn a gap into a task, rate it, evaluate | Must | PB-10 (#34), PB-11 (#42); PB-16 ⏳ | `coverage.cy.ts` (3), `coverage-actions.cy.ts` (2) | `coverage.test.ts`, `coverage-actions.test.ts` | `coverage-quotes.test.ts`, `coverage-scoring.test.ts`, `coverage-providers.test.ts`, `mock-model.test.ts`, `coverage-actions.test.ts` | ✅ check + actions · ⏳ evaluation (PB-16 runs manually with `npm run ai:eval`, never in CI) |
 | FR-08 | Milestones and templates | Should | PB-13 (#43) | `milestones.cy.ts` (4) | `milestones.test.ts` | `milestones.test.ts` | ✅ |
 | FR-09 | Group polls | Should | PB-14 (#50) | `polls.cy.ts` (1) | `polls.test.ts` | `polls.test.ts` | ✅ |
-| FR-10 | Meeting agenda and help-needed topics | Could | PB-15 ⏳ | — | — | — | ⏳ not merged |
+| FR-10 | Meeting agenda and help-needed topics | Could | PB-15 (#58) | `agenda.cy.ts` (2) | `agenda.test.ts` | `agenda.test.ts` | ✅ |
 | (all) | Foundation: shell, auth guard, health, permissions, helpers | — | PB-01 (#18, #20, #39) | `smoke.cy.ts` (5) | `foundation.test.ts`, `health.test.ts`, `authz-sweep.test.ts` | `foundation.test.ts` | ✅ |
 
 **PB-17 AC2** ("every Must FR links to at least one passing E2E spec"): **met for FR-01 … FR-07 on `059147c`**,
@@ -97,11 +97,12 @@ How to read this table:
 | PB-13 Milestones and templates | 4 | AC1, AC2, AC3, AC4 | — | — |
 | PB-12 Team dashboard and home (#45) | 5 | AC1, AC2, AC4, AC5 | AC3 | — |
 | PB-14 Group polls (#50) | 4 | AC1, AC2, AC3, AC4 (one test named "AC1–AC4") | — | — |
-| PB-15 Agenda · PB-16 AI evaluation | — | ⏳ not merged | | |
+| PB-15 Meeting agenda and help-needed topics (#58) | 3 | AC1, AC2, AC3 | — | — |
+| PB-16 AI evaluation | — | ⏳ not merged | | |
 
 Every acceptance criterion of every merged item has at least one passing, named test.
 
-### 4.1 PB-12 and PB-14: the named tests
+### 4.1 PB-12, PB-14 and PB-15: the named tests
 
 All of these passed in the CI run in §2.
 
@@ -116,6 +117,9 @@ All of these passed in the CI run in §2.
 | PB-14 AC2: one vote per member, changeable until close; 409 after | `polls.cy.ts` "AC1–AC4: …" | `polls.test.ts` "AC2: each member has one vote that can change until the poll closes"; "AC2: after closing, voting returns 409 “This poll has closed.”"; "AC2: a vote after the closing time closes the poll (lazy) and is rejected" | — |
 | PB-14 AC3: the final choice goes to activity; members notified | `polls.cy.ts` "AC1–AC4: …" | `polls.test.ts` "AC3: closing early records the winner in activity and notifies members (not the closer)"; "AC3: a poll past its closing time is closed lazily on the next list, with the result in activity"; "AC3: concurrent lazy closes close once, log once, and notify once" | `polls.test.ts` "summarizes the result for activity history (AC3)" |
 | PB-14 AC4: ties go to the first option; no votes → "No winner" | `polls.cy.ts` "AC1–AC4: …" | `polls.test.ts` "AC4: ties go to the option listed first; no votes → no winner" | `polls.test.ts` "AC4: a tie goes to the option listed first"; "AC4: no votes → no winner" |
+| PB-15 AC1: items sorted by how many members flagged them | `agenda.cy.ts` "AC1/AC2: add topics, flag one, and it moves to the top — accessibly" | `agenda.test.ts` "AC1: items are sorted by how many members flagged them, then oldest first" | — |
+| PB-15 AC2: a member can flag/unflag once; counts update | `agenda.cy.ts` "AC1/AC2: …" | `agenda.test.ts` "AC2: a member can flag and unflag once; sending it twice changes nothing"; "AC2: simultaneous flags from one member still count once" | `agenda.test.ts` "uses the right verb for one person and for several" (the count label) |
+| PB-15 AC3: only the author or a leader can delete; another team's meeting → 404 | `agenda.cy.ts` "AC3: another member can't delete a topic, but a leader can" | `agenda.test.ts` "AC3: the author and a leader can delete; another member gets 403"; "AC3: a meeting from another team is 404 for every action" | — |
 
 ## 5. Nonfunctional requirements
 
@@ -133,15 +137,15 @@ All of these passed in the CI run in §2.
 | ID | Found | Area (owner) | What happens | Severity | Status / next step |
 |---|---|---|---|---|---|
 | D-01 | 2026-11-01, Krish (reading `/join/[inviteCode]` while writing the usability script) | Invite links: PB-04 join page (Dev); shared `src/server/session.ts` (tech lead) | Signed out, opening `/join/<code>` redirects to `/sign-in` **without** `?next=`. Checked locally: `307 Location: /sign-in`. After signing up, the student lands on `/profile?welcome=1` and isn't on the team; they have to open the invite link again. The auth form already supports `?next=`; `requirePageUser()` doesn't pass it. `teams.cy.ts` signs in first, so it doesn't catch this. | 3 (major): first step of the core flow (usability T1) | **Fixed** in [#48](https://github.com/tambevarad/studycrew/pull/48) (contract: `src/proxy.ts` adds `?next=` before the `(app)` layout redirects; same-origin `safeNextPath` in `src/lib/safe-next.ts`) and [#49](https://github.com/tambevarad/studycrew/pull/49) (PB-04: `teams.cy.ts` "D-01: … signs up, and ends up on the team"), both merged. Checked on staging @ `5cd4cae` in the usability dry run (`docs/process/usability-test.md` §3.1). PB-02 follow-up (the sign-in form's own `safeNextPath` accepted a tab or newline before `//evil.com`): done in [#54](https://github.com/tambevarad/studycrew/pull/54) |
-| D-02 | 2026-10-23, CI | `coverage.cy.ts` "AC5: an AI failure is shown inline" (Devarsh, PB-10) | One red `e2e` run on `main` ([run 39914422898](https://github.com/tambevarad/studycrew/actions/runs/39914422898), docs-only commit `401f471`): "1 accessibility violation". Likely cause: the error toast is still fading in when axe runs. `docs/contract-requests/PB-02-toast-contrast.md` says specs must wait for toasts first, and this test doesn't. Not reproduced since; the next 4 runs are green. | 1 (test flake, no user impact) | **Fix in [#53](https://github.com/tambevarad/studycrew/pull/53)**: toast wait added, and on failure the test now names the axe rule and elements. Root cause still unknown: this flow fires no toast, and it didn't reproduce under a slow refresh or 4–20× CPU throttling |
+| D-02 | 2026-10-23, CI | `coverage.cy.ts` "AC5: an AI failure is shown inline" (Devarsh, PB-10) | One red `e2e` run on `main` ([run 39914422898](https://github.com/tambevarad/studycrew/actions/runs/39914422898), docs-only commit `401f471`): "1 accessibility violation". Likely cause: the error toast is still fading in when axe runs. `docs/contract-requests/PB-02-toast-contrast.md` says specs must wait for toasts first, and this test doesn't. Not reproduced since; the next 4 runs are green. | 1 (test flake, no user impact) | **Fix in [#53](https://github.com/tambevarad/studycrew/pull/53)**: toast wait added, and on failure the test now names the axe rule and elements. Root cause still unknown: this flow fires no toast, and it didn't reproduce under a slow refresh or 4–20× CPU throttling. Tracked in [#59](https://github.com/tambevarad/studycrew/issues/59) |
 | D-03 | 2026-11-01, Krish (PB-12) | Loading skeletons: `teams/[teamId]/board/loading.tsx`, `notifications/loading.tsx` (Krish), `teams/[teamId]/coverage/loading.tsx` (Devarsh) | Each puts `aria-label` on a `<div>` with no role: axe `aria-prohibited-attr` (serious) whenever a check runs while the skeleton shows. The same pattern failed `smoke.cy.ts` on PB-12's first skeleton; fixed there with `role="status"`. | 2 (minor: only while loading, but counts against NFR-03) | **Fixed**: board and notifications in [#47](https://github.com/tambevarad/studycrew/pull/47), coverage in [#53](https://github.com/tambevarad/studycrew/pull/53), each checked with axe on the real skeleton before and after |
 | D-04 | 2026-11-01, Krish (test report) | `cypress/e2e/board.cy.ts` (Krish, PB-05) | The board spec still excludes the sidebar (`aside`) from axe. That workaround was for the sidebar contrast bug, which #20 fixed, so the board page's sidebar isn't checked. (`smoke.cy.ts` does check the sidebar on a team page.) | 1 (test gap) | **Fixed** in [#47](https://github.com/tambevarad/studycrew/pull/47) (merged): `board.cy.ts` is back on `cy.checkPageA11y()` and passes with the sidebar included |
 | D-05 | 2026-11-03, Dev (the new 19-page axe sweep, `cypress/e2e/a11y-sweep.cy.ts`, run while writing PB-17) | Team Members page: `src/components/features/teams/members-view.tsx` (Dev, PB-04) | The leader's "Make leader" / "Make member" buttons have the accessible name "Make Krish Ruparel a leader", which doesn't contain the visible text "Make leader": axe `label-content-name-mismatch` (serious, WCAG 2.5.3 Label in Name). A voice-control user saying "click Make leader" can't activate it. `teams.cy.ts` only ran axe on a one-person team (no such buttons), so it didn't catch this. | 2 (minor: one control, but counts against NFR-03) | **Fixed** in [#51](https://github.com/tambevarad/studycrew/pull/51) (merged): names now start with the visible text ("Make leader: Krish Ruparel"), and `teams.cy.ts` runs axe after a second member joins |
 
 **Open contract requests (workarounds in place, not defects):**
 
-- `PB-04-update-team-isopen-default.md`: the PATCH route keeps a closed team closed. Covered by `teams.test.ts`.
-- `PB-06-dialog-ids-and-date-helpers.md`: `FindTimeDialog` is mounted only while open.
+- `PB-04-update-team-isopen-default.md`: the PATCH route keeps a closed team closed. Covered by `teams.test.ts`. Tracked in [#60](https://github.com/tambevarad/studycrew/issues/60).
+- `PB-06-dialog-ids-and-date-helpers.md`: `FindTimeDialog` is mounted only while open. Tracked in [#61](https://github.com/tambevarad/studycrew/issues/61).
 
 **Resolved:**
 
