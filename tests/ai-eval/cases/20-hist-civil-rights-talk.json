@@ -1,0 +1,30 @@
+{
+  "id": "20-hist-civil-rights-talk",
+  "subject": "History",
+  "workType": "PRESENTATION",
+  "instructions": "Class presentation: The Montgomery Bus Boycott.\nInclude:\n- What triggered the boycott\n- Who organized it\n- How long it lasted\n- The Supreme Court ruling that ended it\n- Why the boycott mattered for the wider movement",
+  "draft": "Slide 1: On December 1, 1955, Rosa Parks was arrested for refusing to give up her bus seat to a white passenger.\nSlide 2: The Women's Political Council and E. D. Nixon started the protest, and the Montgomery Improvement Association, led by Martin Luther King Jr., ran it.\nSlide 3: Black residents stayed off the buses for 381 days, walking or sharing rides.\nSlide 4: Browder v. Gayle (1956) ruled that segregated buses were unconstitutional.\nSlide 5: The boycott showed that mass nonviolent protest could win, and it made King a national leader.",
+  "expected": [
+    {
+      "requirementHint": "what triggered boycott",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "who organized boycott",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "how long lasted boycott",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "Supreme Court ruling ended",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "boycott mattered wider movement",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Clean draft, no gaps. 'Supreme Court' never appears by name, only the case. Any Missing is a false alarm."
+}
