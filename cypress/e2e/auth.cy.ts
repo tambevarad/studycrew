@@ -1,4 +1,4 @@
-/** PB-02 accounts and profiles: sign up → welcome → courses → save; wrong password; sign out; a11y (AC1–AC4, AC9); unsafe ?next= ignored (D-01). */
+/** PB-02 accounts and profiles: sign up → welcome → courses → save; wrong password; sign out; a11y (AC1–AC4, AC9); unsafe ?next= ignored (D-01); forms POST (D-06). */
 /**
  * Better Auth allows 3 sign-in (and, separately, 3 sign-up) requests per 10 s per IP in production, and other specs'
  * cy.login() calls share the sign-in window. UI submits here can't use cy.login's retry, so: submit, and if the server
@@ -106,6 +106,20 @@ describe("PB-02 accounts and profiles", () => {
     cy.location("pathname", { timeout: 15000 }).should("eq", "/dashboard");
     cy.location("origin").should("eq", new URL(Cypress.config("baseUrl")!).origin);
     cy.contains("h1", "Hi, Krish");
+  });
+
+  it("D-06: the sign-in and sign-up forms use method=post, so fields never go in the URL", () => {
+    // Without a method, a submit before React hydrates is a native GET: /sign-in?email=…&password=… (ZAP alert 10024).
+    // Once hydrated, onSubmit still prevents that and signs in with fetch, so the URL never gets the fields either way.
+    cy.visit("/sign-up");
+    cy.get("input[name=password]").closest("form").should("have.attr", "method", "post");
+    cy.visit("/sign-in");
+    cy.get("input[name=password]").closest("form").should("have.attr", "method", "post");
+    cy.get("input[name=email]").type("krish@studycrew.test");
+    cy.get("input[name=password]").type("studycrew-dev-pass");
+    submitWaitingOutRateLimit("signIn", () => cy.contains("button", "Sign in").click());
+    cy.location("pathname", { timeout: 15000 }).should("eq", "/dashboard");
+    cy.location("href").should("not.include", "password").and("not.include", "email=");
   });
 
   it("429: when sign-in is rate-limited, the form says how many seconds to wait", () => {
