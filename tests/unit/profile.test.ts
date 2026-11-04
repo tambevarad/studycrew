@@ -6,6 +6,7 @@ import {
   validateAuthFields,
 } from "@/components/features/auth/validation";
 import { addChip, COURSE_RULES, SKILL_RULES } from "@/components/features/profile/chips";
+import { safeNextPath as sharedSafeNextPath } from "@/lib/safe-next";
 import { dedupeCourses, dedupeSkills } from "@/server/services/profile/normalize";
 
 describe("PB-02 profile list normalization (server)", () => {
@@ -79,9 +80,22 @@ describe("PB-02 auth form validation", () => {
 
   it("only follows same-site ?next= paths", () => {
     expect(safeNextPath("/teams/abc")).toBe("/teams/abc");
+    expect(safeNextPath("/teams/abc/board?task=t1")).toBe("/teams/abc/board?task=t1");
     expect(safeNextPath("https://evil.example")).toBeNull();
     expect(safeNextPath("//evil.example")).toBeNull();
-    expect(safeNextPath("/\\evil.example")).toBeNull();
     expect(safeNextPath(null)).toBeNull();
+  });
+
+  it("rejects the tab, newline, and backslash tricks that browsers turn into //evil.example", () => {
+    expect(safeNextPath("/\t/evil.example")).toBeNull();
+    expect(safeNextPath("/\n/evil.example")).toBeNull();
+    expect(safeNextPath("/\r\n/evil.example")).toBeNull();
+    expect(safeNextPath("/\\evil.example")).toBeNull();
+    expect(safeNextPath("/\\/evil.example")).toBeNull();
+    expect(safeNextPath("/teams\\..\\..\\evil.example")).toBeNull();
+  });
+
+  it("is the shared @/lib/safe-next implementation, so sign-in and the proxy agree", () => {
+    expect(safeNextPath).toBe(sharedSafeNextPath);
   });
 });
