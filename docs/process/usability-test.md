@@ -3,6 +3,9 @@
 > **Status: plan ready, sessions not run yet.** The results tables in §9 are deliberately empty. Krish runs the sessions
 > with at least 5 students and fills them in from the timing sheets and SUS forms. Never fill in a cell with an
 > estimate, an example, or AI-generated data. A cell stays blank until a real session produced it.
+>
+> **Dry run on staging: 2026-11-03.** All five tasks work on staging, using seeded demo accounts only (§3.1). The
+> script below includes what the dry run changed.
 
 Owner: Krish Ruparel (M2) · Moderator: Krish · Note-taker: a teammate who didn't build the feature being tested
 
@@ -41,15 +44,48 @@ For each participant **P#**, as the moderator (signed in with your own account):
 2. Make sure the team has at least one other member **with saved availability** that overlaps Mon–Thu 6–9 pm (your
    own account, plus one helper account if you have one), so **Find a time** has something to suggest.
 3. Leave the board empty or with 1–2 tasks, and schedule no meetings this week.
-4. Check what `AI_PROVIDER` staging uses (`mock` or a real provider) and write it in the session log. With `mock`, the
-   Appendix A text gives a predictable result: one requirement is **Missing**.
-5. Open a fresh **private / incognito** browser window on the sign-up page. Have the invite link, the task cards, and
+4. **Staging uses a real AI provider.** On Nov 3 the consent box named *Anthropic Claude*, and the report said
+   `claude-haiku-5-5`. Write the provider and model shown on the report in the session log. Each account can run
+   10 checks a day.
+5. **Warm up staging** just before the participant arrives: open the team's Overview, Board, Calendar, and AI
+   Coverage Check once. On the dry run the first load of a tab took several seconds (a cold start), which would
+   otherwise count against the participant's time.
+6. Open a fresh **private / incognito** browser window on the sign-up page. Have the invite link, the task cards, and
    Appendix A printed or ready to paste in chat.
-6. Prepare a test email for the participant to sign up with: **`p#.usability@studycrew.test`**. It's a fake domain,
+7. Prepare a test email for the participant to sign up with: **`p#.usability@studycrew.test`**. It's a fake domain,
    so no real personal data is entered.
+8. Write the session's dates on the T3 and T4 cards (the next 7 days; the date of the next Friday), so the tasks
+   mean the same thing whatever day the session is on.
 
 After the last session: StudyCrew has no "delete team" or "delete account" feature yet, so send Dev the list of test
 emails and team names to remove from the staging database. **Never re-run the seed on staging:** it deletes all data.
+
+### 3.1 Dry run on staging (2026-11-03)
+
+Run by Krish's agent (Claude Code) on `https://studycrew-staging.vercel.app` at commit `5cd4cae` (#49, D-01 fix),
+using **seeded demo accounts only**. No team or account was created for it. The seeded **Olivia Outsider**
+(`outsider@studycrew.test`, on no team) played the participant, and the seeded team **Query Optimizers** (leader
+Maya Chen) played the team. Sign-up itself (the first half of T1) was **not** tried, so no new account was made.
+
+| Task | What was done | Result |
+|---|---|---|
+| T1 | Signed out, opened the team's invite link (`/join/query-opt-demo`) | Redirected to Sign in with `?next=/join/query-opt-demo`, and **"Create an account" keeps the same `next`**. After signing in, Olivia was back on "Join Query Optimizers"; **Join team** opened the team's Overview ("Olivia Outsider joined the team"). ✅ |
+| T2 | My availability: Clear all (Olivia had seeded times), dragged Mon 6:00 PM → Thu 8:30 PM, **Save availability** | "Availability saved"; after a reload, 24 half-hours, Mon–Thu 6–9 PM. ✅ |
+| T3 | Calendar → **Find a time** → Search (defaults: today + 6 days, 1 hour, 8 am–10 pm) → **Schedule** on the top result, title "Kickoff" | Wed Nov 4, 6:30–7:30 PM, "Everyone is free 2/2"; "Meeting scheduled — the team was notified"; the app opens the meeting's page. ✅ The same suggestions also appear under **Best times this week** on the Calendar page, each with its own Schedule button. |
+| T4 | Board → **New task**: title, due Fri Nov 6 5:00 PM, assignee Olivia → Add task; then **Move to…** → In Progress | After a reload: In Progress, assigned to Olivia, due Nov 6. ✅ The New task dialog also has a **Status** field, so "In Progress" can be set without moving the card. |
+| T5 | AI Coverage Check: Appendix A title, instructions, and draft; consent ticked; **Run check** | Report in 7.3 s (Anthropic `claude-haiku-5-5`): score 50. **Missing: "Recommend specific collaboration software…"**, as the card expects. ✅ See Appendix A for the full result. |
+
+**Data the dry run left on staging** (all in Query Optimizers; nothing was deleted):
+
+- Olivia Outsider is now a member.
+- Her availability changed from the seeded Mon–Fri 6–10 PM + Sat to Mon–Thu 6–9 PM.
+- The meeting "Kickoff" (Wed Nov 4, 6:30 PM CT; Maya was notified).
+- The task "Draft the introduction" (In Progress). An extra edit assigns Olivia: the agent's first form fill didn't
+  register the checkbox.
+- The coverage report "Remote work essay".
+- The matching activity events.
+
+Add these to the cleanup list for Dev.
 
 ## 4. Consent (read aloud; participant agrees before anything starts)
 
@@ -103,10 +139,10 @@ Print one card per task. Read the scenario aloud and leave the card with the par
 
 | # | Card text (give to the participant) | Success check (moderator only) | Watch for |
 |---|---|---|---|
-| **T1** | *"You're on a CSE 6324 project team. A teammate sent you this invite link. Create a StudyCrew account with the email on this card and join the team."* | The participant is a member: "Usability P#" is in their sidebar and they can open its Overview | **Known defect D-01** (see `docs/test-report.md`): signed out, the invite link goes to Sign in, and after signing up the student lands on their profile, not back on the invite. Note whether they reopen the link by themselves; a hint here counts as H. Are the password rules clear? |
+| **T1** | *"You're on a CSE 6324 project team. A teammate sent you this invite link. Create a StudyCrew account with the email on this card and join the team."* | The participant is a member: "Usability P#" is in their sidebar and they can open its Overview | The invite link opens **Sign in**. Do they find **Create an account**? (It keeps the invite: D-01, fixed in #49.) Are the password rules clear? After sign-up they should land on "Join Usability P#": do they press **Join team**? |
 | **T2** | *"Tell your team when you're usually free: Monday to Thursday, 6 pm to 9 pm. Save it."* | My availability shows Mon–Thu 18:00–21:00 after a reload (24 half-hour slots) | Do they find "My availability"? Drag vs. click on the grid? Do they notice the Save button and the confirmation? |
-| **T3** | *"Your team needs a one-hour meeting this week. Use StudyCrew to find a time when everyone is free and schedule it as 'Kickoff'."* | A meeting "Kickoff" of 60 min exists this week in the team calendar, at a suggested time | Do they find **Find a time**? Do they understand the ranking and time zones? Any doubt about whether it was saved? |
-| **T4** | *"Add a task 'Draft the introduction', assign it to yourself, and make it due this Friday. Then show your team you've started working on it."* | The board shows the card in **In Progress** with the participant as assignee and a Friday due date | Do they find the board? Assignee and due-date fields? Drag vs. the "Move to…" menu? |
+| **T3** | *"Your team needs a one-hour meeting in the next 7 days (by \_\_\_\_). Use StudyCrew to find a time when everyone is free and schedule it as 'Kickoff'."* | A 60-minute meeting "Kickoff" exists in the team calendar within those 7 days, at a time where everyone is free | Do they use **Best times this week** on the Calendar page or **Find a time**? Note which. Do they understand the ranking and time zones? After scheduling, the app opens the meeting's page: is it clear that it was saved? |
+| **T4** | *"Add a task 'Draft the introduction', assign it to yourself, and make it due on Friday (\_\_\_\_). Then show your team you've started working on it."* | The board shows the card in **In Progress** with the participant as assignee and that Friday as the due date | Do they find the board, and the assignee and due-date fields? Do they get to In Progress by the dialog's **Status** field, by dragging, or by **Move to…**? Note which; all three count. |
 | **T5** | *"Your team wrote a short draft. Use the AI Coverage Check to compare it with the assignment instructions (Appendix A), and tell me which requirement the draft is missing."* | A report is shown, and the participant names **"Recommend specific collaboration software…"** as missing | Do they find the tab? Do they read and tick the consent box? Do they understand Covered / Partial / Missing? |
 
 ## 6. SUS questionnaire
@@ -204,10 +240,16 @@ Add a row for each extra participant.
 
 ## Appendix A: sample text for T5
 
-Hand this to the participant to paste. It's made up for the test, so nobody's real coursework is sent anywhere. With
-the `mock` provider, it gives two **Covered** requirements and one **Missing** one (checked against
-`src/server/ai/mock-model.ts` on Nov 1, 2026). A real provider should give the same answer, but check before
-the sessions.
+Hand this to the participant to paste. It's made up for the test, so nobody's real coursework is sent anywhere.
+
+| Provider | Checked | Result |
+|---|---|---|
+| Staging, Anthropic `claude-haiku-5-5` | Nov 3, 2026 (dry run, §3.1) | Score 50 / 100 · **Missing:** "Recommend specific collaboration software…" · **Partial:** "Write between 400 and 600 words" (the model counts the length as a requirement) and the productivity comparison · **Covered:** the benefits |
+| `mock` (tests, local) | Nov 1, 2026 (`src/server/ai/mock-model.ts`) | Two **Covered**, one **Missing**: the same collaboration-software item |
+
+With either provider, exactly one requirement is **Missing**: the one T5 asks for. A real model can word things
+differently from run to run. If a session shows a different Missing item, write down what the report said, and score
+T5 on whether the participant reads the report correctly.
 
 **Assignment title:** Remote work essay
 
