@@ -19,7 +19,7 @@ pick a window when no usability session is scheduled (ask Krish).
    $a = [Net.NetworkCredential]::new('', (Read-Host 'Load-test password, 12+ characters' -AsSecureString)).Password
    $b = [Net.NetworkCredential]::new('', (Read-Host 'Same password again' -AsSecureString)).Password
    if ($a -ceq $b) { $env:LOAD_TEST_PASSWORD = $a; 'Passwords match' } else { 'They do not match: run these three lines again' }; Remove-Variable a, b
-   npx tsx perf/seed-load.ts --dry-run   # check "Target database:" is the Neon host, not localhost
+   npx tsx perf/seed-load.ts --dry-run   # writes nothing: check the Neon host, and that "latest non-load activity" is recent
    npx tsx perf/seed-load.ts
    Remove-Item Env:DATABASE_URL, Env:LOAD_TEST_PASSWORD
    ```

@@ -10,7 +10,7 @@
  *
  * Usage: set DATABASE_URL (on staging, the Neon DIRECT url) and LOAD_TEST_PASSWORD in your own shell from a hidden
  * prompt, never on the command line (perf/README.md has the exact commands), then:
- *   npx tsx perf/seed-load.ts --dry-run    # prints the plan and the target host, touches nothing
+ *   npx tsx perf/seed-load.ts --dry-run    # prints the plan, the target host, and what's in it; writes nothing
  *   npx tsx perf/seed-load.ts              # create
  *   npx tsx perf/seed-load.ts --reset-password   # only re-sets the 10 load accounts' password (e.g. after a typo)
  * The password is for the load accounts only. Keep it out of git; the nfr.yml workflow reads it from a repo secret.
@@ -50,12 +50,29 @@ async function main() {
   // Host and database name only (no user or password), so whoever runs it can see which database it will write to.
   const target = new URL(url);
   console.log(`Target database: ${target.hostname}${target.pathname}`);
-  if (dryRun) return;
-  const password = process.env.LOAD_TEST_PASSWORD;
-  if (!password || password.length < 12) throw new Error("Set LOAD_TEST_PASSWORD (12+ characters) for the load accounts.");
+  const password = process.env.LOAD_TEST_PASSWORD ?? "";
+  if (!dryRun && password.length < 12) {
+    throw new Error("Set LOAD_TEST_PASSWORD (12+ characters) for the load accounts.");
+  }
 
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
   try {
+    // Read-only summary, so whoever runs it can tell the live staging DB (recent activity) from an empty or local one.
+    const [userCount, teamCount, loadUsers, latest] = await Promise.all([
+      db.user.count(),
+      db.team.count(),
+      db.user.count({ where: { email: { startsWith: "load-", endsWith: "@studycrew.test" } } }),
+      db.activityEvent.findFirst({
+        where: { team: { courseCode: { not: LOAD_COURSE } } },
+        orderBy: { createdAt: "desc" },
+        select: { createdAt: true },
+      }),
+    ]);
+    console.log(
+      `It has ${userCount} users (${loadUsers} of them load users) and ${teamCount} teams; ` +
+        `latest non-load activity: ${latest ? latest.createdAt.toISOString() : "none"}.`,
+    );
+    if (dryRun) return;
     if (process.argv.includes("--reset-password")) {
       // Only the load accounts' password hash changes; their teams and every other row stay as they are.
       const emails = Array.from({ length: USERS }, (_, i) => loadEmail(i + 1));
