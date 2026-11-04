@@ -1,0 +1,30 @@
+{
+  "id": "08-cs-rest-api-design",
+  "subject": "Computer Science",
+  "workType": "ASSIGNMENT",
+  "instructions": "API design document for a campus library service.\nYour document must specify:\n- The list of endpoints with their HTTP methods\n- The authentication method\n- The error response format\n- A rate limiting policy\n- How the API will be versioned",
+  "draft": "Endpoints: GET /v1/books searches the catalog, GET /v1/books/{id} returns one book, POST /v1/loans checks a book out, and DELETE /v1/loans/{id} returns it.\nEvery request must send a JSON Web Token in the Authorization header, issued by the campus single sign-on service.\nThe version is part of the URL path. When we make a breaking change we will publish /v2 and keep /v1 running for one year so existing clients keep working.",
+  "expected": [
+    {
+      "requirementHint": "list endpoints HTTP methods",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "authentication method",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "error response format",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "rate limiting policy",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "API versioned versioning",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Error format and rate limiting absent. Versioning is covered in different words."
+}

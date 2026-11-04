@@ -1,0 +1,30 @@
+{
+  "id": "29-biz-supply-chain",
+  "subject": "Business",
+  "workType": "REPORT",
+  "instructions": "Case report: Supply chain disruption at a bicycle maker.\nYour report must:\n- Describe the disruption\n- Quantify its financial impact\n- Identify the root cause\n- Compare two alternative suppliers\n- Propose a contingency plan\nReports must be 4 to 6 pages. Email your instructor if you need an extension.",
+  "draft": "In March a fire closed the only factory that supplied the company's gear shifters, and production stopped for six weeks.\nThe shutdown cost about $2.1 million in lost sales and $300,000 in overtime to catch up.\nThe real problem was buying a critical part from a single source, with no backup and only two weeks of stock on hand.\nTo avoid this happening again, the company should keep eight weeks of safety stock and qualify a second supplier by next year.",
+  "expected": [
+    {
+      "requirementHint": "describe supply disruption",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "quantify financial impact",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "identify root cause",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "compare two alternative suppliers",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "propose contingency plan",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Supplier comparison absent, though 'second supplier' appears in the plan (keyword trap). Page and email logistics."
+}

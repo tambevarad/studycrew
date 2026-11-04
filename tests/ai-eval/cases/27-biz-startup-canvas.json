@@ -1,0 +1,26 @@
+{
+  "id": "27-biz-startup-canvas",
+  "subject": "Business",
+  "workType": "ASSIGNMENT",
+  "instructions": "Business model canvas for your startup idea.\nFill in:\n- Customer segments\n- Revenue streams\n- Key partners\n- Cost structure",
+  "draft": "Who we sell to: Small restaurants within ten miles of downtown that want to cut food waste.\nHow we make money: A $49 monthly subscription for each location, plus a small fee on every unsold meal we help them resell.\nWho we work with: A local food bank handles pickups, and a payment company processes the fees.\nWhat it costs to run: Our largest expenses are two developers, cloud hosting, and a part-time driver.",
+  "expected": [
+    {
+      "requirementHint": "customer segments",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "revenue streams",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "key partners",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "cost structure",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Clean draft in plain words, none of the canvas terms appear. Any Missing is a false alarm."
+}

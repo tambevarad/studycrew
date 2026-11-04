@@ -1,0 +1,30 @@
+{
+  "id": "02-psych-memory-lab",
+  "subject": "Psychology",
+  "workType": "REPORT",
+  "instructions": "Lab report: The serial position effect.\nInclude:\n1. A clear hypothesis\n2. The number of participants and how they were recruited\n3. The procedure used to present the word lists\n4. Recall results reported as means for each list position\n5. One limitation of the study",
+  "draft": "Hypothesis: We predicted that words at the start and end of a list would be recalled more often than words in the middle.\nParticipants: 24 psychology undergraduates were recruited through the department's research pool.\nProcedure: Each participant heard three lists of 15 unrelated words, one word every two seconds, then wrote down everything they could remember.\nResults: Mean recall was 71% for the first five positions, 38% for the middle five positions, and 66% for the last five positions.\nLimitation: The sample came from one course, so the results may not generalize to older adults.",
+  "expected": [
+    {
+      "requirementHint": "hypothesis lab report clear",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "number participants recruited",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "procedure present word lists",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "recall results means list position",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "limitation study one",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Clean draft, no gaps. Any Missing here is a false alarm."
+}

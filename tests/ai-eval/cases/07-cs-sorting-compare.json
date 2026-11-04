@@ -1,0 +1,30 @@
+{
+  "id": "07-cs-sorting-compare",
+  "subject": "Computer Science",
+  "workType": "REPORT",
+  "instructions": "Report: Quicksort versus mergesort.\nCover the following:\n- Average and worst-case time complexity of both algorithms\n- Space complexity of both algorithms\n- Whether each algorithm is stable\n- A benchmark table with at least three input sizes\n- A recommendation for sorting a large list of customer records",
+  "draft": "Both algorithms run in O(n log n) time on average. Mergesort stays O(n log n) in the worst case, while quicksort degrades to O(n^2) when the pivots are chosen badly, for example on already-sorted input with a first-element pivot.\nWe timed both in Python on a list of one million random integers: quicksort took 1.9 seconds and mergesort took 2.4 seconds.\nFor a large list of customer records we recommend mergesort, because its worst case is predictable.",
+  "expected": [
+    {
+      "requirementHint": "average worst-case time complexity algorithms",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "space complexity algorithms",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "whether algorithm stable stability",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "benchmark table input sizes",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "recommendation sorting large list customer records",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "No space complexity or stability; benchmark has one input size, not three."
+}

@@ -1,0 +1,30 @@
+{
+  "id": "06-psych-stress-survey",
+  "subject": "Psychology",
+  "workType": "ASSIGNMENT",
+  "instructions": "Design a short survey about academic stress.\nRequirements:\n- State your research question\n- Give an operational definition of academic stress\n- Write five Likert-scale items\n- Describe your sampling plan\n- Include an informed consent statement\nSubmit a PDF named lastname_survey.pdf and use 12-point font.",
+  "draft": "Research question: Does the number of credit hours predict how much pressure undergraduates feel about their coursework?\nIn this study, academic stress means a student's self-reported worry about grades, deadlines, and workload in the past two weeks.\nItems (1 = strongly disagree, 5 = strongly agree):\n1. I worry about my grades most days.\n2. I feel I have too many deadlines.\n3. My workload keeps me from sleeping enough.\nWe will post the survey in five general-education classes and invite every student there, aiming for about 150 responses.",
+  "expected": [
+    {
+      "requirementHint": "state research question survey",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "operational definition academic stress",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "five Likert-scale items",
+      "status": "PARTIAL"
+    },
+    {
+      "requirementHint": "describe sampling plan",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "informed consent statement",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Three of five items; no consent statement. File name and font logistics shouldn't become requirements."
+}

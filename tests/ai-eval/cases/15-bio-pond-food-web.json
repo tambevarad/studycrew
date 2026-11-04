@@ -1,0 +1,30 @@
+{
+  "id": "15-bio-pond-food-web",
+  "subject": "Biology",
+  "workType": "ASSIGNMENT",
+  "instructions": "Worksheet: Food web of a freshwater pond.\nAnswer each part:\na) Name two producers\nb) Name two primary consumers\nc) Identify the top predator\nd) Explain the role of decomposers\ne) Predict what happens if the top predator is removed",
+  "draft": "a) Algae and duckweed are the producers because they make their own food from sunlight.\nb) Tadpoles and water snails eat the algae, so they are primary consumers.\nc) The largemouth bass sits at the top of this food web, since nothing in the pond eats it.\ne) Without the bass, the number of small fish would grow quickly. They would eat more insects and tadpoles, and algae could then bloom because fewer animals graze on it.",
+  "expected": [
+    {
+      "requirementHint": "name two producers",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "name two primary consumers",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "identify top predator",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "role decomposers",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "predict top predator removed",
+      "status": "COVERED"
+    }
+  ],
+  "notes": "Part (d) skipped; everything else complete. Top predator appears in two requirements."
+}

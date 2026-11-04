@@ -1,0 +1,30 @@
+{
+  "id": "12-cs-git-workflow",
+  "subject": "Computer Science",
+  "workType": "ASSIGNMENT",
+  "instructions": "Team workflow document for your capstone project.\nDescribe:\n- Your branch naming convention\n- Your code review rule before merging\n- Which checks run in continuous integration\n- How the team resolves merge conflicts\n- Your release process\nUpload to Canvas by Sunday at midnight. Double-space the document.",
+  "draft": "Branches are named feat/<ticket>-<short-name> or fix/<ticket>-<short-name>.\nEvery pull request needs one approval from a teammate who did not write the code.\nOn each push, GitHub Actions runs the linter, the type checker, and the unit tests. A pull request can't be merged until all three pass.",
+  "expected": [
+    {
+      "requirementHint": "branch naming convention",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "code review rule merging",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "checks continuous integration",
+      "status": "COVERED"
+    },
+    {
+      "requirementHint": "resolves merge conflicts",
+      "status": "MISSING"
+    },
+    {
+      "requirementHint": "release process",
+      "status": "MISSING"
+    }
+  ],
+  "notes": "Merge conflicts and releases absent. Canvas deadline and double-spacing shouldn't become requirements."
+}
