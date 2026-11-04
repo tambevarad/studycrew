@@ -122,10 +122,14 @@ jobs:
           rm -f "$jar"
           if [ -z "$id" ]; then echo "::error::StudyCrew Core not found on $TARGET. Is the demo seed there?"; exit 1; fi
           echo "id=$id" >> "$GITHUB_OUTPUT"
-      - name: Lighthouse CI (6 pages, 3 runs each)
+      # Signed out first: once lhci-login.cjs has signed in, /sign-in redirects to /dashboard, so it can't be in the
+      # signed-in list (the first final run on Nov 3 audited /dashboard twice that way).
+      - name: Lighthouse CI, signed out (sign-in page, 3 runs)
+        run: npx --yes @lhci/cli@0.15 autorun --config=perf/lighthouserc.public.json --collect.url="$TARGET/sign-in"
+      - name: Lighthouse CI, signed in (5 pages, 3 runs each)
         run: |
+          rm -rf .lighthouseci
           npx --yes @lhci/cli@0.15 autorun --config=lighthouserc.json \
-            --collect.url="$TARGET/sign-in" \
             --collect.url="$TARGET/dashboard" \
             --collect.url="$TARGET/teams" \
             --collect.url="$TARGET/teams/${{ steps.team.outputs.id }}/board" \
@@ -135,7 +139,9 @@ jobs:
         if: always()
         with:
           name: lighthouse
-          path: perf/results/lighthouse/
+          path: |
+            perf/results/lighthouse/
+            perf/results/lighthouse-public/
 
   load:
     needs: [zap, lighthouse]
