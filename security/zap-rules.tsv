@@ -1,0 +1,2 @@
+# ZAP baseline rule overrides for StudyCrew (PB-17, NFR-02). Format: <rule id>	<IGNORE|WARN|FAIL>	<reason>.
+# Every override needs a reason. Keep this short; prefer fixing the finding.
