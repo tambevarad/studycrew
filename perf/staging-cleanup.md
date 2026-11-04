@@ -33,8 +33,9 @@ same evening didn't reach Neon (it found 0 load users), so there is exactly one 
 
 Runs: [41774963775](https://github.com/tambevarad/studycrew/actions/runs/41774963775) (04:44–04:46 UTC Nov 4; k6 stopped
 at its first sign-in), [41777022628](https://github.com/tambevarad/studycrew/actions/runs/41777022628) (05:04–05:11), and
-[41777216556](https://github.com/tambevarad/studycrew/actions/runs/41777216556) (05:11–05:24). Plus the /sign-in
-Lighthouse rerun, if it happens.
+[41777216556](https://github.com/tambevarad/studycrew/actions/runs/41777216556) (05:11–05:24). Plus two Lighthouse-only
+runs: [41780230678](https://github.com/tambevarad/studycrew/actions/runs/41780230678) (Chrome didn't start; staging
+wasn't contacted) and [41780610747](https://github.com/tambevarad/studycrew/actions/runs/41780610747) (05:41–05:44 UTC).
 
 ## 3. Usability dry run (`docs/process/usability-test.md` §3.1, Nov 3)
 
