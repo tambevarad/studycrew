@@ -1,0 +1,153 @@
+# PB-17 · NFR-01/02/03 — nonfunctional checks. MANUAL ONLY (workflow_dispatch): never on push or PR, because the load
+# test and the ZAP scan hit a live site (staging is also our demo site) and take minutes.
+# Run from Actions → "NFR checks" → Run workflow, ticking only the checks you want.
+# Results land in the run's artifacts; copy the numbers into docs/test-report.md §5 with the run link.
+name: NFR checks
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Site to test (no trailing slash)"
+        default: "https://studycrew-staging.vercel.app"
+        required: true
+      audit:
+        description: "NFR-02: npm audit --omit=dev"
+        type: boolean
+        default: true
+      bundle_scan:
+        description: "NFR-02: scan the client bundle for secrets (builds locally on the runner)"
+        type: boolean
+        default: true
+      zap:
+        description: "NFR-02: OWASP ZAP baseline against target_url"
+        type: boolean
+        default: false
+      lighthouse:
+        description: "NFR-03: Lighthouse CI on 6 pages of target_url"
+        type: boolean
+        default: false
+      load:
+        description: "NFR-01: k6 load test, 100 VUs for 5 min against target_url (needs perf/seed-load.ts run first)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nfr
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: inputs.audit
+    runs-on: ubuntu-latest
+    env:
+      CYPRESS_INSTALL_BINARY: 0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: node security/npm-audit.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-audit
+          path: security/out/
+
+  bundle-scan:
+    if: inputs.bundle_scan
+    runs-on: ubuntu-latest
+    env:
+      CYPRESS_INSTALL_BINARY: 0
+      # Dummy values (same as CI). Being set means the scanner also checks that their VALUES never reach the bundle.
+      DATABASE_URL: postgresql://studycrew:studycrew@localhost:5432/studycrew
+      BETTER_AUTH_SECRET: ci-secret-ci-secret-ci-secret-ci-secret-00
+      BETTER_AUTH_URL: http://localhost:3000
+      AI_PROVIDER: mock
+      OPENAI_API_KEY: sk-proj-dummy-value-for-the-bundle-scan-0000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: node security/scan-client-bundle.mjs .next/static
+
+  zap:
+    if: inputs.zap
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: OWASP ZAP baseline (passive scan, no attacks)
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ inputs.target_url }}
+          rules_file_name: security/zap-rules.tsv
+          cmd_options: "-a -j"
+          allow_issue_writing: false
+          artifact_name: zap-baseline
+
+  lighthouse:
+    if: inputs.lighthouse
+    runs-on: ubuntu-latest
+    env:
+      TARGET: ${{ inputs.target_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install --no-save puppeteer@24
+      - name: Find the seeded "StudyCrew Core" team (for the board and calendar pages)
+        id: team
+        run: |
+          jar=$(mktemp)
+          curl -sf -c "$jar" -X POST "$TARGET/api/auth/sign-in/email" -H "content-type: application/json" \
+            -H "origin: $TARGET" -d '{"email":"varad@studycrew.test","password":"studycrew-dev-pass"}' > /dev/null
+          id=$(curl -sf -b "$jar" "$TARGET/api/v1/teams?course=CSE%206324" | jq -r '.data[] | select(.name=="StudyCrew Core") | .id' | head -1)
+          rm -f "$jar"
+          if [ -z "$id" ]; then echo "::error::StudyCrew Core not found on $TARGET. Is the demo seed there?"; exit 1; fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+      - name: Lighthouse CI (6 pages, 3 runs each)
+        run: |
+          npx --yes @lhci/cli@0.15 autorun --config=lighthouserc.json \
+            --collect.url="$TARGET/sign-in" \
+            --collect.url="$TARGET/dashboard" \
+            --collect.url="$TARGET/teams" \
+            --collect.url="$TARGET/teams/${{ steps.team.outputs.id }}/board" \
+            --collect.url="$TARGET/teams/${{ steps.team.outputs.id }}/calendar" \
+            --collect.url="$TARGET/notifications"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse
+          path: perf/results/lighthouse/
+
+  load:
+    if: inputs.load
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: grafana/setup-k6-action@v1
+      - name: k6 (100 VUs, 5 min)
+        env:
+          BASE_URL: ${{ inputs.target_url }}
+          LOAD_TEST_PASSWORD: ${{ secrets.LOAD_TEST_PASSWORD }}
+        run: |
+          if [ -z "$LOAD_TEST_PASSWORD" ]; then echo "::error::Add the LOAD_TEST_PASSWORD repository secret first."; exit 1; fi
+          k6 run perf/load.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6
+          path: perf/results/

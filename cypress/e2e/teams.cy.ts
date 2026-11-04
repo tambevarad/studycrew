@@ -144,6 +144,10 @@ describe("PB-04 teams, invites, and join requests", () => {
     cy.contains("Olivia Outsider joined the team").should("be.visible");
     cy.get("ul[aria-label='Team members']").should("contain", "Olivia Outsider");
     cy.contains("No pending requests.").should("be.visible");
+    // D-05: with a second member the leader sees "Make leader" / "Remove" buttons; check them with axe too.
+    cy.get("button[aria-label='Make leader: Olivia Outsider']").should("contain", "Make leader");
+    waitForToastToClose("Olivia Outsider joined the team");
+    cy.checkPageA11y();
   });
 
   it("AC8: the only leader can't leave, and the reason is shown", () => {
