@@ -15,6 +15,7 @@ import {
   resultsTable,
   scoreCase,
   TARGETS,
+  terms,
   validateCases,
   type CaseRun,
   type EvalCase,
@@ -45,7 +46,16 @@ function score(want: ExpectedItem[], got: PredictedItem[]) {
 }
 
 describe("PB-16 matching", () => {
-  it("overlap is the share of the hint's keywords in the requirement", () => {
+  it("terms handle plurals, verb forms, hyphens, and possessives", () => {
+    expect(terms("sides")).toEqual(terms("side"));
+    expect(terms("cites")).toEqual(terms("cited"));
+    expect(terms("studies")).toEqual(terms("study"));
+    expect(terms("peer-reviewed Maya's")).toEqual(["peer", "review", "maya"]);
+    expect(terms("the of and explain")).toEqual([]);
+  });
+
+  it("overlap is the share of the hint's terms in the requirement", () => {
+    expect(overlap("compare two sides stronger", "State which side of the comparison is stronger")).toBe(1);
     expect(overlap("benefits social media", "Explain the benefits of social media")).toBe(1);
     expect(overlap("drawbacks social media", "Explain the benefits of social media")).toBeCloseTo(2 / 3);
     expect(overlap("space complexity", "Compare the time complexity")).toBe(0.5);
@@ -74,7 +84,7 @@ describe("PB-16 matching", () => {
     const m = matchItems(want, got);
     expect(m.matches.map((x) => x.predictedIndex)).toEqual([0]);
     expect(m.notExtracted).toEqual([1]);
-    expect(m.splits).toEqual([{ predictedIndex: 1, expectedIndex: 0 }]);
+    expect(m.splits).toEqual([{ predictedIndex: 1, expectedIndexes: [0] }]);
     expect(m.extras).toEqual([2]);
   });
 });
@@ -112,6 +122,16 @@ describe("PB-16 scoring", () => {
     ];
     expect(score([expected("cite peer-reviewed sources APA", "PARTIAL")], split).falsePositives).toBe(0);
     expect(score([expected("cite peer-reviewed sources APA", "COVERED")], split).falsePositives).toBe(1);
+  });
+
+  it("a split overlapping a Covered and a Missing requirement gets the benefit of the doubt", () => {
+    const want = [expected("benefits social media", "COVERED"), expected("drawbacks social media", "MISSING")];
+    const got = [
+      predicted("Explain the benefits of social media", "COVERED"),
+      predicted("Explain the drawbacks of social media", "MISSING"),
+      predicted("Compare the benefits and drawbacks of social media", "MISSING"),
+    ];
+    expect(score(want, got)).toMatchObject({ truePositives: 1, falsePositives: 0, falseNegatives: 0 });
   });
 
   it("fills the confusion matrix row by expected status", () => {

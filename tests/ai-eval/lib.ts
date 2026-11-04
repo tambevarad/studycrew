@@ -3,12 +3,12 @@
  * tests/unit/ai-eval.test.ts pins all of it with fixed inputs. scripts/ai-eval.ts does the running.
  */
 import { COVERAGE_STATUSES, WORK_TYPES, type CoverageStatusValue, type WorkTypeValue } from "@/contracts/coverage";
-import { keywords } from "@/server/ai/mock-model";
+import { STOPWORDS } from "@/server/ai/mock-model";
 
 export const SUBJECTS = ["Psychology", "Computer Science", "Biology", "History", "Business"] as const;
 export const CASES_PER_SUBJECT = 6;
 
-/** A predicted requirement matches an expected one when it contains at least half of the hint's keywords. */
+/** A predicted requirement matches an expected one when it contains at least half of the hint's terms. */
 export const MATCH_THRESHOLD = 0.5;
 
 export const TARGETS = {
@@ -58,18 +58,43 @@ export interface MatchResult {
   matches: Match[];
   /** Expected requirements the model never listed. */
   notExtracted: number[];
-  /** Predicted items that repeat part of an expected requirement already matched (the model split it). */
-  splits: Array<{ predictedIndex: number; expectedIndex: number }>;
+  /** Predicted items that overlap expected requirements already matched (the model split them). */
+  splits: Array<{ predictedIndex: number; expectedIndexes: number[] }>;
   /** Predicted items that match nothing in the labels. */
   extras: number[];
 }
 
-/** Share of the hint's keywords found in the predicted requirement. */
+function stem(word: string): string {
+  const singular = word
+    .replace(/ies$/, "y")
+    .replace(/sses$/, "ss")
+    .replace(/([^s])s$/, "$1");
+  return (singular.length > 4 ? singular.replace(/(ing|ed)$/, "") : singular).replace(/e$/, "");
+}
+
+/** Stemmed content words. Hyphens split ("peer-reviewed"), so "side"/"sides" and "cite"/"cited" compare equal. */
+export function terms(text: string): string[] {
+  const words =
+    text
+      .toLowerCase()
+      .replace(/'s\b/g, "")
+      .match(/[a-z0-9]{3,}/g) ?? [];
+  return [...new Set(words.filter((w) => !STOPWORDS.has(w)).map(stem))];
+}
+
+/** Same stem, or one is a long prefix of the other ("compar" and "comparison"). */
+function sameTerm(a: string, b: string): boolean {
+  if (a === b) return true;
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  return short.length >= 5 && long.startsWith(short);
+}
+
+/** Share of the hint's terms found in the predicted requirement. */
 export function overlap(hint: string, requirement: string): number {
-  const want = keywords(hint);
+  const want = terms(hint);
   if (want.length === 0) return 0;
-  const have = new Set(keywords(requirement));
-  return want.filter((k) => have.has(k)).length / want.length;
+  const have = terms(requirement);
+  return want.filter((k) => have.some((h) => sameTerm(k, h))).length / want.length;
 }
 
 /** Greedy one-to-one matching, best overlap first, so "drawbacks of X" can't take the slot of "benefits of X". */
@@ -99,8 +124,8 @@ export function matchItems(expected: ExpectedItem[], predicted: PredictedItem[])
   const extras: number[] = [];
   predicted.forEach((_, predictedIndex) => {
     if (usedPredicted.has(predictedIndex)) return;
-    const best = candidates.find((c) => c.predictedIndex === predictedIndex);
-    if (best) splits.push({ predictedIndex, expectedIndex: best.expectedIndex });
+    const expectedIndexes = candidates.filter((c) => c.predictedIndex === predictedIndex).map((c) => c.expectedIndex);
+    if (expectedIndexes.length > 0) splits.push({ predictedIndex, expectedIndexes });
     else extras.push(predictedIndex);
   });
 
@@ -132,8 +157,8 @@ export function emptyConfusion(): Confusion {
 
 /**
  * Missing is the status a student acts on, so it is scored strictly: a PARTIAL for an expected MISSING is a miss.
- * A split of a MISSING or PARTIAL requirement that says MISSING is neutral (part of it really is missing, and it mustn't
- * count twice). A MISSING on a split of a COVERED requirement, or on an unlabeled extra, is a false alarm.
+ * A split that says MISSING is neutral if any requirement it overlaps is MISSING or PARTIAL (part of it really is
+ * missing, and it mustn't count twice). If it only overlaps COVERED ones, or is an unlabeled extra, it's a false alarm.
  */
 export function scoreCase(expected: ExpectedItem[], predicted: PredictedItem[], match: MatchResult): CaseScore {
   const confusion = emptyConfusion();
@@ -154,8 +179,8 @@ export function scoreCase(expected: ExpectedItem[], predicted: PredictedItem[], 
     if (expected[i].status === "MISSING") falseNegatives += 1;
   }
   for (const s of match.splits) {
-    if (predicted[s.predictedIndex].status === "MISSING" && expected[s.expectedIndex].status === "COVERED")
-      falsePositives += 1;
+    const onlyCovered = s.expectedIndexes.every((i) => expected[i].status === "COVERED");
+    if (predicted[s.predictedIndex].status === "MISSING" && onlyCovered) falsePositives += 1;
   }
   for (const i of match.extras) {
     if (predicted[i].status === "MISSING") falsePositives += 1;
@@ -328,8 +353,7 @@ export function validateCases(cases: EvalCase[]): string[] {
     if (c.expected.length < 3) problems.push(`${c.id}: fewer than 3 labeled requirements`);
     for (const e of c.expected) {
       if (!COVERAGE_STATUSES.includes(e.status)) problems.push(`${c.id}: bad status ${e.status}`);
-      if (keywords(e.requirementHint).length === 0)
-        problems.push(`${c.id}: hint "${e.requirementHint}" has no keywords`);
+      if (terms(e.requirementHint).length === 0) problems.push(`${c.id}: hint "${e.requirementHint}" has no terms`);
     }
   }
   return problems;

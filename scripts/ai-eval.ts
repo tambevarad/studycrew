@@ -4,6 +4,7 @@
  *
  *   AI_PROVIDER=claude npm run ai:eval              full run (about $0.10), writes the results file
  *   AI_PROVIDER=claude npm run ai:eval -- --limit 2 first 2 cases, writes nothing
+ *   add --verbose to list what the model returned for each case
  *   npm run ai:eval -- --mock                       free dry run on the keyword mock, writes nothing
  *
  * Manual only: it refuses to start in CI or under Vitest (docs/contracts/testing.md). No database is touched.
@@ -153,6 +154,9 @@ async function main() {
       downgraded: run.predicted.filter((i) => i.reason.startsWith(UNVERIFIED_PREFIX)).length,
       notAssessed: run.predicted.filter((i) => i.reason === NOT_ASSESSED_REASON).length,
     });
+    if (args.includes("--verbose")) {
+      for (const item of run.predicted) console.log(`    ${item.status.padEnd(8)}${item.requirement}`);
+    }
     const s = run.score;
     console.log(
       `${c.id.padEnd(34)} ${(run.latencyMs / 1000).toFixed(1).padStart(5)} s  ` +
