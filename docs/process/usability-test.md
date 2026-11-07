@@ -209,7 +209,14 @@ Post-task comments and the final questions: \_\_\_\_
    Open a GitHub issue for every severity ≥ 2 and link it in §9.3.
 4. Copy the summary rows (§9.2) into `docs/test-report.md` under NFR-04 with a link back to this file.
 
-## 9. Results (to be filled in by Krish after the sessions; empty on purpose)
+## 9. Results
+
+> **No sessions were run (n = 0 of 5).** The team couldn't recruit student participants before the Nov 7, 2026
+> submission. The tables below are left empty on purpose: there are no completion times, outcomes or SUS scores, and
+> none were estimated or simulated. NFR-04 is reported as **not evaluated** in `docs/test-report.md` §5.
+>
+> Ready for a later run: this script, a moderator kit (kept outside the repo), and six private teams on staging (`Usability P1` … `P6`,
+> created Nov 7, listed in `perf/staging-cleanup.md` §4).
 
 ### 9.1 Session log
 
@@ -237,6 +244,20 @@ Add a row for each extra participant.
 | # | Task | What happened | Participants | Severity (0–4) | Issue / fix PR |
 |---|---|---|---|---|---|
 | | | | | | |
+
+### 9.4 Substitute evidence (not a usability result)
+
+This is what the team can show instead. It does **not** measure whether students can use StudyCrew, and it isn't
+counted as NFR-04 evidence:
+
+- **Dry run, Nov 3 (§3.1):** a team member's agent did T1–T5 through the UI on staging with seeded accounts. All five
+  tasks could be completed, and it changed the script: warm up staging first (cold starts took several seconds), T3
+  can also be done from **Best times this week**, T4 can also use the New task dialog's **Status** field, and the T3/T4
+  cards take concrete dates.
+- **Accessibility (NFR-03):** Lighthouse accessibility 100 on 6 pages; 0 serious/critical axe issues on 19 pages in
+  every CI run.
+- **Defect found while preparing the sessions and fixed:** D-01 (an invite link lost the destination through
+  sign-up, which was usability task T1; fixed in #48/#49).
 
 ## Appendix A: sample text for T5
 

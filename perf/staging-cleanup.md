@@ -50,16 +50,16 @@ All in the seeded demo team **Query Optimizers**. Undoing these puts the demo te
 | Coverage report "Remote work essay" | DB |
 | Activity rows for all of the above ("joined the team", "scheduled", "created", "moved", …) | DB (activity is a history, so it can't be undone in the app) |
 
-## 4. Usability sessions (Krish, after the sessions)
+## 4. Usability sessions (prepared Nov 7, not run)
 
-The script (§3) creates one set per participant P#. Krish fills in this table after the last session.
+No sessions were run (n = 0, see `docs/process/usability-test.md` §9), so no participant accounts exist. Only the
+empty teams prepared for them were created, on 2026-11-07 through the API with the moderators' seeded demo accounts.
 
 | What | How to recognize it | Undo |
 |---|---|---|
-| Participant accounts | `p1.usability@studycrew.test` … `p6.usability@studycrew.test` (Krish's plan on issue #17; P6 is a spare) | DB |
-| Teams | `Usability P1` … `Usability P6` in `CSE 6324` | DB (tasks, meetings, coverage reports, activity, and notifications go with the team) |
-| Helper accounts, if any | Krish lists them here | DB |
-| Changes to the moderator's own account (availability, team memberships) | Krish lists them here | App |
+| Participant accounts | none created (`p1.usability@studycrew.test` … `p6` were never used) | — |
+| Teams | `Usability P1`, `P3`, `P5` (leader `krish@studycrew.test`) and `Usability P2`, `P4`, `P6` (leader `varad@studycrew.test`), all private, course `CSE 6324`, no tasks, meetings or reports | DB, or keep them for sessions after submission |
+| Changes to the moderators' own accounts | Membership in those teams only; availability unchanged | App |
 
 ## How the DB deletes will work (not written yet)
 
