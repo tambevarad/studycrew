@@ -215,7 +215,7 @@ Post-task comments and the final questions: \_\_\_\_
 > submission. The tables below are left empty on purpose: there are no completion times, outcomes or SUS scores, and
 > none were estimated or simulated. NFR-04 is reported as **not evaluated** in `docs/test-report.md` §5.
 >
-> Ready for a later run: this script, the moderator kit, and six private teams on staging (`Usability P1` … `P6`,
+> Ready for a later run: this script, a moderator kit (kept outside the repo), and six private teams on staging (`Usability P1` … `P6`,
 > created Nov 7, listed in `perf/staging-cleanup.md` §4).
 
 ### 9.1 Session log
@@ -256,8 +256,8 @@ counted as NFR-04 evidence:
   cards take concrete dates.
 - **Accessibility (NFR-03):** Lighthouse accessibility 100 on 6 pages; 0 serious/critical axe issues on 19 pages in
   every CI run.
-- **Defects found while preparing the sessions and fixed:** D-01 (an invite link lost the destination through
-  sign-up, fixed in #48/#49, which was usability task T1) and D-06 (fixed in #69).
+- **Defect found while preparing the sessions and fixed:** D-01 (an invite link lost the destination through
+  sign-up, which was usability task T1; fixed in #48/#49).
 
 ## Appendix A: sample text for T5
 
